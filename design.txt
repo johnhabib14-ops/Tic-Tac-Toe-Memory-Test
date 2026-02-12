@@ -1,0 +1,440 @@
+﻿TITLE
+Tic Tac Toe Memory Test
+GOAL
+Build a simple web or mobile app that measures visual spatial working memory and recognition for symbol location patterns under time pressure, with increasing load and interference.
+CORE TASK SUMMARY
+The app briefly shows one or more tic tac toe style grids containing X and O symbols placed in specific cells. The grid disappears. The user must reconstruct the exact layout by tapping cells and choosing X or O for each selected cell. Difficulty increases by increasing the number of placed symbols, adding a second grid to remember, decreasing display time, adding delay, and adding interference via distractor shapes and decoy response options.
+IMPORTANT CONSTRAINTS
+1. Randomize layouts every trial.
+
+2. Some trials show partially filled grids, not always full.
+
+3. Two trials per level.
+
+4. Clearly instruct that only X and O count. Distractor shapes are noise.
+
+5. Record accuracy and reaction time.
+
+6. Final results page shows raw performance and a percentile comparison only if norms exist. If no norms exist, show “local sample comparison” or “not available yet.”
+
+________________
+
+
+USER FLOW PAGES
+PAGE 1: WELCOME AND DEMOGRAPHICS
+Title text at top: “Tic Tac Toe Memory Test”
+Subtitle: “A brief visual memory task. You will see grids very quickly. Try to remember exact symbol positions.”
+Fields, required:
+   1. Name (text input)
+
+   2. Age (number input, integer, range 10 to 90)
+
+   3. Gender (dropdown)
+Options: Male, Female, Nonbinary, Prefer not to say, Self describe
+
+   4. Location (text input, optional or required, your choice)
+
+Buttons:
+Start Test
+Validation:
+Do not allow start if Name, Age, Gender are empty.
+Store:
+Create a participant record with an anonymous id plus the demographics.
+________________
+
+
+PAGE 2: INSTRUCTIONS
+Title: “Instructions”
+Show short bullets, plain language. Include one example image or a small demo animation if easy. If not, text only is fine.
+Instruction text, use this wording exactly or close to it:
+      1. You will briefly see a grid with X and O symbols.
+
+      2. Your job is to remember the exact positions of X and O.
+
+      3. The grid will disappear. Then you will rebuild the grid from memory.
+
+      4. Tap a cell, then choose X or O to place in that cell.
+
+      5. Some trials include extra shapes like triangles. Ignore them. Only X and O matter.
+
+      6. Some trials will show two grids one after another. You must remember both in order.
+
+      7. Work as quickly and accurately as you can. Guess if you are unsure.
+
+Buttons:
+Begin
+Optional: Practice Trials toggle, default On
+________________
+
+
+PAGE 3: PRACTICE OPTIONAL
+If Practice is On, run 2 practice trials:
+Practice Trial 1: 3 by 3 grid, 1 symbol only, X in center
+Display time 3000 ms, no delay, no distractors, reconstruction for 1 grid
+Practice Trial 2: 3 by 3 grid, 2 symbols, random positions, no distractors
+Display time 2500 ms
+After practice, show a short message:
+“Practice complete. The test will now begin.”
+Button:
+Start Test
+________________
+
+
+PAGE 4: TEST LOOP
+Run levels. Each level has exactly 2 trials.
+Define these constants for shapes and visuals.
+Grid appearance:
+Background white or light neutral
+Grid lines dark gray
+Grid cell count depends on level, start at 3 by 3
+Cell size: responsive, but keep square cells
+Show grid centered
+Symbols:
+X drawn as two diagonal strokes
+O drawn as a circle outline
+Both black, thick line weight for visibility
+Distractor shapes:
+Triangle: equilateral outline
+Square: outline
+Star: simple 5 point outline
+Diamond: outline rhombus
+These distractors should appear only during the display phase, not counted in scoring.
+Make distractors a different color if you want, but they must still be clearly shapes.
+If you want to keep it simpler, make them gray and keep X and O black.
+Interference rule:
+When distractors are present, they can appear in empty cells or outside the grid margin.
+They must never replace X or O. X and O placements stay the targets.
+In instructions and UI labels, explicitly say ignore distractor shapes.
+Delay rule:
+After display, show a blank screen with a fixation cross for a delay that increases with difficulty.
+Two grid rule:
+When two grids are used, show Grid A then brief blank then Grid B.
+Then reconstruction phase requires rebuilding Grid A first, then Grid B second.
+________________
+
+
+LEVEL DESIGN
+Each level has parameters:
+GridSize
+NumTargets
+NumGrids
+DisplayTimeMs
+DelayMs
+HasDistractors
+NumDistractors
+ResponseDecoysEnabled
+Use gradual progression like this. You can tune numbers, but keep the structure.
+Level 1
+GridSize 3
+NumTargets 1
+NumGrids 1
+DisplayTimeMs 3000
+DelayMs 500
+HasDistractors false
+NumDistractors 0
+ResponseDecoysEnabled false
+Target layout rule for Level 1 Trial 1 only:
+X must be in center cell of 3 by 3
+Level 1 Trial 2:
+Random targets
+Level 2
+GridSize 3
+NumTargets 2
+NumGrids 1
+DisplayTimeMs 2500
+DelayMs 800
+Distractors false
+Level 3
+GridSize 3
+NumTargets 3
+NumGrids 1
+DisplayTimeMs 2000
+DelayMs 1000
+Distractors false
+Level 4
+GridSize 3
+NumTargets 4
+NumGrids 1
+DisplayTimeMs 1700
+DelayMs 1200
+Distractors true
+NumDistractors 1
+ResponseDecoysEnabled true
+Level 5
+GridSize 3
+NumTargets 5
+NumGrids 1
+DisplayTimeMs 1400
+DelayMs 1400
+Distractors true
+NumDistractors 2
+Decoys true
+Level 6
+GridSize 3
+NumTargets 6
+NumGrids 1
+DisplayTimeMs 1200
+DelayMs 1600
+Distractors true
+NumDistractors 2
+Decoys true
+Level 7
+GridSize 3
+NumTargets 7
+NumGrids 1
+DisplayTimeMs 1000
+DelayMs 1800
+Distractors true
+NumDistractors 3
+Decoys true
+Level 8
+GridSize 3
+NumTargets 8
+NumGrids 1
+DisplayTimeMs 900
+DelayMs 2000
+Distractors true
+NumDistractors 3
+Decoys true
+Level 9
+GridSize 3
+NumTargets 9
+NumGrids 1
+DisplayTimeMs 850
+DelayMs 2200
+Distractors true
+NumDistractors 3
+Decoys true
+Note: This is a fully filled 3 by 3 grid.
+After Level 9, introduce 2 grid trials.
+Level 10
+GridSize 3
+NumTargets 4 per grid
+NumGrids 2
+DisplayTimeMs 900 per grid
+InterGridBlankMs 300
+DelayMs 2000
+Distractors true
+NumDistractors 2 total during display, can split between grids
+Decoys true
+Level 11
+GridSize 3
+NumTargets 5 per grid
+NumGrids 2
+DisplayTimeMs 800 per grid
+InterGridBlankMs 250
+DelayMs 2200
+Distractors true
+NumDistractors 3
+Decoys true
+Level 12
+GridSize 4
+NumTargets 6
+NumGrids 1
+DisplayTimeMs 900
+DelayMs 2200
+Distractors true
+NumDistractors 3
+Decoys true
+Level 13
+GridSize 4
+NumTargets 8
+NumGrids 1
+DisplayTimeMs 800
+DelayMs 2400
+Distractors true
+NumDistractors 4
+Decoys true
+Level 14
+GridSize 4
+NumTargets 10
+NumGrids 1
+DisplayTimeMs 700
+DelayMs 2600
+Distractors true
+NumDistractors 4
+Decoys true
+Stop condition:
+Run all levels, no adaptive stopping.
+Optional alternative:
+Stop early if participant gets 0 correct on both trials of a level after Level 5.
+________________
+
+
+TRIAL GENERATION RULES
+For each grid in a trial:
+         1. Create list of all cells for GridSize by GridSize.
+
+         2. Randomly select NumTargets distinct cells as target positions.
+
+         3. For each target cell assign a symbol:
+Option A: 50 percent X and 50 percent O, random
+Option B: balanced count when possible, for example if NumTargets is even, half X half O
+Use Option B for cleaner scoring.
+
+         4. Ensure no two targets overlap obviously, overlap is already prevented by distinct cells.
+
+         5. For distractors:
+Select NumDistractors cells from remaining empty cells or positions outside grid.
+Choose distractor shape types randomly from Triangle, Star, Diamond, Square.
+Distractors must not occupy target cells.
+
+Special case:
+Level 1 Trial 1 must be X in center cell only.
+________________
+
+
+DISPLAY PHASE UI
+Show “Get ready” for 500 ms.
+Show the grid with symbols for DisplayTimeMs.
+If two grids:
+Show Grid A for DisplayTimeMs
+Show blank for InterGridBlankMs
+Show Grid B for DisplayTimeMs
+Then show fixation cross for DelayMs.
+________________
+
+
+RECONSTRUCTION PHASE UI
+Title at top: “Rebuild the grid”
+If two grids:
+Step label: “Grid 1 of 2” then later “Grid 2 of 2”
+Show empty grid.
+User places symbols.
+Placement interaction:
+Tap a cell opens a small selector:
+Option 1: X
+Option 2: O
+Option 3: Clear cell
+If ResponseDecoysEnabled is true, add decoy options in the selector:
+Triangle, Star, Diamond, Square
+But do not allow them to be submitted as correct targets.
+If the user places a decoy, treat it as an error for that cell.
+Also remind above grid: “Only X and O count. Ignore other shapes.”
+Submission:
+Button: Submit
+Allow editing until submit.
+Time limit for response:
+Optional but recommended.
+Set response time limit equal to max of 8000 ms and (NumTargets times 1500 ms).
+If time runs out, auto submit.
+Record reaction time:
+From start of reconstruction phase to submit or timeout.
+________________
+
+
+SCORING PER TRIAL
+For each grid:
+Target set is the exact mapping of cell to symbol.
+Compute:
+            1. CorrectPlacements:
+Count cells where the user placed the correct symbol in the correct cell.
+
+            2. CommissionErrors:
+Count cells where user placed any symbol in a cell that should be empty, including X, O, or decoys.
+
+            3. OmissionErrors:
+Count targets that were not placed correctly, meaning either left blank or wrong symbol.
+
+            4. GridAccuracyPercent:
+CorrectPlacements divided by NumTargets times 100
+
+TrialCorrectBinary:
+A trial is correct if GridAccuracyPercent is at least 80 percent and CommissionErrors is 0
+If you want stricter scoring, require 100 percent exact match. Pick one and keep it consistent.
+Two grid trials:
+Compute scores per grid and combine:
+CombinedCorrectPlacements equals sum across grids.
+CombinedNumTargets equals NumTargets times NumGrids.
+CombinedAccuracyPercent equals combined correct divided by combined targets.
+TrialCorrectBinary uses combined values.
+Store all trial details for later review.
+________________
+
+
+OVERALL SCORE
+Compute these summary metrics:
+               1. TotalCorrectPlacements across all trials
+
+               2. TotalTargets across all trials
+
+               3. OverallAccuracyPercent
+
+               4. MeanReactionTimeMs
+
+               5. LevelPassedCount: number of levels where at least 1 of 2 trials is TrialCorrectBinary true
+
+               6. HighestLevelPassed: maximum level with pass criteria met
+
+Primary score to show:
+HighestLevelPassed and OverallAccuracyPercent
+________________
+
+
+RESULTS PAGE
+Title: “Results”
+Show:
+Name
+Age
+Gender
+Date and time
+HighestLevelPassed
+OverallAccuracyPercent
+MeanReactionTimeMs
+Comparison section:
+If you do not have norms, do NOT fake percentile by age and gender.
+Instead implement one of these options:
+Option 1 Local sample only
+If the app has stored data from at least N equals 30 prior participants:
+Compute percentile within same age band and gender group, using bands:
+Age band 10 to 17, 18 to 25, 26 to 35, 36 to 50, 51 to 65, 66 plus
+Show “Percentile relative to local sample” with sample size.
+Option 2 No norms available
+Show: “Normative comparison not available yet. This tool requires a larger validation sample.”
+Also add:
+Button: Download results as JSON
+Button: Download results as CSV
+Optional: Show trial by trial table.
+________________
+
+
+DATA STORAGE
+Store in local database or browser storage or simple backend.
+Participant:
+id, name, age, gender, location, timestamp
+Trials:
+participantId, level, trialIndex, gridIndex, gridSize, numTargets, numGrids, displayTimeMs, delayMs, distractorCount, targetMap, responseMap, correctPlacements, commissionErrors, omissionErrors, accuracyPercent, reactionTimeMs, trialCorrectBinary
+TargetMap and ResponseMap format:
+Dictionary keyed by cell index.
+Cell index definition:
+For gridSize N, cellIndex equals row times N plus col, rows and cols zero based.
+Example for 3 by 3:
+Top left is 0, top middle 1, top right 2
+Middle left 3, center 4, middle right 5
+Bottom left 6, bottom middle 7, bottom right 8
+Symbol encoding:
+X, O, TRI, STAR, DIAMOND, SQUARE, EMPTY
+________________
+
+
+RANDOMIZATION AND REPRODUCIBILITY
+Use a random seed per participant session and store it.
+Allow a developer setting to replay a session with the same seed.
+________________
+
+
+ACCESSIBILITY
+Large symbols
+High contrast
+No reliance on color alone
+Touch friendly buttons
+________________
+
+
+MINIMUM VIABLE IMPLEMENTATION
+If time is short, build:
+Welcome page
+Instructions page
+Levels 1 through 10 only
+No local norms
+Results page with raw scores only
