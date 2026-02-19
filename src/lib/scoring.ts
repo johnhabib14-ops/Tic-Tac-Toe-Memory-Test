@@ -4,7 +4,7 @@ export function scoreGrid(
   targetMap: TargetMap,
   responseMap: ResponseMap,
   numTargets: number,
-  gridSize: number
+  _gridSize: number
 ): {
   correctPlacements: number;
   commissionErrors: number;

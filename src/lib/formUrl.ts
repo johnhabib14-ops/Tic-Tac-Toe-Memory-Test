@@ -46,7 +46,7 @@ export function buildFormPrefillUrl(participant: Participant, summary: SummaryMe
   params.set(`entry.${ENTRIES.age}`, String(safeNum(participant.age)));
   params.set(`entry.${ENTRIES.gender}`, formGender(participant.gender ?? ''));
   params.set(`entry.${ENTRIES.date}`, formatDate(participant.timestamp ?? new Date().toISOString()));
-  params.set(`entry.${ENTRIES.totalPoints}`, String(safeNum(summary.totalCorrectPlacements)));
+  params.set(`entry.${ENTRIES.totalPoints}`, String(safeNum(summary.memoryPoints)));
   params.set(`entry.${ENTRIES.totalIncorrectPlacements}`, String(safeNum(summary.totalIncorrectPlacements)));
   params.set(`entry.${ENTRIES.totalWrongShapeUsed}`, String(safeNum(summary.totalWrongShapeUsed)));
   params.set(`entry.${ENTRIES.highestLevelPassed}`, String(safeNum(summary.highestLevelPassed)));

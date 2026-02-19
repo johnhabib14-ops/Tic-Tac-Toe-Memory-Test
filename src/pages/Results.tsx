@@ -5,7 +5,7 @@ import { openFormInNewTab } from '../lib/formUrl';
 
 export default function Results() {
   const navigate = useNavigate();
-  const { participant, trials } = useAppState();
+  const { participant, trials, copyResult, setTrials, setCopyResult, setParticipant } = useAppState();
 
   if (!participant) {
     navigate('/');
@@ -15,7 +15,8 @@ export default function Results() {
   const summary = computeSummary(trials);
 
   function handleDownloadJSON() {
-    const data = { participant, trials };
+    if (!participant) return;
+    const data = { participant, trials, copyResult };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -26,6 +27,7 @@ export default function Results() {
   }
 
   function handleDownloadCSV() {
+    if (!participant) return;
     const headers = [
       'participantId', 'level', 'trialIndex', 'gridIndex', 'correctPlacements',
       'commissionErrors', 'wrongShapeInTarget', 'omissionErrors', 'accuracyPercent', 'reactionTimeMs', 'trialCorrectBinary',
@@ -45,7 +47,18 @@ export default function Results() {
   }
 
   function handleSubmitToStudy() {
+    if (!participant) return;
     openFormInNewTab(participant, summary);
+    setParticipant(null);
+    setTrials([]);
+    setCopyResult(null);
+    navigate('/');
+  }
+
+  function handleTakeTestAgain() {
+    setTrials([]);
+    setCopyResult(null);
+    navigate('/intro');
   }
 
   const dateStr = new Date(participant.timestamp).toLocaleString();
@@ -61,13 +74,16 @@ export default function Results() {
         <p><strong>Date:</strong> {dateStr}</p>
       </div>
       <div className="results-section">
-        <h3>Performance</h3>
-        <p><strong>Total points:</strong> {summary.totalCorrectPlacements ?? 0}</p>
-        <p><strong>Total incorrect placement:</strong> {summary.totalIncorrectPlacements ?? 0}</p>
-        <p><strong>Total wrong shape used:</strong> {summary.totalWrongShapeUsed ?? 0}</p>
+        <h3>Memory test</h3>
+        <p><strong>Memory points:</strong> {summary.memoryPoints ?? 0} / 22</p>
         <p><strong>Highest level passed:</strong> {summary.highestLevelPassed ?? 0}</p>
         <p><strong>Overall accuracy:</strong> {(summary.overallAccuracyPercent ?? 0).toFixed(1)}%</p>
         <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
+      </div>
+      <div className="results-section">
+        <h3>Copy task</h3>
+        <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 9` : '—'}</p>
+        <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
       </div>
       <div className="results-section">
         <h3>Comparison</h3>
@@ -75,6 +91,7 @@ export default function Results() {
       </div>
       <div className="results-actions">
         <button onClick={handleSubmitToStudy}>Submit results to study</button>
+        <button onClick={handleTakeTestAgain}>Take the test again</button>
         <button className="secondary" onClick={handleDownloadJSON}>Download results as JSON</button>
         <button className="secondary" onClick={handleDownloadCSV}>Download results as CSV</button>
       </div>

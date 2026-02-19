@@ -86,4 +86,10 @@ export interface SummaryMetrics {
   meanReactionTimeMs: number;
   levelPassedCount: number;
   highestLevelPassed: number;
+  memoryPoints: number; // 1 pt per correct level 1–18, 2 pt per correct level 19–20 (max 22)
+}
+
+export interface CopyResult {
+  score: number; // 0–9, 1 point per correctly placed shape
+  timeMs: number;
 }

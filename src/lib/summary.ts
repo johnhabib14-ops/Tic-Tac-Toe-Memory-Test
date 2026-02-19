@@ -24,6 +24,14 @@ export function computeSummary(trials: TrialRecord[]): SummaryMetrics {
   const highestLevelPassed =
     levelPassedCount === 0 ? 0 : Math.max(...Array.from(levelsWithPass));
 
+  // Memory points: 1 pt per correct level 1–18, 2 pt per correct level 19–20 (max 22)
+  let memoryPoints = 0;
+  trials.forEach((t) => {
+    if (!t.trialCorrectBinary) return;
+    if (t.level >= 1 && t.level <= 18) memoryPoints += 1;
+    else if (t.level >= 19 && t.level <= 20) memoryPoints += 2;
+  });
+
   return {
     totalCorrectPlacements,
     totalTargets,
@@ -33,6 +41,7 @@ export function computeSummary(trials: TrialRecord[]): SummaryMetrics {
     meanReactionTimeMs,
     levelPassedCount,
     highestLevelPassed,
+    memoryPoints,
   };
 }
 

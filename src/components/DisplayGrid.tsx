@@ -20,12 +20,18 @@ export default function DisplayGrid({ gridSize, displayMap }: DisplayGridProps) 
     >
       {Array.from({ length: n }, (_, i) => {
         const cell = displayMap[i];
+        const num = i + 1;
         if (!cell) {
-          return <div key={i} className="grid-cell" />;
+          return (
+            <div key={i} className="grid-cell">
+              <span className="cell-number">{num}</span>
+            </div>
+          );
         }
         if (cell.type === 'X') {
           return (
             <div key={i} className="grid-cell">
+              <span className="cell-number">{num}</span>
               <SymbolX />
             </div>
           );
@@ -33,12 +39,14 @@ export default function DisplayGrid({ gridSize, displayMap }: DisplayGridProps) 
         if (cell.type === 'O') {
           return (
             <div key={i} className="grid-cell">
+              <span className="cell-number">{num}</span>
               <SymbolO />
             </div>
           );
         }
         return (
           <div key={i} className="grid-cell">
+            <span className="cell-number">{num}</span>
             <DistractorShape cell={cell} />
           </div>
         );

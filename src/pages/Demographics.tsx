@@ -40,7 +40,7 @@ export default function Demographics() {
     };
     setParticipant(p);
     setTrials([]);
-    navigate('/instructions');
+    navigate('/intro');
   }
 
   return (

@@ -4,11 +4,9 @@ import SymbolX from './SymbolX';
 import SymbolO from './SymbolO';
 import DistractorShape from './DistractorShape';
 
-const DECOY_TYPES: Array<{ id: CellSymbol; cell: { type: 'TRI' | 'STAR' | 'DIAMOND' | 'SQUARE' } }> = [
+// Triangles only as decoys
+const DECOY_TYPES: Array<{ id: CellSymbol; cell: { type: 'TRI' } }> = [
   { id: 'TRI', cell: { type: 'TRI' } },
-  { id: 'STAR', cell: { type: 'STAR' } },
-  { id: 'DIAMOND', cell: { type: 'DIAMOND' } },
-  { id: 'SQUARE', cell: { type: 'SQUARE' } },
 ];
 
 interface ShapePaletteProps {

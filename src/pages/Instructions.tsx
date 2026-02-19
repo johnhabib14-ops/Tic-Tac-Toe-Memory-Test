@@ -1,16 +1,30 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppState } from '../context/AppState';
+import DisplayGrid from '../components/DisplayGrid';
+import type { DisplayMap } from '../types';
+
+function buildRandomExampleMap(): DisplayMap {
+  const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  const count = 4 + Math.floor(Math.random() * 2); // 4 or 5 cells
+  const shuffled = [...cells].sort(() => Math.random() - 0.5);
+  const chosen = shuffled.slice(0, count);
+  const map: DisplayMap = {};
+  chosen.forEach((i) => {
+    map[i] = { type: Math.random() < 0.5 ? 'X' : 'O' };
+  });
+  return map;
+}
 
 export default function Instructions() {
   const navigate = useNavigate();
-  const { practiceMode, setPracticeMode } = useAppState();
+  const [exampleDisplayMap, setExampleDisplayMap] = useState<DisplayMap>({});
+
+  useEffect(() => {
+    setExampleDisplayMap(buildRandomExampleMap());
+  }, []);
 
   function handleBegin() {
-    if (practiceMode) {
-      navigate('/practice');
-    } else {
-      navigate('/test');
-    }
+    navigate('/practice');
   }
 
   return (
@@ -21,20 +35,15 @@ export default function Instructions() {
           <li>You will see a grid with X and O (and sometimes other shapes to ignore).</li>
           <li>Remember the exact positions of X and O.</li>
           <li>The grid will disappear. Then you will rebuild the grid from memory.</li>
-          <li>Place shapes from the <strong>palette</strong> into the grid (drag or tap shape then tap cell).</li>
+          <li>Tap a shape in the <strong>palette</strong>, then tap a cell in the grid to place it.</li>
           <li>Only X and O count. Ignore other shapes.</li>
-          <li>Some trials will show two grids one after another. You must remember both in order.</li>
           <li>Work as quickly and accurately as you can. Guess if you are unsure.</li>
+          <li>Later you will also do a quick copy task: copy a grid into an empty grid as fast as you can.</li>
         </ul>
       </div>
-      <div className="toggle-row">
-        <input
-          type="checkbox"
-          id="practice"
-          checked={practiceMode}
-          onChange={(e) => setPracticeMode(e.target.checked)}
-        />
-        <label htmlFor="practice">Practice trials (recommended)</label>
+      <p style={{ marginBottom: '0.5rem' }}>Here&apos;s an example of a grid you might see:</p>
+      <div className="grid-container" style={{ marginBottom: '1.5rem' }}>
+        <DisplayGrid gridSize={3} displayMap={exampleDisplayMap} />
       </div>
       <button onClick={handleBegin}>Begin</button>
     </div>

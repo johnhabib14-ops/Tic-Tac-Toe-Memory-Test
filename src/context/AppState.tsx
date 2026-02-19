@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import type { Participant, TrialRecord } from '../types';
+import type { Participant, TrialRecord, CopyResult } from '../types';
 
 interface AppStateValue {
   participant: Participant | null;
@@ -7,8 +7,8 @@ interface AppStateValue {
   trials: TrialRecord[];
   addTrial: (t: TrialRecord) => void;
   setTrials: (t: TrialRecord[]) => void;
-  practiceMode: boolean;
-  setPracticeMode: (v: boolean) => void;
+  copyResult: CopyResult | null;
+  setCopyResult: (r: CopyResult | null) => void;
 }
 
 const AppStateContext = createContext<AppStateValue | null>(null);
@@ -16,7 +16,7 @@ const AppStateContext = createContext<AppStateValue | null>(null);
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [trials, setTrials] = useState<TrialRecord[]>([]);
-  const [practiceMode, setPracticeMode] = useState(true);
+  const [copyResult, setCopyResult] = useState<CopyResult | null>(null);
 
   const addTrial = useCallback((t: TrialRecord) => {
     setTrials((prev) => [...prev, t]);
@@ -28,8 +28,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     trials,
     addTrial,
     setTrials,
-    practiceMode,
-    setPracticeMode,
+    copyResult,
+    setCopyResult,
   };
 
   return (

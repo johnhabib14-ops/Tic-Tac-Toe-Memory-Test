@@ -7,7 +7,7 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/Tic-Tac-Toe-Memory-Test">
       <AppStateProvider>
         <App />
       </AppStateProvider>

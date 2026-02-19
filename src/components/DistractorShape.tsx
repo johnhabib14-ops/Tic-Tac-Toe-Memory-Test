@@ -7,8 +7,8 @@ export default function DistractorShape({ cell }: { cell: DisplayCell }) {
   switch (cell.type) {
     case 'TRI':
       return (
-        <svg {...common} strokeWidth="2">
-          <path d="M16 4 L28 26 L4 26 Z" />
+        <svg className="distractor distractor-svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round">
+          <path d="M16 4 L16 28 M4 16 L28 16" />
         </svg>
       );
     case 'STAR':

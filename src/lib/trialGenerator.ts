@@ -1,8 +1,9 @@
-import type { GridTrial, TrialConfig, TargetMap, DisplayMap, DisplayCell } from '../types';
+import type { GridTrial, TrialConfig, TargetMap, DisplayMap } from '../types';
 import { LEVELS } from './levelConfig';
 import { createSeededRandom, shuffle } from './seedRandom';
 
-const DISTRACTOR_TYPES: Array<'TRI' | 'STAR' | 'DIAMOND' | 'SQUARE'> = ['TRI', 'STAR', 'DIAMOND', 'SQUARE'];
+// Triangles only for distractors
+const DISTRACTOR_TYPE = 'TRI' as const;
 
 function buildCellIndices(gridSize: number): number[] {
   const n = gridSize * gridSize;
@@ -34,53 +35,39 @@ export function generateTrial(
   const seed = sessionSeed + level * 1000 + trialIndex * 100;
   const random = createSeededRandom(seed);
 
-  const grids: GridTrial[] = [];
-  for (let g = 0; g < params.numGrids; g++) {
-    const gridSeed = seed + g * 10;
-    const rnd = createSeededRandom(gridSeed);
-    const cellIndices = buildCellIndices(params.gridSize);
-    const n = params.gridSize * params.gridSize;
-    const centerCell = Math.floor(n / 2); // e.g. 4 for 3x3
+  const cellIndices = buildCellIndices(params.gridSize);
+  const targetCells = shuffle(cellIndices, random).slice(0, params.numTargets);
 
-    let targetCells: number[];
-    if (level === 1 && trialIndex === 0 && g === 0) {
-      targetCells = [centerCell];
-    } else {
-      targetCells = shuffle(cellIndices, rnd).slice(0, params.numTargets);
-    }
+  const symbols = balancedSymbols(targetCells.length, random);
+  const targetMap: TargetMap = {};
+  targetCells.forEach((cell, i) => {
+    targetMap[cell] = symbols[i];
+  });
 
-    const symbols = balancedSymbols(targetCells.length, rnd);
-    const targetMap: TargetMap = {};
-    targetCells.forEach((cell, i) => {
-      targetMap[cell] = symbols[i];
-    });
-
-    const displayMap: DisplayMap = {};
-    for (const c of targetCells) {
-      displayMap[c] = { type: targetMap[c] };
-    }
-
-    if (params.hasDistractors && params.numDistractors > 0) {
-      const emptyCells = cellIndices.filter((c) => targetMap[c] === undefined);
-      const distractorCells = shuffle(emptyCells, rnd).slice(0, params.numDistractors);
-      for (const c of distractorCells) {
-        const kind = DISTRACTOR_TYPES[Math.floor(rnd() * DISTRACTOR_TYPES.length)];
-        displayMap[c] = { type: kind };
-      }
-    }
-
-    grids.push({
-      gridSize: params.gridSize,
-      numTargets: params.numTargets,
-      targetMap,
-      displayMap,
-    });
+  const displayMap: DisplayMap = {};
+  for (const c of targetCells) {
+    displayMap[c] = { type: targetMap[c] };
   }
+
+  if (params.hasDistractors && params.numDistractors > 0) {
+    const emptyCells = cellIndices.filter((c) => targetMap[c] === undefined);
+    const distractorCells = shuffle(emptyCells, random).slice(0, params.numDistractors);
+    for (const c of distractorCells) {
+      displayMap[c] = { type: DISTRACTOR_TYPE };
+    }
+  }
+
+  const grid: GridTrial = {
+    gridSize: params.gridSize,
+    numTargets: params.numTargets,
+    targetMap,
+    displayMap,
+  };
 
   return {
     level,
     trialIndex,
-    grids,
+    grids: [grid],
     displayTimeMs: params.displayTimeMs,
     delayMs: params.delayMs,
     interGridBlankMs: params.interGridBlankMs,

@@ -21,7 +21,7 @@ interface ReconstructionGridProps {
 export default function ReconstructionGrid({
   gridSize,
   responseMap,
-  onPlace,
+  onPlace: _onPlace,
   onDrop,
   onCellClick,
 }: ReconstructionGridProps) {
@@ -63,6 +63,7 @@ export default function ReconstructionGrid({
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, i)}
           >
+            <span className="cell-number">{i + 1}</span>
             {sym === 'X' && <SymbolX />}
             {sym === 'O' && <SymbolO />}
             {sym !== 'X' && sym !== 'O' && sym !== 'EMPTY' && DECOY_MAP[sym] && (
