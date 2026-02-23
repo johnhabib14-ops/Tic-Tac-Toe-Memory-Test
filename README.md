@@ -38,10 +38,10 @@ A web app that measures visual spatial working memory: participants briefly see 
 
 Store every submission in Supabase and view/export from a PIN-protected page.
 
-1. **Supabase:** Create a project and a table `submissions` with columns: `id` (int8, identity), `created_at` (timestamptz, default `now()`), `participant_id`, `name`, `age`, `gender`, `location`, `timestamp`, `memory_points`, `highest_level_passed`, `overall_accuracy_percent`, `mean_reaction_time_ms`, `total_incorrect_placements`, `total_wrong_shape_used`, `copy_score`, `copy_time_ms` (all text or numeric as appropriate).
-2. **Vercel:** Import this repo as a project. In **Settings → Environment Variables** add: `SUPABASE_URL` (your Supabase project URL), `SUPABASE_ANON_KEY` (anon key), `DATA_SECRET` (a PIN you choose for the data page).
-3. **Build env:** In Vercel (or `.env` for local), set `VITE_API_URL` to your Vercel app URL (e.g. `https://your-app.vercel.app`).
-4. Deploy. Participants submit from the Results page; each submission is stored in Supabase. You open `https://your-app.vercel.app/pin` (or `/pin` on your domain), enter the same value as `DATA_SECRET`, and get to the Data page to Export JSON or CSV.
+1. **Supabase:** Create a project and a table `submissions` with columns: `id` (int8, identity), `created_at` (timestamptz, default `now()`), `participant_id`, `name`, `age`, `gender`, `location`, `timestamp`, `memory_points`, `highest_level_passed`, `overall_accuracy_percent`, `mean_reaction_time_ms`, `total_incorrect_placements`, `total_wrong_shape_used`, `copy_score`, `copy_time_ms` (all text or numeric as appropriate). The `location` column stores the participant’s education value.
+2. **Vercel:** Import this repo as a project. In **Settings → Environment Variables** add: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DATA_SECRET` (PIN for the data page), and `VITE_API_URL` (your Vercel app URL, e.g. `https://your-app.vercel.app` — required at build time). Redeploy after adding or changing env vars.
+3. **Base path (optional):** By default the app is served under `/Tic-Tac-Toe-Memory-Test/`. To serve at the Vercel root (e.g. `https://your-app.vercel.app/`), set `VITE_BASE_PATH=/` in Vercel and redeploy.
+4. Deploy. Test: open your app URL (with or without `/Tic-Tac-Toe-Memory-Test/` per step 3), complete the participant flow and submit; then open `/pin` (same base path), enter `DATA_SECRET`, and use the Data page to Export JSON or CSV.
 
 ## Sending results to Google Sheets
 
