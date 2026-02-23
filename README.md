@@ -1,4 +1,4 @@
-# Tic Tac Toe Memory Test
+# Grid Memory
 
 A web app that measures visual spatial working memory: participants briefly see grids with X and O (and sometimes distractor shapes), then reconstruct the layout by placing shapes from a palette into the grid. Results can be submitted to a Google Form (one row per participant).
 

@@ -8,7 +8,7 @@ export interface SheetPayload {
   name: string;
   age: number;
   gender: string;
-  location: string;
+  education: string;
   timestamp: string;
   memoryPoints: number;
   highestLevelPassed: number;
@@ -35,7 +35,7 @@ export function buildSheetPayload(
     name: String(participant.name ?? '').trim(),
     age: safeNum(participant.age),
     gender: participant.gender ?? '',
-    location: String(participant.location ?? '').trim(),
+    education: String(participant.education ?? '').trim(),
     timestamp: participant.timestamp ?? new Date().toISOString(),
     memoryPoints: safeNum(summary.memoryPoints),
     highestLevelPassed: safeNum(summary.highestLevelPassed),

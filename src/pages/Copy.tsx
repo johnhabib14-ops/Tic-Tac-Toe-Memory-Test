@@ -54,26 +54,36 @@ export default function Copy() {
   if (!copyGrid) return <div className="page">Loading...</div>;
 
   return (
-    <div className="page grid-container">
+    <div className="page copy-page">
       <h2 className="grid-title">Copy the grid</h2>
-      <p className="subtitle">Copy the grid below into the empty grid as fast and accurately as you can.</p>
-      <p style={{ fontWeight: 600, marginBottom: 0 }}>Reference grid (copy this):</p>
-      <DisplayGrid gridSize={copyGrid.gridSize} displayMap={copyGrid.displayMap} />
-      <p style={{ fontWeight: 600, marginBottom: 0 }}>Your copy:</p>
-      <ShapePalette
-        decoysEnabled={false}
-        onDragStart={() => {}}
-        selectedSymbol={selectedSymbol}
-        onSelectSymbol={setSelectedSymbol}
-      />
-      <ReconstructionGrid
-        gridSize={copyGrid.gridSize}
-        responseMap={responseMap}
-        onPlace={handlePlace}
-        onDrop={(cell, sym) => handlePlace(cell, sym)}
-        onCellClick={(cell) => selectedSymbol && handlePlace(cell, selectedSymbol)}
-      />
-      <button type="button" onClick={handleSubmit} style={{ marginTop: '1rem' }}>Submit</button>
+      <p className="subtitle">Copy the reference grid into the empty grid as fast and accurately as you can.</p>
+      <div className="copy-page-layout">
+        <div className="copy-reference">
+          <p className="copy-section-label">Reference (copy this)</p>
+          <div className="grid-container copy-grid-wrap">
+            <DisplayGrid gridSize={copyGrid.gridSize} displayMap={copyGrid.displayMap} />
+          </div>
+        </div>
+        <div className="copy-response">
+          <p className="copy-section-label">Your copy</p>
+          <ShapePalette
+            decoysEnabled={false}
+            onDragStart={() => {}}
+            selectedSymbol={selectedSymbol}
+            onSelectSymbol={setSelectedSymbol}
+          />
+          <div className="grid-container copy-grid-wrap">
+            <ReconstructionGrid
+              gridSize={copyGrid.gridSize}
+              responseMap={responseMap}
+              onPlace={handlePlace}
+              onDrop={(cell, sym) => handlePlace(cell, sym)}
+              onCellClick={(cell) => selectedSymbol && handlePlace(cell, selectedSymbol)}
+            />
+          </div>
+          <button type="button" onClick={handleSubmit} className="copy-submit">Submit</button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export interface Participant {
   name: string;
   age: number;
   gender: Gender;
-  location: string;
+  education: string;
   timestamp: string; // ISO
   sessionSeed: number;
 }

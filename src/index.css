@@ -60,6 +60,13 @@ input, select {
   border: 1px solid #888;
   border-radius: 6px;
   background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #6b4e9a;
+  box-shadow: 0 0 0 2px rgba(107, 78, 154, 0.25);
 }
 
 button {
@@ -71,10 +78,15 @@ button {
   background: #6b4e9a;
   color: #fff;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 button:hover {
   background: #5a3d8a;
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 button:disabled {
@@ -98,18 +110,54 @@ button.secondary:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: pageFadeIn 0.25s ease-out;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-instructions h1 {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.instructions {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
 }
 
 .instructions ul {
   text-align: left;
-  max-width: 420px;
-  margin: 0 auto 1.5rem;
+  max-width: 100%;
+  margin: 0;
   padding-left: 1.25rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .instructions li {
+  margin-bottom: 0.6rem;
+}
+
+.instructions-example-label {
   margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.instructions-example-grid {
+  margin-bottom: 1.5rem;
 }
 
 .toggle-row {
@@ -131,6 +179,68 @@ button.secondary:hover {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+}
+
+/* Copy page: two-column layout so reference and empty grid are both visible without scrolling */
+.copy-page {
+  max-width: 720px;
+}
+
+.copy-page-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.copy-reference,
+.copy-response {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.copy-section-label {
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.copy-grid-wrap {
+  margin-bottom: 0.5rem;
+}
+
+.copy-submit {
+  margin-top: 1rem;
+}
+
+/* Slightly smaller grids on copy page to fit both on screen */
+.copy-grid-wrap .grid {
+  grid-template-columns: repeat(4, 48px) !important;
+  grid-template-rows: repeat(4, 48px) !important;
+}
+
+.copy-grid-wrap .grid-cell {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.copy-grid-wrap .symbol-x,
+.copy-grid-wrap .symbol-o,
+.copy-grid-wrap .distractor-svg {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 639px) {
+  .copy-page-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grid-title {

@@ -24,7 +24,7 @@ const HEADERS = [
   'name',
   'age',
   'gender',
-  'location',
+  'education',
   'timestamp',
   'memoryPoints',
   'highestLevelPassed',

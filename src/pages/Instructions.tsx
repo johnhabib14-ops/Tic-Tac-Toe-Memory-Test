@@ -28,21 +28,21 @@ export default function Instructions() {
   }
 
   return (
-    <div className="page">
+    <div className="page page-instructions">
       <h1>Instructions</h1>
       <div className="instructions">
         <ul>
-          <li>You will see a grid with X and O (and sometimes other shapes to ignore).</li>
-          <li>Remember the exact positions of X and O.</li>
-          <li>The grid will disappear. Then you will rebuild the grid from memory.</li>
+          <li>You will see a grid with X and O (and sometimes a + symbol to ignore).</li>
+          <li>Memorize the exact positions of each X and O.</li>
+          <li>The grid will disappear — then place X and O from the palette into the empty grid in the same positions.</li>
           <li>Tap a shape in the <strong>palette</strong>, then tap a cell in the grid to place it.</li>
-          <li>Only X and O count. Ignore other shapes.</li>
+          <li>Only X and O matter; ignore the + symbol.</li>
           <li>Work as quickly and accurately as you can. Guess if you are unsure.</li>
-          <li>Later you will also do a quick copy task: copy a grid into an empty grid as fast as you can.</li>
+          <li>You will also do a quick copy task: copy a grid into an empty grid as fast as you can.</li>
         </ul>
       </div>
-      <p style={{ marginBottom: '0.5rem' }}>Here&apos;s an example of a grid you might see:</p>
-      <div className="grid-container" style={{ marginBottom: '1.5rem' }}>
+      <p className="instructions-example-label">Here&apos;s an example of a grid you might see:</p>
+      <div className="grid-container instructions-example-grid">
         <DisplayGrid gridSize={4} displayMap={exampleDisplayMap} />
       </div>
       <button onClick={handleBegin}>Begin</button>
