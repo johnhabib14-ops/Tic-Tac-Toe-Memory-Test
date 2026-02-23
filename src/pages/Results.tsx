@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../context/AppState';
 import { computeSummary } from '../lib/summary';
 import { openFormInNewTab } from '../lib/formUrl';
+import { isBackendConfigured, isSheetSubmitConfigured, submitToBackend, submitToGoogleSheet } from '../lib/submitToSheet';
 
 export default function Results() {
   const navigate = useNavigate();
   const { participant, trials, copyResult, setTrials, setCopyResult, setParticipant } = useAppState();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   if (!participant) {
     navigate('/');
@@ -46,13 +50,37 @@ export default function Results() {
     URL.revokeObjectURL(url);
   }
 
-  function handleSubmitToStudy() {
+  async function handleSubmitToStudy() {
     if (!participant) return;
-    openFormInNewTab(participant, summary);
-    setParticipant(null);
-    setTrials([]);
-    setCopyResult(null);
-    navigate('/');
+    setSubmitError(null);
+    if (isBackendConfigured()) {
+      setSubmitting(true);
+      try {
+        await submitToBackend(participant, summary, copyResult ?? null);
+        setParticipant(null);
+        setTrials([]);
+        setCopyResult(null);
+        navigate('/');
+      } catch (e) {
+        setSubmitError(e instanceof Error ? e.message : 'Failed to submit');
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+    if (isSheetSubmitConfigured()) {
+      submitToGoogleSheet(participant, summary, copyResult ?? null);
+      setParticipant(null);
+      setTrials([]);
+      setCopyResult(null);
+      navigate('/');
+    } else {
+      openFormInNewTab(participant, summary);
+      setParticipant(null);
+      setTrials([]);
+      setCopyResult(null);
+      navigate('/');
+    }
   }
 
   function handleTakeTestAgain() {
@@ -75,22 +103,25 @@ export default function Results() {
       </div>
       <div className="results-section">
         <h3>Memory test</h3>
-        <p><strong>Memory points:</strong> {summary.memoryPoints ?? 0} / 22</p>
+        <p><strong>Memory points:</strong> {summary.memoryPoints ?? 0} / 31</p>
         <p><strong>Highest level passed:</strong> {summary.highestLevelPassed ?? 0}</p>
         <p><strong>Overall accuracy:</strong> {(summary.overallAccuracyPercent ?? 0).toFixed(1)}%</p>
         <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
       </div>
       <div className="results-section">
         <h3>Copy task</h3>
-        <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 9` : '—'}</p>
+        <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 16` : '—'}</p>
         <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
       </div>
       <div className="results-section">
         <h3>Comparison</h3>
         <p>Normative comparison not available yet. This tool requires a larger validation sample.</p>
       </div>
+      {submitError && <p className="form-error" style={{ marginTop: '1rem' }}>{submitError}</p>}
       <div className="results-actions">
-        <button onClick={handleSubmitToStudy}>Submit results to study</button>
+        <button onClick={handleSubmitToStudy} disabled={submitting}>
+          {submitting ? 'Submitting…' : 'Submit results to study'}
+        </button>
         <button onClick={handleTakeTestAgain}>Take the test again</button>
         <button className="secondary" onClick={handleDownloadJSON}>Download results as JSON</button>
         <button className="secondary" onClick={handleDownloadCSV}>Download results as CSV</button>

@@ -13,20 +13,20 @@ const PRACTICE_TRIALS: { displayMs: number; delayMs: number; grid: GridTrial }[]
     displayMs: 2000,
     delayMs: 0,
     grid: {
-      gridSize: 3,
+      gridSize: 4,
       numTargets: 1,
-      targetMap: { 4: 'X' },
-      displayMap: { 4: { type: 'X' } },
+      targetMap: { 7: 'X' },
+      displayMap: { 7: { type: 'X' } },
     },
   },
   {
     displayMs: 2000,
     delayMs: 0,
     grid: {
-      gridSize: 3,
+      gridSize: 4,
       numTargets: 2,
-      targetMap: { 0: 'X', 8: 'O' },
-      displayMap: { 0: { type: 'X' }, 8: { type: 'O' } },
+      targetMap: { 2: 'X', 13: 'O' },
+      displayMap: { 2: { type: 'X' }, 13: { type: 'O' } },
     },
   },
 ];

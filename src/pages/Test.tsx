@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppState } from '../context/AppState';
 import { NUM_LEVELS } from '../lib/levelConfig';
 import { generateTrial } from '../lib/trialGenerator';
-import { scoreGrid, normalizeResponseMap } from '../lib/scoring';
+import { scoreGrid, normalizeResponseMap, getLevelPoints } from '../lib/scoring';
 import type { TrialConfig, GridTrial, ResponseMap, CellSymbol, TrialRecord } from '../types';
 import DisplayGrid from '../components/DisplayGrid';
 import FixationCross from '../components/FixationCross';
@@ -98,6 +98,14 @@ export default function Test() {
             currentGrid.numTargets,
             currentGrid.gridSize
           );
+          const levelPoints = getLevelPoints(
+            trialConfig.level,
+            result.correctPlacements,
+            currentGrid.numTargets,
+            result.commissionErrors
+          );
+          const maxForLevel = trialConfig.level <= 9 ? 1 : 2;
+          const isImperfect = levelPoints < maxForLevel;
           const reactionTimeMs = reconstructionStartRef.current > 0 ? Date.now() - reconstructionStartRef.current : 0;
           const record: TrialRecord = {
             participantId: participant.id,
@@ -119,11 +127,12 @@ export default function Test() {
             accuracyPercent: result.accuracyPercent,
             reactionTimeMs,
             trialCorrectBinary: result.trialCorrectBinary,
+            levelPoints,
           };
           addTrial(record);
-          recentOutcomesRef.current = [...recentOutcomesRef.current, result.trialCorrectBinary].slice(-3);
+          recentOutcomesRef.current = [...recentOutcomesRef.current, isImperfect].slice(-3);
           setHasRecordedThisTrial(true);
-          setPassed(result.trialCorrectBinary);
+          setPassed(levelPoints >= maxForLevel);
           setShowNextAfterTimeout(true);
           return 0;
         }
@@ -155,6 +164,14 @@ export default function Test() {
         currentGrid.numTargets,
         currentGrid.gridSize
       );
+      const levelPoints = getLevelPoints(
+        trialConfig.level,
+        result.correctPlacements,
+        currentGrid.numTargets,
+        result.commissionErrors
+      );
+      const maxForLevel = trialConfig.level <= 9 ? 1 : 2;
+      const isImperfect = levelPoints < maxForLevel;
       const reactionTimeMs = reconstructionStartRef.current > 0 ? Date.now() - reconstructionStartRef.current : 0;
       const record: TrialRecord = {
         participantId: participant.id,
@@ -176,11 +193,12 @@ export default function Test() {
         accuracyPercent: result.accuracyPercent,
         reactionTimeMs,
         trialCorrectBinary: result.trialCorrectBinary,
+        levelPoints,
       };
       addTrial(record);
-      recentOutcomesRef.current = [...recentOutcomesRef.current, result.trialCorrectBinary].slice(-3);
+      recentOutcomesRef.current = [...recentOutcomesRef.current, isImperfect].slice(-3);
       setHasRecordedThisTrial(true);
-      setPassed(result.trialCorrectBinary);
+      setPassed(levelPoints >= maxForLevel);
       setShowNextAfterTimeout(true);
     }
     handleNextRef.current();
@@ -189,7 +207,8 @@ export default function Test() {
   function handleNext() {
     if (!trialConfig || !currentGrid) return;
     const last3 = recentOutcomesRef.current;
-    if (last3.length >= 3 && last3.every((o) => !o)) {
+    // Discontinue after 3 consecutive imperfect scores (less than full points for that level)
+    if (last3.length >= 3 && last3.every((o) => o)) {
       navigate('/results');
       return;
     }

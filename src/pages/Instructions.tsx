@@ -4,8 +4,8 @@ import DisplayGrid from '../components/DisplayGrid';
 import type { DisplayMap } from '../types';
 
 function buildRandomExampleMap(): DisplayMap {
-  const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-  const count = 4 + Math.floor(Math.random() * 2); // 4 or 5 cells
+  const cells = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  const count = 5 + Math.floor(Math.random() * 3); // 5–7 cells
   const shuffled = [...cells].sort(() => Math.random() - 0.5);
   const chosen = shuffled.slice(0, count);
   const map: DisplayMap = {};
@@ -43,7 +43,7 @@ export default function Instructions() {
       </div>
       <p style={{ marginBottom: '0.5rem' }}>Here&apos;s an example of a grid you might see:</p>
       <div className="grid-container" style={{ marginBottom: '1.5rem' }}>
-        <DisplayGrid gridSize={3} displayMap={exampleDisplayMap} />
+        <DisplayGrid gridSize={4} displayMap={exampleDisplayMap} />
       </div>
       <button onClick={handleBegin}>Begin</button>
     </div>

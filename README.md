@@ -14,7 +14,9 @@ A web app that measures visual spatial working memory: participants briefly see 
    ```bash
    npm install
    ```
-2. (Optional) Copy `.env.example` to `.env` and set `VITE_GOOGLE_FORM_*` and `VITE_ENTRY_*` if you use a different form. Defaults point to the form and entry IDs in `PLAN.md`.
+2. (Optional) **Backend (Option B – recommended for online use):** To store submissions in Supabase and download them from a PIN-protected page, see [Option B: Vercel + Supabase](#option-b-vercel--supabase). Set `VITE_API_URL` in `.env` and deploy to Vercel with the API routes and env vars.  
+   (Optional) **Google Sheets:** To send results to a Google Sheet instead, see [Sending results to Google Sheets](#sending-results-to-google-sheets). Set `VITE_GOOGLE_SHEETS_SCRIPT_URL` in `.env`. Used only if `VITE_API_URL` is not set.  
+   (Optional) **Google Form fallback:** If neither is set, the app opens the Google Form with fields pre-filled.
 3. Run the app:
    ```bash
    npm run dev
@@ -30,7 +32,31 @@ A web app that measures visual spatial working memory: participants briefly see 
 2. **Instructions** – Task-only instructions; optional practice trials (default on).
 3. **Practice** – Two trials (X in center; then 2 symbols). Must pass each to continue.
 4. **Test** – Levels 1–10, 2 trials per level. Level 1 shows the grid for 5 seconds; difficulty increases (shorter display, delay, then distractors and decoys). Participant must get 100% correct to advance; 2-minute limit per reconstruction; test stops after 3 imperfect trials in a row.
-5. **Results** – Total points, highest level passed, accuracy, mean RT. “Submit results to study” opens the Google Form with fields pre-filled. Download JSON/CSV.
+5. **Results** – Total points, highest level passed, accuracy, mean RT. “Submit results to study” sends one row to your backend (if `VITE_API_URL` is set), or to your Google Sheet, or opens the Google Form. Download JSON/CSV.
+
+## Option B: Vercel + Supabase
+
+Store every submission in Supabase and view/export from a PIN-protected page.
+
+1. **Supabase:** Create a project and a table `submissions` with columns: `id` (int8, identity), `created_at` (timestamptz, default `now()`), `participant_id`, `name`, `age`, `gender`, `location`, `timestamp`, `memory_points`, `highest_level_passed`, `overall_accuracy_percent`, `mean_reaction_time_ms`, `total_incorrect_placements`, `total_wrong_shape_used`, `copy_score`, `copy_time_ms` (all text or numeric as appropriate).
+2. **Vercel:** Import this repo as a project. In **Settings → Environment Variables** add: `SUPABASE_URL` (your Supabase project URL), `SUPABASE_ANON_KEY` (anon key), `DATA_SECRET` (a PIN you choose for the data page).
+3. **Build env:** In Vercel (or `.env` for local), set `VITE_API_URL` to your Vercel app URL (e.g. `https://your-app.vercel.app`).
+4. Deploy. Participants submit from the Results page; each submission is stored in Supabase. You open `https://your-app.vercel.app/pin` (or `/pin` on your domain), enter the same value as `DATA_SECRET`, and get to the Data page to Export JSON or CSV.
+
+## Sending results to Google Sheets
+
+To skip the Google Form and have each participant’s results appended as one row in a Google Sheet:
+
+1. Create a new Google Sheet (e.g. “Tic-Tac-Toe Memory Test Results”).
+2. **Extensions → Apps Script**, then replace the default code with the contents of [scripts/GoogleSheetsWebApp.gs](./scripts/GoogleSheetsWebApp.gs) (see comments there for the same steps).
+3. **Deploy → New deployment → Web app**: Execute as “Me”, Who has access “Anyone”. Deploy and copy the **Web app URL**.
+4. In the project root, create or edit `.env` and set:
+   ```bash
+   VITE_GOOGLE_SHEETS_SCRIPT_URL=https://script.google.com/macros/s/YOUR_ID/exec
+   ```
+5. Rebuild and run the app. When a participant clicks **Submit results to study**, a new tab will POST the results to the script; the script appends one row to the sheet and shows “Results recorded.”
+
+Column order in the sheet: participantId, name, age, gender, location, timestamp, memoryPoints, highestLevelPassed, overallAccuracyPercent, meanReactionTimeMs, totalIncorrectPlacements, totalWrongShapeUsed, copyScore, copyTimeMs.
 
 ## Plan
 

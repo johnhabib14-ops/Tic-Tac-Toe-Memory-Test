@@ -25,7 +25,8 @@ export default function Copy() {
       navigate('/');
       return;
     }
-    const config = generateTrial(9, 0, participant.sessionSeed + COPY_SEED_OFFSET);
+    // Level 20 = 4x4 full grid (16 targets) for copy task
+    const config = generateTrial(20, 0, participant.sessionSeed + COPY_SEED_OFFSET);
     setCopyGrid(config.grids[0]);
     startTimeRef.current = Date.now();
   }, [participant, navigate]);

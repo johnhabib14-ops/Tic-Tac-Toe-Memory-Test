@@ -10,7 +10,7 @@ export default function CopyInstructions() {
         You will see a grid with X and O symbols. Your task is to copy it exactly into the empty grid below as fast and accurately as you can.
       </p>
       <p className="subtitle">
-        Use the palette to place X or O in each cell. You get 1 point for each correctly placed shape (9 points maximum).
+        Use the palette to place X or O in each cell. You get 1 point for each correctly placed shape (16 points maximum).
       </p>
       <button onClick={() => navigate('/copy')}>Next</button>
     </div>

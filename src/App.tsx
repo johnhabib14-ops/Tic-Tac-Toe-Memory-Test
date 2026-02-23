@@ -10,6 +10,8 @@ import TrianglesWarning from './pages/TrianglesWarning';
 import BigGridWarning from './pages/BigGridWarning';
 import Copy from './pages/Copy';
 import Results from './pages/Results';
+import PinGate from './pages/PinGate';
+import Data from './pages/Data';
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
       <Route path="/test/big-grid-warning" element={<BigGridWarning />} />
       <Route path="/copy" element={<Copy />} />
       <Route path="/results" element={<Results />} />
+      <Route path="/pin" element={<PinGate />} />
+      <Route path="/data" element={<Data />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

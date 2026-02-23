@@ -1,6 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly VITE_API_URL?: string;
+  readonly VITE_GOOGLE_SHEETS_SCRIPT_URL?: string;
   readonly VITE_GOOGLE_FORM_BASE?: string;
   readonly VITE_ENTRY_NAME?: string;
   readonly VITE_ENTRY_AGE?: string;

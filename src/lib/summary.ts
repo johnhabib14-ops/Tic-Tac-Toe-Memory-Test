@@ -1,5 +1,16 @@
 import type { TrialRecord, SummaryMetrics } from '../types';
 
+/** Level points for this trial (0, 1, or 2). Fallback for records without levelPoints. */
+function getTrialLevelPoints(t: TrialRecord): number {
+  if (t.levelPoints !== undefined && t.levelPoints !== null) return t.levelPoints;
+  if (t.level >= 1 && t.level <= 9) return t.trialCorrectBinary ? 1 : 0;
+  if (t.level >= 10 && t.level <= 20) {
+    if (t.trialCorrectBinary) return 2;
+    return (t.correctPlacements ?? 0) >= 5 ? 1 : 0;
+  }
+  return 0;
+}
+
 export function computeSummary(trials: TrialRecord[]): SummaryMetrics {
   const totalCorrectPlacements = trials.reduce((s, t) => s + (t.correctPlacements ?? 0), 0);
   const totalTargets = trials.reduce((s, t) => s + (t.numTargets ?? 0), 0);
@@ -18,19 +29,16 @@ export function computeSummary(trials: TrialRecord[]): SummaryMetrics {
 
   const levelsWithPass = new Set<number>();
   trials.forEach((t) => {
-    if (t.trialCorrectBinary) levelsWithPass.add(t.level);
+    const pts = getTrialLevelPoints(t);
+    const maxForLevel = t.level <= 9 ? 1 : 2;
+    if (pts >= maxForLevel) levelsWithPass.add(t.level);
   });
   const levelPassedCount = levelsWithPass.size;
   const highestLevelPassed =
     levelPassedCount === 0 ? 0 : Math.max(...Array.from(levelsWithPass));
 
-  // Memory points: 1 pt per correct level 1–18, 2 pt per correct level 19–20 (max 22)
-  let memoryPoints = 0;
-  trials.forEach((t) => {
-    if (!t.trialCorrectBinary) return;
-    if (t.level >= 1 && t.level <= 18) memoryPoints += 1;
-    else if (t.level >= 19 && t.level <= 20) memoryPoints += 2;
-  });
+  // Memory points: sum of levelPoints (max 31: 9×1 + 11×2)
+  const memoryPoints = trials.reduce((s, t) => s + getTrialLevelPoints(t), 0);
 
   return {
     totalCorrectPlacements,
@@ -48,5 +56,9 @@ export function computeSummary(trials: TrialRecord[]): SummaryMetrics {
 export function shouldDiscontinue(trials: TrialRecord[]): boolean {
   if (trials.length < 3) return false;
   const last3 = trials.slice(-3);
-  return last3.every((t) => !t.trialCorrectBinary);
+  return last3.every((t) => {
+    const pts = getTrialLevelPoints(t);
+    const maxForLevel = t.level <= 9 ? 1 : 2;
+    return pts < maxForLevel;
+  });
 }

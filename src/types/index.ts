@@ -75,6 +75,7 @@ export interface TrialRecord {
   accuracyPercent: number;
   reactionTimeMs: number;
   trialCorrectBinary: boolean; // perfect = 100% and 0 commission
+  levelPoints: number; // 0, 1, or 2 for this level (1–9: max 1; 10–20: max 2)
 }
 
 export interface SummaryMetrics {
@@ -86,7 +87,7 @@ export interface SummaryMetrics {
   meanReactionTimeMs: number;
   levelPassedCount: number;
   highestLevelPassed: number;
-  memoryPoints: number; // 1 pt per correct level 1–18, 2 pt per correct level 19–20 (max 22)
+  memoryPoints: number; // sum of levelPoints; max 31 (9×1 + 11×2)
 }
 
 export interface CopyResult {

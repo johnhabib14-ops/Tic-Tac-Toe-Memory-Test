@@ -47,6 +47,25 @@ export function scoreGrid(
   };
 }
 
+/** Points for this level: 1–9 → 0 or 1; 10–20 → 0, 1, or 2 (2 = perfect, 1 = 5+ correct). */
+export function getLevelPoints(
+  level: number,
+  correctPlacements: number,
+  numTargets: number,
+  commissionErrors: number
+): 0 | 1 | 2 {
+  const perfect = correctPlacements === numTargets && commissionErrors === 0;
+  if (level >= 1 && level <= 9) {
+    return perfect ? 1 : 0;
+  }
+  if (level >= 10 && level <= 20) {
+    if (perfect) return 2;
+    if (correctPlacements >= 5) return 1;
+    return 0;
+  }
+  return 0;
+}
+
 export function normalizeResponseMap(
   responseMap: ResponseMap,
   gridSize: number

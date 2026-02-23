@@ -39,13 +39,16 @@ export function generateTrial(
   const targetCells = shuffle(cellIndices, random).slice(0, params.numTargets);
 
   const symbols = balancedSymbols(targetCells.length, random);
+  // Shuffle (cell, symbol) pairs so placement has no pattern (avoids X/O clusters)
+  const pairs = targetCells.map((cell, i) => ({ cell, symbol: symbols[i] }));
+  const shuffledPairs = shuffle(pairs, random);
   const targetMap: TargetMap = {};
-  targetCells.forEach((cell, i) => {
-    targetMap[cell] = symbols[i];
+  shuffledPairs.forEach(({ cell, symbol }) => {
+    targetMap[cell] = symbol;
   });
 
   const displayMap: DisplayMap = {};
-  for (const c of targetCells) {
+  for (const c of Object.keys(targetMap).map(Number)) {
     displayMap[c] = { type: targetMap[c] };
   }
 
