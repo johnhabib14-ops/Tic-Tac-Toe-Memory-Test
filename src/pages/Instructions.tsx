@@ -38,7 +38,6 @@ export default function Instructions() {
           <li>Tap a shape in the <strong>palette</strong>, then tap a cell in the grid to place it.</li>
           <li>Only X and O matter; ignore the + symbol.</li>
           <li>Work as quickly and accurately as you can. Guess if you are unsure.</li>
-          <li>You will also do a quick copy task: copy a grid into an empty grid as fast as you can.</li>
         </ul>
       </div>
       <p className="instructions-example-label">Here&apos;s an example of a grid you might see:</p>

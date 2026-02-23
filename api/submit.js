@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     name: body.name ?? '',
     age: Number(body.age) || 0,
     gender: body.gender ?? '',
-    location: body.location ?? '',
+    location: body.education ?? body.location ?? '',
     timestamp: body.timestamp ?? '',
     memory_points: Number(body.memoryPoints) || 0,
     highest_level_passed: Number(body.highestLevelPassed) || 0,

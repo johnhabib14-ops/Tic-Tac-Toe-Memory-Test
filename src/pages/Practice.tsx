@@ -39,7 +39,6 @@ export default function Practice() {
   const [trialIndex, setTrialIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('getReady');
   const [responseMap, setResponseMap] = useState<ResponseMap>({});
-  const [passed, setPassed] = useState(false);
   const [selectedSymbol, setSelectedSymbol] = useState<CellSymbol | null>(null);
   const [bothPassed, setBothPassed] = useState(false);
   const [showTryAgain, setShowTryAgain] = useState(false);
@@ -58,7 +57,6 @@ export default function Practice() {
     if (!config) return;
     setPhase('getReady');
     setResponseMap({});
-    setPassed(false);
   }, [trialIndex]);
 
   useEffect(() => {
@@ -81,7 +79,7 @@ export default function Practice() {
     setResponseMap((prev) => ({ ...prev, [cellIndex]: symbol }));
   }
 
-  function handleSubmit() {
+  function handleNextClick() {
     if (!currentGrid) return;
     const normalized = normalizeResponseMap(responseMap, currentGrid.gridSize);
     const result = scoreGrid(
@@ -90,17 +88,14 @@ export default function Practice() {
       currentGrid.numTargets,
       currentGrid.gridSize
     );
-    setPassed(result.trialCorrectBinary);
     if (!result.trialCorrectBinary) {
       setShowTryAgain(true);
+      return;
     }
-  }
-
-  function handleNext() {
-    if (trialIndex === 0 && passed) {
+    if (trialIndex === 0) {
       setTrialIndex(1);
       setShowTryAgain(false);
-    } else if (trialIndex === 1 && passed) {
+    } else {
       setBothPassed(true);
     }
   }
@@ -108,7 +103,6 @@ export default function Practice() {
   function handleTryAgain() {
     setTrialIndex(0);
     setShowTryAgain(false);
-    setPassed(false);
     setResponseMap({});
     setPhase('getReady');
   }
@@ -177,12 +171,9 @@ export default function Practice() {
         onCellClick={(cell) => selectedSymbol && handlePlace(cell, selectedSymbol)}
       />
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
-        <button onClick={handleSubmit}>Submit</button>
-        {passed && (
-          <button onClick={() => handleNext()}>
-            {trialIndex === 0 ? 'Next' : 'Finish practice'}
-          </button>
-        )}
+        <button type="button" onClick={handleNextClick}>
+          {trialIndex === 0 ? 'Next' : 'Finish practice'}
+        </button>
       </div>
     </div>
   );

@@ -33,7 +33,12 @@ export default function Data() {
         return r.json();
       })
       .then((data) => {
-        if (data != null) setSessions(Array.isArray(data) ? data : []);
+        const raw = Array.isArray(data) ? data : [];
+        const list = raw.map((r: SessionRow & { location?: string }) => ({
+          ...r,
+          education: r.education ?? r.location ?? '',
+        }));
+        if (data != null) setSessions(list);
         setError(null);
       })
       .catch((e) => {
