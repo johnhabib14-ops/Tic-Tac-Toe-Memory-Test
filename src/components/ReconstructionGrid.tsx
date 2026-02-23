@@ -25,6 +25,7 @@ export default function ReconstructionGrid({
   onDrop,
   onCellClick,
 }: ReconstructionGridProps) {
+  void _onPlace;
   const n = gridSize * gridSize;
 
   function handleDragOver(e: React.DragEvent) {

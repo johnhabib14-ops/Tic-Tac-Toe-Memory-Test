@@ -33,15 +33,15 @@ export function generateTrial(
   const params = LEVELS[level - 1];
   if (!params) throw new Error(`Unknown level ${level}`);
   const seed = sessionSeed + level * 1000 + trialIndex * 100;
-  const random = createSeededRandom(seed);
+  const rng = createSeededRandom(seed);
 
   const cellIndices = buildCellIndices(params.gridSize);
-  const targetCells = shuffle(cellIndices, random).slice(0, params.numTargets);
+  const targetCells = shuffle(cellIndices, rng).slice(0, params.numTargets);
 
-  const symbols = balancedSymbols(targetCells.length, random);
+  const symbols = balancedSymbols(targetCells.length, rng);
   // Shuffle (cell, symbol) pairs so placement has no pattern (avoids X/O clusters)
   const pairs = targetCells.map((cell, i) => ({ cell, symbol: symbols[i] }));
-  const shuffledPairs = shuffle(pairs, random);
+  const shuffledPairs = shuffle(pairs, rng);
   const targetMap: TargetMap = {};
   shuffledPairs.forEach(({ cell, symbol }) => {
     targetMap[cell] = symbol;
@@ -54,7 +54,7 @@ export function generateTrial(
 
   if (params.hasDistractors && params.numDistractors > 0) {
     const emptyCells = cellIndices.filter((c) => targetMap[c] === undefined);
-    const distractorCells = shuffle(emptyCells, random).slice(0, params.numDistractors);
+    const distractorCells = shuffle(emptyCells, rng).slice(0, params.numDistractors);
     for (const c of distractorCells) {
       displayMap[c] = { type: DISTRACTOR_TYPE };
     }

@@ -9,7 +9,7 @@ export interface SessionRow {
   name: string;
   age: number;
   gender: string;
-  location: string;
+  education: string;
   timestamp: string;
   memoryPoints: number;
   highestLevelPassed: number;
@@ -42,12 +42,12 @@ export function downloadSessionsJson(sessions: SessionRow[]): void {
 
 export function downloadSessionsCsv(sessions: SessionRow[]): void {
   const headers = [
-    'id', 'createdAt', 'participantId', 'name', 'age', 'gender', 'location', 'timestamp',
+    'id', 'createdAt', 'participantId', 'name', 'age', 'gender', 'education', 'timestamp',
     'memoryPoints', 'highestLevelPassed', 'overallAccuracyPercent', 'meanReactionTimeMs',
     'totalIncorrectPlacements', 'totalWrongShapeUsed', 'copyScore', 'copyTimeMs',
   ];
   const rows = sessions.map((s) =>
-    headers.map((h) => escapeCsvCell((s as Record<string, unknown>)[h])).join(',')
+    headers.map((h) => escapeCsvCell((s as unknown as Record<string, unknown>)[h] as string | number | boolean | undefined)).join(',')
   );
   const csv = [headers.join(','), ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });

@@ -19,19 +19,21 @@ export default function Results() {
   const summary = computeSummary(trials);
 
   function handleDownloadJSON() {
-    if (!participant) return;
-    const data = { participant, trials, copyResult };
+    const p = participant;
+    if (!p) return;
+    const data = { participant: p, trials, copyResult };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `memory-test-${participant.id}.json`;
+    a.download = `memory-test-${p.id}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function handleDownloadCSV() {
-    if (!participant) return;
+    const p = participant;
+    if (!p) return;
     const headers = [
       'participantId', 'level', 'trialIndex', 'gridIndex', 'correctPlacements',
       'commissionErrors', 'wrongShapeInTarget', 'omissionErrors', 'accuracyPercent', 'reactionTimeMs', 'trialCorrectBinary',
@@ -45,18 +47,19 @@ export default function Results() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `memory-test-${participant.id}.csv`;
+    a.download = `memory-test-${p.id}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   async function handleSubmitToStudy() {
-    if (!participant) return;
+    const p = participant;
+    if (!p) return;
     setSubmitError(null);
     if (isBackendConfigured()) {
       setSubmitting(true);
       try {
-        await submitToBackend(participant, summary, copyResult ?? null);
+        await submitToBackend(p, summary, copyResult ?? null);
         setParticipant(null);
         setTrials([]);
         setCopyResult(null);
@@ -69,13 +72,13 @@ export default function Results() {
       return;
     }
     if (isSheetSubmitConfigured()) {
-      submitToGoogleSheet(participant, summary, copyResult ?? null);
+      submitToGoogleSheet(p, summary, copyResult ?? null);
       setParticipant(null);
       setTrials([]);
       setCopyResult(null);
       navigate('/');
     } else {
-      openFormInNewTab(participant, summary);
+      openFormInNewTab(p, summary);
       setParticipant(null);
       setTrials([]);
       setCopyResult(null);
@@ -99,6 +102,7 @@ export default function Results() {
         <p><strong>Name:</strong> {participant.name}</p>
         <p><strong>Age:</strong> {participant.age}</p>
         <p><strong>Gender:</strong> {participant.gender}</p>
+        <p><strong>Education:</strong> {participant.education}</p>
         <p><strong>Date:</strong> {dateStr}</p>
       </div>
       <div className="results-section">
