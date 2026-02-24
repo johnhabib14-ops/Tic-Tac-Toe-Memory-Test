@@ -81,7 +81,8 @@ export function submitToBackend(
       const text = await r.text();
       const parsed = text ? JSON.parse(text) : null;
       if (parsed && typeof parsed.error === 'string') detail = `: ${parsed.error}`;
-      else if (text && text.length < 120) detail = `: ${text}`;
+      if (parsed && typeof parsed.detail === 'string' && parsed.detail) detail += ` — ${parsed.detail}`;
+      else if (!detail && text && text.length < 120) detail = `: ${text}`;
     } catch {
       // ignore
     }

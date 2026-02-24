@@ -60,7 +60,15 @@ export default async function handler(req, res) {
   if (!response.ok) {
     const text = await response.text();
     console.error('Supabase insert failed', response.status, text);
-    return res.status(502).json({ error: 'Failed to save submission' });
+    let detail = '';
+    try {
+      const parsed = text ? JSON.parse(text) : null;
+      const msg = parsed?.message ?? parsed?.error_description ?? (typeof text === 'string' ? text : '');
+      detail = String(msg).slice(0, 200).replace(/\s+/g, ' ').trim();
+    } catch {
+      if (text && typeof text === 'string') detail = text.slice(0, 200).replace(/\s+/g, ' ').trim();
+    }
+    return res.status(502).setHeader('Access-Control-Allow-Origin', '*').json({ error: 'Failed to save submission', detail: detail || undefined });
   }
 
   return res.status(200).setHeader('Access-Control-Allow-Origin', '*').json({ ok: true });
