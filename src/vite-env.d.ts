@@ -14,6 +14,7 @@ interface ImportMetaEnv {
   readonly VITE_ENTRY_LEVEL_PASSED_COUNT?: string;
   readonly VITE_ENTRY_TOTAL_CORRECT?: string;
   readonly VITE_ENTRY_TOTAL_TARGETS?: string;
+  readonly VITE_GMT22_OVERLOAD?: string;
 }
 
 interface ImportMeta {
