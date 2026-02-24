@@ -64,6 +64,7 @@ export default function GMT22Demographics() {
       session_id: generateSessionId(),
       participant_id: participantId.trim(),
       birth_year: birthYearNum,
+      age: CURRENT_YEAR - birthYearNum,
       gender: genderValue,
       education: education.trim(),
       device_type: deviceType as GMT22DeviceType,

@@ -2,6 +2,9 @@
 -- Adds flattened scalar columns for SPSS/research-friendly CSV export (one column per variable, no JSON).
 -- Run once. Safe to re-run: uses ADD COLUMN IF NOT EXISTS.
 
+-- Age (computed from birth_year on client: currentYear - birth_year)
+ALTER TABLE gmt22_submissions ADD COLUMN IF NOT EXISTS age INTEGER NOT NULL DEFAULT 0;
+
 -- Mean accuracy per condition (0–1)
 ALTER TABLE gmt22_submissions ADD COLUMN IF NOT EXISTS mean_accuracy_baseline NUMERIC NOT NULL DEFAULT 0;
 ALTER TABLE gmt22_submissions ADD COLUMN IF NOT EXISTS mean_accuracy_ignore_distractor NUMERIC NOT NULL DEFAULT 0;

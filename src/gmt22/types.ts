@@ -39,6 +39,7 @@ export interface GMT22Participant {
   session_id: string;
   participant_id: string;
   birth_year: number;
+  age: number;
   gender: string;
   education: string;
   device_type: GMT22DeviceType;

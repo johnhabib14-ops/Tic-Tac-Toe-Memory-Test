@@ -156,16 +156,20 @@ export default function GMT22Memory() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
-    const encodingSubtitle =
-      currentItem.condition === 'ignore_distractor'
-        ? 'Remember only the X and O positions. Ignore the + symbols.'
-        : currentItem.condition === 'remember_distractor'
-          ? 'Remember the positions of X, O, and +.'
-          : 'Watch the positions carefully.';
+    const instructionStyle = { color: 'red' as const, fontWeight: 'bold' as const };
     return (
       <div className="page">
         <h2 className="grid-title">Remember the grid</h2>
-        <p className="subtitle">{encodingSubtitle}</p>
+        <p className="subtitle">
+          {currentItem.condition === 'ignore_distractor' && (
+            <>Remember only the X and O positions. <span style={instructionStyle}>Ignore the + symbols.</span></>
+          )}
+          {currentItem.condition === 'remember_distractor' && (
+            <span style={instructionStyle}>Remember the positions of X, O, and +.</span>
+          )}
+          {currentItem.condition === 'baseline' && 'Watch the positions carefully.'}
+          {currentItem.condition === 'delay' && 'Watch the positions carefully.'}
+        </p>
         <div className="grid-container">
           <GMT22DisplayGrid gridMap={displayMap} />
         </div>

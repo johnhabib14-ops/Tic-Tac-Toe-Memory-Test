@@ -11,6 +11,7 @@ export interface GMT22SubmitPayload {
   session_id: string;
   participant_id: string;
   birth_year: number;
+  age: number;
   gender: string;
   education: string;
   device_type: string;
@@ -49,6 +50,7 @@ export function buildGMT22Payload(
     session_id: participant.session_id,
     participant_id: participant.participant_id,
     birth_year: participant.birth_year,
+    age: participant.age,
     gender: participant.gender,
     education: participant.education,
     device_type: participant.device_type,

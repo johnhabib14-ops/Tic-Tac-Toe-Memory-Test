@@ -45,6 +45,8 @@ Store every submission in Supabase and view/export from a PIN-protected page.
 
 **Data not saving?** (1) Set `VITE_API_URL` in Vercel (your app URL, no trailing slash) and **redeploy** so the frontend is built with it. (2) Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel. (3) In Supabase, ensure the `submissions` table exists and, if RLS is enabled, add policies allowing `anon` to insert and select.
 
+**GMT 2.2: 502 "Could not find column" (e.g. `clean_trial_rate_baseline`)?** Your `gmt22_submissions` table was created before the flat columns were added. Run `scripts/gmt22_submissions_add_flat_columns.sql` in the Supabase SQL Editor to add the required columns.
+
 ## Sending results to Google Sheets
 
 To skip the Google Form and have each participant’s results appended as one row in a Google Sheet:

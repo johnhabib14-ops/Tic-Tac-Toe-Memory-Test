@@ -10,7 +10,7 @@ export default function GMT22Consent() {
         You will see grids with symbols and reconstruct their positions. By continuing, you agree that your responses may be used for research.
       </p>
       <p>
-        The task has two parts: a short copy task, then a memory task. It usually takes about 10–15 minutes.
+        The task has two parts: a short copy task, then a memory task.
       </p>
       <button type="button" onClick={() => setPhase('demographics')}>
         I agree, continue

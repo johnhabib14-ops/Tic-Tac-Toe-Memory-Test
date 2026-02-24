@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS gmt22_submissions (
   session_id TEXT NOT NULL,
   participant_id TEXT NOT NULL DEFAULT '',
   birth_year INTEGER NOT NULL DEFAULT 0,
+  age INTEGER NOT NULL DEFAULT 0,
   gender TEXT NOT NULL DEFAULT '',
   education TEXT NOT NULL DEFAULT '',
   device_type TEXT NOT NULL DEFAULT '',

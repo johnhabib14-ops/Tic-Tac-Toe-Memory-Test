@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     session_id: body.session_id ?? '',
     participant_id: body.participant_id ?? '',
     birth_year: Number(body.birth_year) || 0,
+    age: Number(body.age) || 0,
     gender: body.gender ?? '',
     education: body.education ?? '',
     device_type: body.device_type ?? '',

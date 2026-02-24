@@ -17,6 +17,8 @@ Before exporting, run these SQL scripts once in the **Supabase SQL Editor** (in 
 
 After that, all new submissions will have the flat columns filled automatically. Existing rows get backfilled by the add-flat-columns script.
 
+**Troubleshooting:** If you get a 502 error when submitting (e.g. "Could not find the 'clean_trial_rate_baseline' column"), the table is missing the flat columns. Run `scripts/gmt22_submissions_add_flat_columns.sql` in the Supabase SQL Editor.
+
 ---
 
 ## Wide format: one row per participant
@@ -34,6 +36,7 @@ Use this for participant-level analyses (e.g. demographics, overall accuracy, co
 | `session_id` | text | Session identifier |
 | `participant_id` | text | Participant ID |
 | `birth_year` | integer | Birth year |
+| `age` | integer | Age (current year minus birth year) |
 | `gender` | text | Gender |
 | `education` | text | Education (years) |
 | `device_type` | text | Device used |
