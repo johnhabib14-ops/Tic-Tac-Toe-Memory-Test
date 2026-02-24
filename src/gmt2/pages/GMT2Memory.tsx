@@ -190,10 +190,16 @@ export default function GMT2Memory() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
+    const encodingSubtitle =
+      currentItem.condition === 'ignore_distractor'
+        ? 'Remember only the X and O positions. Ignore the + symbols.'
+        : currentItem.condition === 'remember_distractor'
+          ? 'Remember the positions of X, O, and +.'
+          : 'Watch the positions carefully.';
     return (
       <div className="page">
         <h2 className="grid-title">Remember the grid</h2>
-        <p className="subtitle">Watch the positions carefully.</p>
+        <p className="subtitle">{encodingSubtitle}</p>
         <div className="grid-container">
           <GMT2DisplayGrid gridMap={displayMap} />
         </div>
