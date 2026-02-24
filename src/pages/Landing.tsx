@@ -10,7 +10,7 @@ export default function Landing() {
         A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
       </p>
       <button onClick={() => navigate('/demographics')}>Begin</button>
-      <p style={{ marginTop: '1rem' }}>
+      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <button
           type="button"
           className="secondary"
@@ -18,7 +18,6 @@ export default function Landing() {
         >
           Start GMT 2.1 (research version)
         </button>
-        {' '}
         <button
           type="button"
           className="secondary"
@@ -26,7 +25,7 @@ export default function Landing() {
         >
           Start GMT 2.2 (harder research version)
         </button>
-      </p>
+      </div>
     </div>
   );
 }
