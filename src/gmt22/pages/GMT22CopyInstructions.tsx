@@ -7,13 +7,16 @@ export default function GMT22CopyInstructions() {
     <div className="page">
       <h1>Part 1: Copy task</h1>
       <p className="subtitle">
-        You will see a reference grid with 8 symbols (X and O). Copy it exactly into the empty grid by placing X and O in the correct positions.
+        A reference grid will show 8 symbols (X and O). Your job is to copy it into the empty grid in the same positions.
       </p>
       <p>
-        You have 30 seconds. Use the palette to select a symbol, then click a cell to place it. Click <strong>Submit</strong> when done, or your answers will be saved automatically when time runs out.
+        Choose X or O from the palette, then click a cell to place it. When your copy matches the reference, click <strong>Submit</strong>.
+      </p>
+      <p style={{ marginTop: '1rem', fontSize: '0.95rem', color: '#555' }}>
+        You have 30 seconds; if time runs out, your answers are saved automatically.
       </p>
       <button type="button" onClick={() => setPhase('copy')}>
-        Continue
+        Start copy task
       </button>
     </div>
   );

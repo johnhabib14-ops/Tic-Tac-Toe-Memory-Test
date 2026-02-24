@@ -21,6 +21,24 @@ CREATE TABLE IF NOT EXISTS gmt22_submissions (
   global_accuracy NUMERIC NOT NULL DEFAULT 0,
   global_mean_rt NUMERIC NOT NULL DEFAULT 0,
   global_clean_trial_rate NUMERIC NOT NULL DEFAULT 0,
+  -- SPSS-friendly flat columns (one per condition)
+  mean_accuracy_baseline NUMERIC NOT NULL DEFAULT 0,
+  mean_accuracy_ignore_distractor NUMERIC NOT NULL DEFAULT 0,
+  mean_accuracy_remember_distractor NUMERIC NOT NULL DEFAULT 0,
+  mean_accuracy_delay NUMERIC NOT NULL DEFAULT 0,
+  mean_rt_baseline NUMERIC NOT NULL DEFAULT 0,
+  mean_rt_ignore_distractor NUMERIC NOT NULL DEFAULT 0,
+  mean_rt_remember_distractor NUMERIC NOT NULL DEFAULT 0,
+  mean_rt_delay NUMERIC NOT NULL DEFAULT 0,
+  total_commissions_baseline INTEGER NOT NULL DEFAULT 0,
+  total_commissions_ignore_distractor INTEGER NOT NULL DEFAULT 0,
+  total_commissions_remember_distractor INTEGER NOT NULL DEFAULT 0,
+  total_commissions_delay INTEGER NOT NULL DEFAULT 0,
+  clean_trial_rate_baseline NUMERIC NOT NULL DEFAULT 0,
+  clean_trial_rate_ignore_distractor NUMERIC NOT NULL DEFAULT 0,
+  clean_trial_rate_remember_distractor NUMERIC NOT NULL DEFAULT 0,
+  clean_trial_rate_delay NUMERIC NOT NULL DEFAULT 0,
+  copy_rt_sec NUMERIC NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

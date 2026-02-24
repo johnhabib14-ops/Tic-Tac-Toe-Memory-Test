@@ -26,6 +26,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON' });
   }
 
+  const acc = body.mean_accuracy_per_condition && typeof body.mean_accuracy_per_condition === 'object' ? body.mean_accuracy_per_condition : {};
+  const rt = body.mean_rt_per_condition && typeof body.mean_rt_per_condition === 'object' ? body.mean_rt_per_condition : {};
+  const comm = body.total_commissions_per_condition && typeof body.total_commissions_per_condition === 'object' ? body.total_commissions_per_condition : {};
+  const clean = body.clean_trial_rate_per_condition && typeof body.clean_trial_rate_per_condition === 'object' ? body.clean_trial_rate_per_condition : {};
+
   const row = {
     session_id: body.session_id ?? '',
     participant_id: body.participant_id ?? '',
@@ -35,28 +40,34 @@ export default async function handler(req, res) {
     device_type: body.device_type ?? '',
     copy_hits: Number(body.copy_hits) || 0,
     copy_total_rt_ms: Number(body.copy_total_rt_ms) || 0,
+    copy_rt_sec: Number(body.copy_total_rt_ms) ? Number(body.copy_total_rt_ms) / 1000 : 0,
     copy_target_map: Array.isArray(body.copy_target_map) ? body.copy_target_map : [],
     copy_response_map: Array.isArray(body.copy_response_map) ? body.copy_response_map : [],
     memory_trials: Array.isArray(body.memory_trials) ? body.memory_trials : [],
-    mean_accuracy_per_condition:
-      body.mean_accuracy_per_condition && typeof body.mean_accuracy_per_condition === 'object'
-        ? body.mean_accuracy_per_condition
-        : {},
-    mean_rt_per_condition:
-      body.mean_rt_per_condition && typeof body.mean_rt_per_condition === 'object'
-        ? body.mean_rt_per_condition
-        : {},
-    total_commissions_per_condition:
-      body.total_commissions_per_condition && typeof body.total_commissions_per_condition === 'object'
-        ? body.total_commissions_per_condition
-        : {},
-    clean_trial_rate_per_condition:
-      body.clean_trial_rate_per_condition && typeof body.clean_trial_rate_per_condition === 'object'
-        ? body.clean_trial_rate_per_condition
-        : {},
+    mean_accuracy_per_condition: acc,
+    mean_rt_per_condition: rt,
+    total_commissions_per_condition: comm,
+    clean_trial_rate_per_condition: clean,
     global_accuracy: Number(body.global_accuracy) || 0,
     global_mean_rt: Number(body.global_mean_rt) || 0,
     global_clean_trial_rate: Number(body.global_clean_trial_rate) || 0,
+    // SPSS-friendly flat columns
+    mean_accuracy_baseline: Number(acc.baseline) || 0,
+    mean_accuracy_ignore_distractor: Number(acc.ignore_distractor) || 0,
+    mean_accuracy_remember_distractor: Number(acc.remember_distractor) || 0,
+    mean_accuracy_delay: Number(acc.delay) || 0,
+    mean_rt_baseline: Number(rt.baseline) || 0,
+    mean_rt_ignore_distractor: Number(rt.ignore_distractor) || 0,
+    mean_rt_remember_distractor: Number(rt.remember_distractor) || 0,
+    mean_rt_delay: Number(rt.delay) || 0,
+    total_commissions_baseline: Number(comm.baseline) || 0,
+    total_commissions_ignore_distractor: Number(comm.ignore_distractor) || 0,
+    total_commissions_remember_distractor: Number(comm.remember_distractor) || 0,
+    total_commissions_delay: Number(comm.delay) || 0,
+    clean_trial_rate_baseline: Number(clean.baseline) || 0,
+    clean_trial_rate_ignore_distractor: Number(clean.ignore_distractor) || 0,
+    clean_trial_rate_remember_distractor: Number(clean.remember_distractor) || 0,
+    clean_trial_rate_delay: Number(clean.delay) || 0,
   };
 
   const response = await fetch(`${supabaseUrl}/rest/v1/gmt22_submissions`, {

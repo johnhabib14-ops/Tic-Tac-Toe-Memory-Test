@@ -7,24 +7,21 @@ export default function GMT22MemoryInstructions() {
     <div className="page">
       <h1>Part 2: Memory task</h1>
       <p className="subtitle">
-        You will see a series of grids to remember. After each grid, you will reconstruct it by placing symbols in the correct positions.
+        You will see a grid, then place the same symbols in the same positions in the empty grid.
       </p>
       <p>
-        <strong>Symbols:</strong> Most grids use <strong>X</strong> and <strong>O</strong>. Some grids also include a <strong>+</strong> symbol.
+        Symbols are <strong>X</strong>, <strong>O</strong>, and sometimes <strong>+</strong>. Before each grid, the screen will tell you:
       </p>
-      <p>
-        <strong>Important:</strong> Before each grid we will tell you what to do:
-      </p>
-      <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1rem' }}>
-        <li><strong>Ignore the +</strong> — Only remember and place X and O. Do not place +.</li>
-        <li><strong>Remember X, O, and +</strong> — Remember all symbols including + and place them in the correct positions.</li>
-        <li>If there is no +, just remember and place X and O.</li>
+      <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
+        <li><strong>Ignore the +</strong> — Only place X and O. Do not place +.</li>
+        <li><strong>Remember X, O, and +</strong> — Place all three in the correct spots.</li>
+        <li><strong>No +</strong> — Just place X and O.</li>
       </ul>
       <p>
-        Read the instruction on each screen carefully. You will have a time limit to reconstruct each grid.
+        Follow the line of text on each screen; it tells you whether to ignore or remember + for that grid.
       </p>
       <button type="button" onClick={() => setPhase('memory')}>
-        Continue
+        Start memory task
       </button>
     </div>
   );

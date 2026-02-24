@@ -7,10 +7,10 @@ export default function GMT22Consent() {
     <div className="page">
       <h1>GMT 2.2</h1>
       <p className="subtitle">
-        This is a visual working memory task. You will see grids with symbols and be asked to remember and reconstruct their positions. This version is more challenging.
+        You will see grids with symbols and reconstruct their positions. By continuing, you agree that your responses may be used for research.
       </p>
       <p>
-        By continuing, you agree that your responses may be used for research purposes. The task takes about 10–15 minutes.
+        The task has two parts: a short copy task, then a memory task. It usually takes about 10–15 minutes.
       </p>
       <button type="button" onClick={() => setPhase('demographics')}>
         I agree, continue
