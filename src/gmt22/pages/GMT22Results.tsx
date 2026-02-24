@@ -6,7 +6,6 @@ import {
   submitGMT22,
   isGMT22BackendConfigured,
 } from '../lib/submitGmt22';
-import { getPairingFallbackUsed } from '../lib/memoryTask';
 import { GMT22_CONDITIONS } from '../types';
 import type { GMT22Condition } from '../types';
 import { COPY_NUM_TARGETS } from '../types';
@@ -26,7 +25,6 @@ export default function GMT22Results() {
     practiceTrials,
     practiceFailed,
     practicePassedFirstTry,
-    memoryEarlyStopped,
     attentionCheckFailed,
   } = useGMT22State();
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -36,11 +34,10 @@ export default function GMT22Results() {
   if (!participant) return null;
 
   const summary = computeGMT22Summary(memoryTrials, {
-    memory_early_stopped: memoryEarlyStopped,
     practice_failed: practiceFailed,
     practice_passed_first_try: practicePassedFirstTry,
     attention_check_failed: attentionCheckFailed,
-    pairing_fallback_used: getPairingFallbackUsed(),
+    condition_order: participant.condition_order,
   });
 
   async function handleSubmit() {
@@ -68,16 +65,10 @@ export default function GMT22Results() {
     }
   }
 
-  const accuracyPercent = (summary.global_accuracy * 100).toFixed(1);
-
   return (
     <div className="page">
       <div className="results-card">
         <h1 className="results-title">Thank you for completing GMT 2</h1>
-        <div className="results-accuracy" aria-label={`Overall accuracy: ${accuracyPercent}%`}>
-          <span className="results-accuracy-value">{accuracyPercent}%</span>
-          <span className="results-accuracy-label">Overall accuracy</span>
-        </div>
 
         <div className="results-score-block">
           <h3>Copy</h3>
@@ -97,26 +88,24 @@ export default function GMT22Results() {
             return (
               <p key={condition}>
                 <strong>{CONDITION_LABELS[condition] ?? condition}:</strong>{' '}
-                Start span {c.start_span}, span estimate {c.span_estimate}. Mean accuracy{' '}
-                {(c.mean_accuracy * 100).toFixed(1)}%, Mean RT {(c.mean_rt_ms / 1000).toFixed(1)}s,{' '}
-                Total commissions {c.total_commissions}
-                {c.discontinued_at_span != null &&
-                  ` — Discontinued at span ${c.discontinued_at_span}`}
+                Span estimate {c.span_estimate}, span consistency {c.span_consistency_flag ? 'yes' : 'no'}. Mean accuracy{' '}
+                {(c.mean_accuracy * 100).toFixed(1)}%, Mean RT {(c.mean_rt_ms / 1000).toFixed(1)}s
               </p>
             );
           })}
         </div>
 
         <div className="results-score-block">
-          <h3>Overall</h3>
+          <h3>Costs</h3>
+          <p><strong>Interference cost:</strong> {summary.interference_cost}</p>
+          <p><strong>Binding cost:</strong> {summary.binding_cost}</p>
+          <p><strong>Delay cost:</strong> {summary.delay_cost}</p>
+        </div>
+
+        <div className="results-score-block">
+          <h3>Participant</h3>
           <p><strong>Participant ID:</strong> {participant.participant_id}</p>
-          <p>Total trials completed: {memoryTrials.length}</p>
-          <p><strong>Overall accuracy:</strong> {(summary.global_accuracy * 100).toFixed(1)}%</p>
-          <p><strong>Mean RT:</strong> {(summary.global_mean_rt_ms / 1000).toFixed(1)}s</p>
-          <p><strong>Total commissions:</strong> {summary.global_total_commissions}</p>
-          {summary.memory_early_stopped && (
-            <p className="results-note">The memory task ended early.</p>
-          )}
+          <p><strong>Condition order:</strong> {summary.condition_order}</p>
         </div>
 
         {isGMT22BackendConfigured() && (

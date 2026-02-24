@@ -138,11 +138,6 @@ export function isPassed(commissions: number, accuracy_raw: number): boolean {
   return commissions === 0 && accuracy_raw >= 0.85;
 }
 
-/** near_passed = (accuracy_raw >= 0.85); for analysis only. */
-export function isNearPassed(accuracy_raw: number): boolean {
-  return accuracy_raw >= 0.85;
-}
-
 const pairCache = new Map<string, { item1: GMT22ItemBankEntry; item2: GMT22ItemBankEntry; fallback: boolean }>();
 
 /**

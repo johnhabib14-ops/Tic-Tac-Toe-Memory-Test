@@ -10,7 +10,6 @@ import {
   normalizeResponseMap,
   scoreTrial,
   isPassed,
-  isNearPassed,
 } from '../lib/memoryTask';
 import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
@@ -106,7 +105,6 @@ export default function GMT22Practice() {
     const { hits, commissions, omissions, binding_errors, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
     const passed = isPassed(commissions, accuracy_raw);
-    const near_passed = isNearPassed(accuracy_raw);
     const trialPayload = {
       condition: currentItem.condition,
       span: currentItem.span,
@@ -123,7 +121,6 @@ export default function GMT22Practice() {
       total_targets,
       accuracy_raw,
       passed,
-      near_passed,
       timeout,
     };
     const nextTrials = [...practiceTrials, trialPayload];

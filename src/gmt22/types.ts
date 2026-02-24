@@ -75,7 +75,6 @@ export interface GMT22MemoryTrialRecord {
   total_targets: number;
   accuracy_raw: number;
   passed: boolean;
-  near_passed: boolean;
   timeout: boolean;
 }
 
@@ -96,32 +95,29 @@ export interface GMT22PracticeTrialRecord {
   total_targets: number;
   accuracy_raw: number;
   passed: boolean;
-  near_passed: boolean;
   timeout: boolean;
 }
 
 export interface GMT22ConditionSummary {
-  start_span: number;
   span_estimate: number;
-  span_reached: number;
-  discontinued_at_span: number | null;
-  trials_completed_count: number;
+  span_consistency_flag: boolean;
   mean_accuracy: number;
   mean_rt_ms: number;
-  total_commissions: number;
-  span_consistency_flag: boolean;
 }
 
 export interface GMT22Summary {
   by_condition: Record<GMT22Condition, GMT22ConditionSummary>;
-  global_accuracy: number;
-  global_mean_rt_ms: number;
-  global_total_commissions: number;
-  memory_early_stopped: boolean;
+  baseline_span: number;
+  ignore_span: number;
+  remember_span: number;
+  delay_span: number;
+  interference_cost: number;
+  binding_cost: number;
+  delay_cost: number;
   practice_failed: boolean;
   practice_passed_first_try: boolean;
   attention_check_failed: boolean;
-  pairing_fallback_used: boolean;
+  condition_order: GMT22ConditionOrder;
 }
 
 export interface GMT22ItemBankEntry {

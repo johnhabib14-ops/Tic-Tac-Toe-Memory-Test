@@ -35,7 +35,6 @@ export interface GMT22SubmitPayload {
     total_targets: number;
     accuracy_raw: number;
     passed: boolean;
-    near_passed: boolean;
     timeout: boolean;
   }>;
   copy_item_id: string;
@@ -59,32 +58,29 @@ export interface GMT22SubmitPayload {
     total_targets: number;
     accuracy_raw: number;
     passed: boolean;
-    near_passed: boolean;
     timeout: boolean;
   }>;
   summary: {
     by_condition: Record<
       string,
       {
-        start_span: number;
         span_estimate: number;
-        span_reached: number;
-        discontinued_at_span: number | null;
-        trials_completed_count: number;
+        span_consistency_flag: boolean;
         mean_accuracy: number;
         mean_rt_ms: number;
-        total_commissions: number;
-        span_consistency_flag: boolean;
       }
     >;
-    global_accuracy: number;
-    global_mean_rt_ms: number;
-    global_total_commissions: number;
-    memory_early_stopped: boolean;
+    baseline_span: number;
+    ignore_span: number;
+    remember_span: number;
+    delay_span: number;
+    interference_cost: number;
+    binding_cost: number;
+    delay_cost: number;
     practice_failed: boolean;
     practice_passed_first_try: boolean;
     attention_check_failed: boolean;
-    pairing_fallback_used: boolean;
+    condition_order: string;
   };
 }
 
@@ -107,7 +103,6 @@ function mapTrial(
     total_targets: t.total_targets,
     accuracy_raw: t.accuracy_raw,
     passed: t.passed,
-    near_passed: t.near_passed,
     timeout: t.timeout,
   };
 }
@@ -122,15 +117,10 @@ export function buildGMT22Payload(
   const by_condition: GMT22SubmitPayload['summary']['by_condition'] = {};
   for (const [c, s] of Object.entries(summary.by_condition)) {
     by_condition[c] = {
-      start_span: s.start_span,
       span_estimate: s.span_estimate,
-      span_reached: s.span_reached,
-      discontinued_at_span: s.discontinued_at_span,
-      trials_completed_count: s.trials_completed_count,
+      span_consistency_flag: s.span_consistency_flag,
       mean_accuracy: s.mean_accuracy,
       mean_rt_ms: s.mean_rt_ms,
-      total_commissions: s.total_commissions,
-      span_consistency_flag: s.span_consistency_flag,
     };
   }
   return {
@@ -153,14 +143,17 @@ export function buildGMT22Payload(
     memory_trials: memoryTrials.map(mapTrial),
     summary: {
       by_condition,
-      global_accuracy: summary.global_accuracy,
-      global_mean_rt_ms: summary.global_mean_rt_ms,
-      global_total_commissions: summary.global_total_commissions,
-      memory_early_stopped: summary.memory_early_stopped,
+      baseline_span: summary.baseline_span,
+      ignore_span: summary.ignore_span,
+      remember_span: summary.remember_span,
+      delay_span: summary.delay_span,
+      interference_cost: summary.interference_cost,
+      binding_cost: summary.binding_cost,
+      delay_cost: summary.delay_cost,
       practice_failed: summary.practice_failed,
       practice_passed_first_try: summary.practice_passed_first_try,
       attention_check_failed: summary.attention_check_failed,
-      pairing_fallback_used: summary.pairing_fallback_used,
+      condition_order: summary.condition_order,
     },
   };
 }

@@ -10,7 +10,6 @@ import {
   normalizeResponseMap,
   scoreTrial,
   isPassed,
-  isNearPassed,
 } from '../lib/memoryTask';
 import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
@@ -39,7 +38,6 @@ export default function GMT22Memory() {
     memoryTrials,
     addMemoryTrial,
     setPhase,
-    setMemoryEarlyStopped,
     setAttentionCheckFailed,
   } = useGMT22State();
 
@@ -47,7 +45,6 @@ export default function GMT22Memory() {
   const [conditionIndex, setConditionIndex] = useState(0);
   const [span, setSpan] = useState(2);
   const [trialIndexInSpan, setTrialIndexInSpan] = useState(1 as 1 | 2);
-  const [discontinueCount, setDiscontinueCount] = useState(0);
 
   const [phase, setPhaseLocal] = useState<'encoding' | 'delay_fixation' | 'reconstructing'>('encoding');
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
@@ -128,7 +125,6 @@ export default function GMT22Memory() {
     const { hits, commissions, omissions, binding_errors, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
     const passed = isPassed(commissions, accuracy_raw);
-    const near_passed = isNearPassed(accuracy_raw);
     const trialPayload = {
       condition: currentItem.condition,
       span: currentItem.span,
@@ -145,7 +141,6 @@ export default function GMT22Memory() {
       total_targets,
       accuracy_raw,
       passed,
-      near_passed,
       timeout,
     };
     flushSync(() => {
@@ -181,19 +176,11 @@ export default function GMT22Memory() {
       return;
     }
 
-    const discontinuedAtSpan = span;
     const nextConditionIndex = conditionIndex + 1;
     if (nextConditionIndex >= conditionOrder.length) {
       setPhase('results');
       return;
     }
-    const newDiscontinueCount = discontinuedAtSpan <= 2 ? discontinueCount + 1 : discontinueCount;
-    if (newDiscontinueCount >= 2) {
-      setMemoryEarlyStopped(true);
-      setPhase('results');
-      return;
-    }
-    setDiscontinueCount(newDiscontinueCount);
     setConditionIndex(nextConditionIndex);
     setSpan(2);
     setTrialIndexInSpan(1);
