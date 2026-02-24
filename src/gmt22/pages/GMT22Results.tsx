@@ -76,7 +76,7 @@ export default function GMT22Results() {
           <h3>Overall</h3>
           <p><strong>Participant ID:</strong> {participant.participant_id}</p>
           <p>Total trials completed: {memoryTrials.length}</p>
-          <p><strong>Accuracy:</strong> {(summary.global_accuracy * 100).toFixed(1)}%</p>
+          <p><strong>Overall accuracy:</strong> {(summary.global_accuracy * 100).toFixed(1)}%</p>
           <p><strong>Mean RT:</strong> {(summary.global_mean_rt / 1000).toFixed(1)}s</p>
           <p><strong>Clean trial rate:</strong> {(summary.global_clean_trial_rate * 100).toFixed(1)}%</p>
         </div>

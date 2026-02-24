@@ -74,7 +74,7 @@ export default function GMT2Results() {
           <h3>Overall</h3>
           <p><strong>Participant ID:</strong> {participant.participant_id}</p>
           <p>Total trials completed: {memoryTrials.length}</p>
-          <p><strong>Accuracy:</strong> {(summary.global_accuracy * 100).toFixed(1)}%</p>
+          <p><strong>Overall accuracy:</strong> {(summary.global_accuracy * 100).toFixed(1)}%</p>
         </div>
 
         {isGMT2BackendConfigured() && (
