@@ -64,7 +64,7 @@ export default function GMT22Practice() {
   const currentItem: GMT22ItemBankEntry | null = items[trialIndex] ?? null;
 
   useEffect(() => {
-    if (!currentItem || phase !== 'encoding') return;
+    if (showIntro || showClarification || !currentItem || phase !== 'encoding') return;
     const ms = encodingMs(currentItem.span);
     const t = setTimeout(() => {
       setPhaseLocal('reconstructing');
@@ -72,10 +72,10 @@ export default function GMT22Practice() {
       setTimeLeftSec(Math.floor(reconLimitMs(currentItem.span) / 1000));
     }, ms);
     return () => clearTimeout(t);
-  }, [currentItem, phase, trialIndex]);
+  }, [currentItem, phase, trialIndex, showIntro, showClarification]);
 
   useEffect(() => {
-    if (!currentItem || phase !== 'reconstructing') return;
+    if (showIntro || showClarification || !currentItem || phase !== 'reconstructing') return;
     let secondsLeft = Math.floor(reconLimitMs(currentItem.span) / 1000);
     setTimeLeftSec(secondsLeft);
     let cancelled = false;
@@ -95,7 +95,7 @@ export default function GMT22Practice() {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [currentItem, phase, trialIndex]);
+  }, [currentItem, phase, trialIndex, showIntro, showClarification]);
 
   function recordTrial(timeout: boolean, responseMapOverride?: Record<number, GMT22CellSymbol>) {
     if (!currentItem || !participant) return;
