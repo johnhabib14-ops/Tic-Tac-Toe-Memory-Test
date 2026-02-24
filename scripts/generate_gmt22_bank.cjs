@@ -116,20 +116,22 @@ function mulberry32(seed) {
   };
 }
 
-function generateTargetMaps(span, condition, count, rng) {
+function generateTargetMaps(span, condition, count, rng, globalSeen) {
   const out = [];
   const indices = [...Array(16).keys()];
   const seen = new Set();
 
   let attempts = 0;
-  while (out.length < count && attempts < 8000) {
+  while (out.length < count && attempts < 12000) {
     attempts++;
     const grid = emptyGrid();
     const positions = shuffle(indices, rng).slice(0, span);
-    const usePlus = condition === 'remember_distractor' && span >= 2 && rng() < 0.4;
+    const usePlus = condition === 'remember_distractor' && span >= 2;
     const numPlus = usePlus ? 1 : 0;
     const rest = span - numPlus;
-    const targetX = Math.ceil(rest / 2);
+    // Balance X/O: for odd rest, randomize which symbol gets the extra to get ~0.5 globally
+    const extraIsX = rng() < 0.5;
+    const targetX = extraIsX ? Math.ceil(rest / 2) : Math.floor(rest / 2);
     const targetO = rest - targetX;
 
     let xC = 0, oC = 0, plusC = 0;
@@ -143,10 +145,12 @@ function generateTargetMaps(span, condition, count, rng) {
 
     const key = grid.join(',');
     if (seen.has(key)) continue;
+    if (globalSeen && globalSeen.has(key)) continue;
     if (!validTargetGrid(grid, span)) continue;
     if (condition === 'remember_distractor' && xoBalance(grid) > 1) continue;
     if (condition !== 'remember_distractor' && xoBalance(grid) > 1) continue;
     seen.add(key);
+    if (globalSeen) globalSeen.add(key);
     out.push(grid.slice());
   }
   return out;
@@ -170,10 +174,11 @@ function main() {
   const rng = mulberry32(12345);
   const bank = [];
   const spans = [...BASE_SPANS, OVERLOAD_SPAN];
+  const globalLayoutSeen = new Set();
 
   for (const condition of CONDITIONS) {
     for (const span of spans) {
-      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng);
+      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng, globalLayoutSeen);
       for (const target_map of targetMaps) {
         const distractor_map = condition === 'ignore_distractor'
           ? addDistractors(target_map, span, rng)
