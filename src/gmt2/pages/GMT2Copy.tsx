@@ -16,6 +16,9 @@ export default function GMT2Copy() {
   const startTimeRef = useRef<number>(0);
   const responseMapRef = useRef<Record<number, GMT2CellSymbol>>({});
   responseMapRef.current = responseMap;
+  useEffect(() => {
+    responseMapRef.current = responseMap;
+  }, [responseMap]);
 
   useEffect(() => {
     startTimeRef.current = Date.now();
@@ -64,7 +67,7 @@ export default function GMT2Copy() {
     };
   }, [setCopyResult, setPhase]);
 
-  function submitCopy() {
+  function submitCopy(responseMapOverride?: Record<number, GMT2CellSymbol>) {
     // #region agent log
     const _p3 = { sessionId: 'b9aa2a', location: 'GMT2Copy.tsx:submitCopy', message: 'Submit button clicked', data: { submittedRef: submittedRef.current }, timestamp: Date.now(), hypothesisId: 'H3' };
     pushDebugLog(_p3);
@@ -73,7 +76,8 @@ export default function GMT2Copy() {
     // #endregion
     if (submittedRef.current) return;
     submittedRef.current = true;
-    const response = toResponseGridMap(responseMapRef.current);
+    const source = responseMapOverride ?? responseMapRef.current;
+    const response = toResponseGridMap(source);
     const { copy_hits } = scoreCopyTask(COPY_TARGET_MAP, response);
     const copy_total_rt_ms = startTimeRef.current > 0 ? Date.now() - startTimeRef.current : 0;
     flushSync(() => {
@@ -130,7 +134,7 @@ export default function GMT2Copy() {
           </div>
           <button
             type="button"
-            onClick={() => submitCopy()}
+            onClick={() => submitCopy(responseMap)}
             className="copy-submit"
           >
             Submit

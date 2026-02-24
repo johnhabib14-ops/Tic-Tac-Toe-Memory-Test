@@ -51,6 +51,9 @@ export default function GMT2Memory() {
   const responseMapRef = useRef<Record<number, GMT2CellSymbol>>({});
   const recordedForTrialRef = useRef(-1);
   responseMapRef.current = responseMap;
+  useEffect(() => {
+    responseMapRef.current = responseMap;
+  }, [responseMap]);
 
   const currentItem: GMT2ItemBankEntry | null = trials[trialIndex] ?? null;
   const isLastTrial = trialIndex >= trials.length - 1;
@@ -116,7 +119,7 @@ export default function GMT2Memory() {
     };
   }, [currentItem, phase, trialIndex]);
 
-  function recordTrial(timeout: boolean) {
+  function recordTrial(timeout: boolean, responseMapOverride?: Record<number, GMT2CellSymbol>) {
     // #region agent log
     const _p3 = { sessionId: 'b9aa2a', location: 'GMT2Memory.tsx:recordTrial', message: 'recordTrial called', data: { timeout, trialIndex, recordedRef: recordedForTrialRef.current, willSkip: recordedForTrialRef.current === trialIndex }, timestamp: Date.now(), hypothesisId: 'H1' };
     pushDebugLog(_p3);
@@ -132,7 +135,8 @@ export default function GMT2Memory() {
     }
     console.log('[GMT2Memory] recordTrial proceeding', { trialIndex, timeout });
     recordedForTrialRef.current = trialIndex;
-    const response = normalizeResponseMap(responseMapRef.current);
+    const source = responseMapOverride ?? responseMapRef.current;
+    const response = normalizeResponseMap(source);
     const { hits, commissions, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
     const trialPayload = {
@@ -171,7 +175,7 @@ export default function GMT2Memory() {
     fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p4)}).catch(()=>{});
     // #endregion
     if (!currentItem || phase !== 'reconstructing') return;
-    flushSync(() => recordTrial(false));
+    flushSync(() => recordTrial(false, responseMap));
   }
 
   if (!participant || trials.length === 0) return null;
