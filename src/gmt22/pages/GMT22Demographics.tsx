@@ -24,30 +24,51 @@ const DEVICE_TYPES: GMT22DeviceType[] = [
   'Prefer not to say',
 ];
 
-const CURRENT_YEAR = new Date().getFullYear();
-const MIN_BIRTH_YEAR = CURRENT_YEAR - 90;
-const MAX_BIRTH_YEAR = CURRENT_YEAR - 10;
+const today = new Date();
+
+function toDateOnly(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function ageFromDateOfBirth(birthDate: Date, referenceDate: Date = today): number {
+  const b = toDateOnly(birthDate);
+  const r = toDateOnly(referenceDate);
+  let age = r.getFullYear() - b.getFullYear();
+  if (r.getMonth() < b.getMonth() || (r.getMonth() === b.getMonth() && r.getDate() < b.getDate())) {
+    age -= 1;
+  }
+  return age;
+}
+
+function isoDateString(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+const MIN_BIRTH_DATE = new Date(today.getFullYear() - 90, today.getMonth(), today.getDate());
+const MAX_BIRTH_DATE = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+const MIN_DATE_STR = isoDateString(MIN_BIRTH_DATE);
+const MAX_DATE_STR = isoDateString(MAX_BIRTH_DATE);
 
 export default function GMT22Demographics() {
   const { setParticipant, setPhase } = useGMT22State();
   const [participantId, setParticipantId] = useState('');
-  const [birthYear, setBirthYear] = useState<string>('');
+  const [dateOfBirth, setDateOfBirth] = useState<string>('');
   const [gender, setGender] = useState<GMT22Gender | ''>('');
   const [genderSelfDescribe, setGenderSelfDescribe] = useState('');
   const [education, setEducation] = useState('');
   const [deviceType, setDeviceType] = useState<GMT22DeviceType | ''>('');
 
-  const birthYearNum = birthYear.trim() === '' ? null : parseInt(birthYear, 10);
-  const birthYearValid =
-    birthYearNum !== null &&
-    !Number.isNaN(birthYearNum) &&
-    birthYearNum >= MIN_BIRTH_YEAR &&
-    birthYearNum <= MAX_BIRTH_YEAR;
+  const birthDate = dateOfBirth.trim() === '' ? null : new Date(dateOfBirth + 'T12:00:00');
+  const dateOfBirthValid =
+    birthDate !== null &&
+    !Number.isNaN(birthDate.getTime()) &&
+    birthDate >= MIN_BIRTH_DATE &&
+    birthDate <= MAX_BIRTH_DATE;
   const educationNum = education === '' ? null : parseInt(education, 10);
   const educationValid = educationNum !== null && educationNum >= 10 && educationNum <= 20;
   const valid =
     participantId.trim() !== '' &&
-    birthYearValid &&
+    dateOfBirthValid &&
     gender !== '' &&
     educationValid &&
     (gender !== 'Self describe' || genderSelfDescribe.trim() !== '') &&
@@ -55,16 +76,18 @@ export default function GMT22Demographics() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!valid || birthYearNum === null) return;
+    if (!valid || !birthDate) return;
     const genderValue =
       gender === 'Self describe'
         ? (genderSelfDescribe.trim() ? `Self describe: ${genderSelfDescribe.trim()}` : 'Self describe')
         : gender;
+    const birth_year = birthDate.getFullYear();
+    const age = ageFromDateOfBirth(birthDate);
     const p: GMT22Participant = {
       session_id: generateSessionId(),
       participant_id: participantId.trim(),
-      birth_year: birthYearNum,
-      age: CURRENT_YEAR - birthYearNum,
+      birth_year,
+      age,
       gender: genderValue,
       education: education.trim(),
       device_type: deviceType as GMT22DeviceType,
@@ -93,20 +116,20 @@ export default function GMT22Demographics() {
           />
         </label>
         <label>
-          Year of birth *
+          Date of birth *
           <input
-            type="number"
-            value={birthYear}
-            onChange={(e) => setBirthYear(e.target.value)}
+            type="date"
+            value={dateOfBirth}
+            onChange={(e) => setDateOfBirth(e.target.value)}
             required
-            min={MIN_BIRTH_YEAR}
-            max={MAX_BIRTH_YEAR}
-            placeholder="e.g. 1990"
+            min={MIN_DATE_STR}
+            max={MAX_DATE_STR}
+            aria-describedby={dateOfBirth.trim() !== '' && !dateOfBirthValid ? 'dob-error' : undefined}
           />
         </label>
-        {birthYear.trim() !== '' && !birthYearValid && (
-          <p className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
-            Year must be between {MIN_BIRTH_YEAR} and {MAX_BIRTH_YEAR}.
+        {dateOfBirth.trim() !== '' && !dateOfBirthValid && (
+          <p id="dob-error" className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
+            Date must be between {MIN_DATE_STR} and {MAX_DATE_STR} (age 10–90).
           </p>
         )}
         <label>
