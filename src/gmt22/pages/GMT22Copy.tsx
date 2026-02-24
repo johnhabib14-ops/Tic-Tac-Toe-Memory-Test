@@ -3,9 +3,9 @@ import { flushSync } from 'react-dom';
 import { useGMT22State } from '../GMT22State';
 import type { GMT22CellSymbol } from '../types';
 import { COPY_TARGET_MAP, scoreCopyTask, toResponseGridMap } from '../lib/copyTask';
-import GMT2DisplayGrid from '../../gmt2/components/GMT2DisplayGrid';
-import GMT2ShapePalette from '../../gmt2/components/GMT2ShapePalette';
-import GMT2ReconstructionGrid from '../../gmt2/components/GMT2ReconstructionGrid';
+import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
+import GMT22ShapePalette from '../components/GMT22ShapePalette';
+import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
 import { COPY_TIME_LIMIT_MS } from '../types';
 
 export default function GMT22Copy() {
@@ -99,22 +99,22 @@ export default function GMT22Copy() {
         <div className="copy-reference">
           <p className="copy-section-label">Reference (copy this)</p>
           <div className="grid-container copy-grid-wrap">
-            <GMT2DisplayGrid gridMap={COPY_TARGET_MAP} />
+            <GMT22DisplayGrid gridMap={COPY_TARGET_MAP} />
           </div>
         </div>
         <div className="copy-response">
           <p className="copy-section-label">Your copy</p>
-          <GMT2ShapePalette
+          <GMT22ShapePalette
             includePlus={false}
             selectedSymbol={selected}
             onSelectSymbol={setSelected}
           />
           <div className="grid-container copy-grid-wrap">
-            <GMT2ReconstructionGrid
+            <GMT22ReconstructionGrid
               responseMap={responseMap}
               onPlace={handlePlace}
               onDrop={handleDrop}
-              onCellClick={(cell) => selected && handlePlace(cell, selected)}
+              onCellClick={(cellIndex: number) => selected && handlePlace(cellIndex, selected)}
               paletteIncludesPlus={false}
             />
           </div>

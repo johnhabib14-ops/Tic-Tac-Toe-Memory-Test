@@ -10,9 +10,9 @@ import {
   normalizeResponseMap,
   scoreTrial,
 } from '../lib/memoryTask';
-import GMT2DisplayGrid from '../../gmt2/components/GMT2DisplayGrid';
-import GMT2ShapePalette from '../../gmt2/components/GMT2ShapePalette';
-import GMT2ReconstructionGrid from '../../gmt2/components/GMT2ReconstructionGrid';
+import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
+import GMT22ShapePalette from '../components/GMT22ShapePalette';
+import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
 import FixationCross from '../../components/FixationCross';
 import { DELAY_FIXATION_MS } from '../types';
 
@@ -167,7 +167,7 @@ export default function GMT22Memory() {
         <h2 className="grid-title">Remember the grid</h2>
         <p className="subtitle">{encodingSubtitle}</p>
         <div className="grid-container">
-          <GMT2DisplayGrid gridMap={displayMap} />
+          <GMT22DisplayGrid gridMap={displayMap} />
         </div>
       </div>
     );
@@ -188,17 +188,17 @@ export default function GMT22Memory() {
       <p className="subtitle">
         Place the symbols in the correct positions. Time left: {timeLeftSec}s
       </p>
-      <GMT2ShapePalette
+      <GMT22ShapePalette
         includePlus={includePlus}
         selectedSymbol={selectedSymbol}
         onSelectSymbol={setSelectedSymbol}
       />
       <div className="grid-container">
-        <GMT2ReconstructionGrid
+        <GMT22ReconstructionGrid
           responseMap={responseMap}
           onPlace={handlePlace}
           onDrop={handlePlace}
-          onCellClick={(cell) => selectedSymbol && handlePlace(cell, selectedSymbol)}
+          onCellClick={(cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
         />
       </div>
