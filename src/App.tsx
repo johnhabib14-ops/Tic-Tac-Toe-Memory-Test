@@ -32,6 +32,7 @@ export default function App() {
       <Route path="/results" element={<Results />} />
       <Route path="/pin" element={<PinGate />} />
       <Route path="/data" element={<Data />} />
+      <Route path="/gmt2" element={<GMT22Shell />} />
       <Route path="/gmt22" element={<GMT22Shell />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

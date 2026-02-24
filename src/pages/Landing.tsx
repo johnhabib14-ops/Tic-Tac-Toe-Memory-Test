@@ -14,9 +14,9 @@ export default function Landing() {
         type="button"
         className="secondary"
         style={{ marginTop: '1rem' }}
-        onClick={() => navigate('/gmt22')}
+        onClick={() => navigate('/gmt2')}
       >
-        GMT 2.2
+        GMT 2
       </button>
     </div>
   );

@@ -71,7 +71,7 @@ export default function GMT22Demographics() {
       session_seed: Date.now(),
     };
     setParticipant(p);
-    setPhase('copy_instructions');
+    setPhase('practice');
   }
 
   return (

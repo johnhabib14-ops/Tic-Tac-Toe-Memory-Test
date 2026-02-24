@@ -1,10 +1,11 @@
 /**
- * GMT 2.2 types. Harder variant: span 6 (and optional 7), shorter timing, 8-target copy, clean_trial.
+ * GMT 2 Span 7: 4 conditions, spans 2–7, 2 trials per span, discontinue + smart start.
  */
 
 export type GMT22Phase =
   | 'consent'
   | 'demographics'
+  | 'practice'
   | 'copy_instructions'
   | 'copy'
   | 'memory_instructions'
@@ -56,34 +57,62 @@ export interface GMT22CopyResult {
 export interface GMT22MemoryTrialRecord {
   condition: GMT22Condition;
   span: number;
+  trial_index: 1 | 2;
+  item_id: string;
   target_map: GMT22GridMap;
+  distractor_map: GMT22GridMap;
   response_map: GMT22GridMap;
   recon_rt_ms: number;
   hits: number;
   commissions: number;
+  total_targets: number;
   accuracy_raw: number;
+  passed: boolean;
+  near_passed: boolean;
   timeout: boolean;
-  clean_trial: boolean;
+}
+
+/** Same shape as memory trial for submission. */
+export interface GMT22PracticeTrialRecord {
+  condition: GMT22Condition;
+  span: number;
+  trial_index: 1 | 2;
+  item_id: string;
+  target_map: GMT22GridMap;
+  distractor_map: GMT22GridMap;
+  response_map: GMT22GridMap;
+  recon_rt_ms: number;
+  hits: number;
+  commissions: number;
+  total_targets: number;
+  accuracy_raw: number;
+  passed: boolean;
+  near_passed: boolean;
+  timeout: boolean;
 }
 
 export interface GMT22ConditionSummary {
+  start_span: number;
+  span_estimate: number;
+  span_reached: number;
+  discontinued_at_span: number | null;
+  trials_completed_count: number;
   mean_accuracy: number;
-  mean_rt: number;
+  mean_rt_ms: number;
   total_commissions: number;
-  clean_trial_rate: number;
 }
 
 export interface GMT22Summary {
-  mean_accuracy_per_condition: Record<GMT22Condition, number>;
-  mean_rt_per_condition: Record<GMT22Condition, number>;
-  total_commissions_per_condition: Record<GMT22Condition, number>;
-  clean_trial_rate_per_condition: Record<GMT22Condition, number>;
+  by_condition: Record<GMT22Condition, GMT22ConditionSummary>;
   global_accuracy: number;
-  global_mean_rt: number;
-  global_clean_trial_rate: number;
+  global_mean_rt_ms: number;
+  global_total_commissions: number;
+  memory_early_stopped: boolean;
+  practice_failed: boolean;
 }
 
 export interface GMT22ItemBankEntry {
+  item_id: string;
   condition: GMT22Condition;
   span: number;
   target_map: GMT22GridMap;
@@ -97,9 +126,8 @@ export const GMT22_CONDITIONS: GMT22Condition[] = [
   'delay',
 ];
 
-/** Base spans 2–6; span 7 added if VITE_GMT22_OVERLOAD=1 */
-export const GMT22_BASE_SPANS = [2, 3, 4, 5, 6] as const;
-export const GMT22_OVERLOAD_SPAN = 7;
+export const GMT22_SPANS = [2, 3, 4, 5, 6, 7] as const;
+export const GMT22_TRIALS_PER_SPAN = 2;
 
 export const COPY_GRID_SIZE = 4;
 export const COPY_NUM_TARGETS = 8;

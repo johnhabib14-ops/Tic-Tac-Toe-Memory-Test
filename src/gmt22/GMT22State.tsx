@@ -10,6 +10,7 @@ import type {
   GMT22Participant,
   GMT22CopyResult,
   GMT22MemoryTrialRecord,
+  GMT22PracticeTrialRecord,
 } from './types';
 
 interface GMT22StateValue {
@@ -22,6 +23,10 @@ interface GMT22StateValue {
   memoryTrials: GMT22MemoryTrialRecord[];
   addMemoryTrial: (t: GMT22MemoryTrialRecord) => void;
   setMemoryTrials: (t: GMT22MemoryTrialRecord[]) => void;
+  practiceTrials: GMT22PracticeTrialRecord[];
+  setPracticeTrials: (t: GMT22PracticeTrialRecord[]) => void;
+  practiceFailed: boolean;
+  setPracticeFailed: (v: boolean) => void;
 }
 
 const GMT22StateContext = createContext<GMT22StateValue | null>(null);
@@ -31,6 +36,8 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
   const [participant, setParticipant] = useState<GMT22Participant | null>(null);
   const [copyResult, setCopyResult] = useState<GMT22CopyResult | null>(null);
   const [memoryTrials, setMemoryTrials] = useState<GMT22MemoryTrialRecord[]>([]);
+  const [practiceTrials, setPracticeTrials] = useState<GMT22PracticeTrialRecord[]>([]);
+  const [practiceFailed, setPracticeFailed] = useState(false);
 
   const addMemoryTrial = useCallback((t: GMT22MemoryTrialRecord) => {
     setMemoryTrials((prev) => [...prev, t]);
@@ -46,6 +53,10 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
     memoryTrials,
     addMemoryTrial,
     setMemoryTrials,
+    practiceTrials,
+    setPracticeTrials,
+    practiceFailed,
+    setPracticeFailed,
   };
 
   return (
