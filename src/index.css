@@ -233,6 +233,7 @@ button.secondary:hover {
 
 .copy-grid-wrap .symbol-x,
 .copy-grid-wrap .symbol-o,
+.copy-grid-wrap .symbol-plus,
 .copy-grid-wrap .distractor-svg {
   width: 28px;
   height: 28px;
@@ -288,20 +289,18 @@ button.secondary:hover {
 }
 
 /* Symbols in grid */
-.symbol-x, .symbol-o {
+.symbol-x, .symbol-o, .symbol-plus {
   stroke: #2d2d2d;
   stroke-width: 3;
   stroke-linecap: round;
 }
 
-.symbol-x {
+.symbol-x, .symbol-o, .symbol-plus {
   width: 32px;
   height: 32px;
 }
 
 .symbol-o {
-  width: 32px;
-  height: 32px;
   fill: none;
   stroke-width: 3;
 }
