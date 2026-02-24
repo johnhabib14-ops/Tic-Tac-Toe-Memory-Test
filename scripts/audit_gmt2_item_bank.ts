@@ -15,6 +15,9 @@
  * or
  * npx tsx scripts/audit_gmt2_item_bank.ts
  *
+ * Recommended (full audit including selection uniqueness over 500 sessions)
+ * GMT2_SELECTOR_MODULE=../src/gmt22/selection npx tsx scripts/audit_gmt2_item_bank.ts
+ *
  * Optional selection simulation
  * Set an env var GMT2_SELECTOR_MODULE to a module path that exports:
  *   selectItemsForSession(seed: string | number, items: any[]): string[]

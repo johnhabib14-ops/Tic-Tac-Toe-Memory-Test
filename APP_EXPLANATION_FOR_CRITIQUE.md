@@ -2,6 +2,8 @@
 
 This document describes the **Tic-Tac-Toe Memory Test** web application in enough detail for an external reviewer (e.g. ChatGPT) to critique its design, implementation, and research validity. The app exists in two versions: **GMT 1.0** (original) and **GMT 2** (streamlined research version). The explanation focuses on GMT 2 as the primary research protocol; GMT 1.0 is summarized for context.
 
+**Protocol freeze:** The GMT 2 research protocol (span 2–7, four conditions, discontinue, span-centered summary) is frozen as of app version **1.0.0**. Task logic, scoring, and summary structure are stable for data collection.
+
 ---
 
 ## 1. Purpose and Research Context
