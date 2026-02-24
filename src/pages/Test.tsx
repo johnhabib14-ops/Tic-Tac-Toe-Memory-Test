@@ -89,7 +89,10 @@ export default function Test() {
 
   useEffect(() => {
     if (phase !== 'reconstructing' || passed || showNextAfterTimeout || !currentGrid || !participant || !trialConfig) return;
-    let secondsLeft = Math.floor(trialConfig.reconstructionTimeLimitMs / 1000);
+    const grid = currentGrid;
+    const config = trialConfig;
+    const p = participant;
+    let secondsLeft = Math.floor(config.reconstructionTimeLimitMs / 1000);
     setTimeLeftSec(secondsLeft);
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -98,38 +101,38 @@ export default function Test() {
       secondsLeft -= 1;
       setTimeLeftSec(secondsLeft);
       if (secondsLeft <= 0) {
-        const _p1 = { sessionId: 'b9aa2a', location: 'Test.tsx:timeoutBranch', message: 'GMT1 recon timer hit 0', data: { level: trialConfig?.level }, timestamp: Date.now(), hypothesisId: 'H4' };
+        const _p1 = { sessionId: 'b9aa2a', location: 'Test.tsx:timeoutBranch', message: 'GMT1 recon timer hit 0', data: { level: config.level }, timestamp: Date.now(), hypothesisId: 'H4' };
         pushDebugLog(_p1);
-        console.log('[Test] recon timer hit 0', { level: trialConfig?.level });
+        console.log('[Test] recon timer hit 0', { level: config.level });
         fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p1)}).catch(()=>{});
-        const normalized = normalizeResponseMap(responseMapRef.current, currentGrid.gridSize);
+        const normalized = normalizeResponseMap(responseMapRef.current, grid.gridSize);
         const result = scoreGrid(
-          currentGrid.targetMap,
+          grid.targetMap,
           normalized,
-          currentGrid.numTargets,
-          currentGrid.gridSize
+          grid.numTargets,
+          grid.gridSize
         );
         const levelPoints = getLevelPoints(
-          trialConfig.level,
+          config.level,
           result.correctPlacements,
-          currentGrid.numTargets,
+          grid.numTargets,
           result.commissionErrors
         );
-        const maxForLevel = trialConfig.level <= 9 ? 1 : 2;
+        const maxForLevel = config.level <= 9 ? 1 : 2;
         const isImperfect = levelPoints < maxForLevel;
         const reactionTimeMs = reconstructionStartRef.current > 0 ? Date.now() - reconstructionStartRef.current : 0;
         const record: TrialRecord = {
-          participantId: participant.id,
-          level: trialConfig.level,
+          participantId: p.id,
+          level: config.level,
           trialIndex: 0,
           gridIndex: 0,
-          gridSize: currentGrid.gridSize,
-          numTargets: currentGrid.numTargets,
+          gridSize: grid.gridSize,
+          numTargets: grid.numTargets,
           numGrids: 1,
-          displayTimeMs: trialConfig.displayTimeMs,
-          delayMs: trialConfig.delayMs,
-          distractorCount: Object.keys(currentGrid.displayMap).length - currentGrid.numTargets,
-          targetMap: currentGrid.targetMap,
+          displayTimeMs: config.displayTimeMs,
+          delayMs: config.delayMs,
+          distractorCount: Object.keys(grid.displayMap).length - grid.numTargets,
+          targetMap: grid.targetMap,
           responseMap: normalized,
           correctPlacements: result.correctPlacements,
           commissionErrors: result.commissionErrors,
