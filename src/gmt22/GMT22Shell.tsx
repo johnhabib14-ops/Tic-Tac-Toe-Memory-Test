@@ -1,4 +1,5 @@
 import { GMT22StateProvider, useGMT22State } from './GMT22State';
+import GMT22Intro from './pages/GMT22Intro';
 import GMT22Consent from './pages/GMT22Consent';
 import GMT22Demographics from './pages/GMT22Demographics';
 import GMT22Practice from './pages/GMT22Practice';
@@ -12,6 +13,8 @@ function GMT22ShellContent() {
   const { phase } = useGMT22State();
 
   switch (phase) {
+    case 'intro':
+      return <GMT22Intro />;
     case 'consent':
       return <GMT22Consent />;
     case 'demographics':
@@ -29,7 +32,7 @@ function GMT22ShellContent() {
     case 'results':
       return <GMT22Results />;
     default:
-      return <GMT22Consent />;
+      return <GMT22Intro />;
   }
 }
 

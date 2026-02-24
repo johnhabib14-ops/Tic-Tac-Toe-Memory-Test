@@ -34,7 +34,7 @@ interface GMT22StateValue {
 const GMT22StateContext = createContext<GMT22StateValue | null>(null);
 
 export function GMT22StateProvider({ children }: { children: ReactNode }) {
-  const [phase, setPhase] = useState<GMT22Phase>('consent');
+  const [phase, setPhase] = useState<GMT22Phase>('intro');
   const [participant, setParticipant] = useState<GMT22Participant | null>(null);
   const [copyResult, setCopyResult] = useState<GMT22CopyResult | null>(null);
   const [memoryTrials, setMemoryTrials] = useState<GMT22MemoryTrialRecord[]>([]);

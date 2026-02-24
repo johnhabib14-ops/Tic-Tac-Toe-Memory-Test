@@ -3,6 +3,7 @@
  */
 
 export type GMT22Phase =
+  | 'intro'
   | 'consent'
   | 'demographics'
   | 'practice'
