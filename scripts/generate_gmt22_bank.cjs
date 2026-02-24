@@ -116,7 +116,19 @@ function mulberry32(seed) {
   };
 }
 
-function generateTargetMaps(span, condition, count, rng, globalSeen) {
+/**
+ * Pick `span` positions slightly favoring cells with lower heatmap counts (reduces spatial clustering).
+ * Key = rng() - penalty * heatmap[i]; sort descending so low-heatmap cells tend to be chosen first.
+ */
+function pickPositionsWeighted(span, heatmap, rng) {
+  const penalty = 0.12;
+  const indices = [...Array(16).keys()];
+  const keys = indices.map((i) => rng() - penalty * (heatmap[i] || 0));
+  const sorted = indices.slice().sort((a, b) => keys[b] - keys[a]);
+  return sorted.slice(0, span);
+}
+
+function generateTargetMaps(span, condition, count, rng, globalSeen, heatmap) {
   const out = [];
   const indices = [...Array(16).keys()];
   const seen = new Set();
@@ -125,7 +137,9 @@ function generateTargetMaps(span, condition, count, rng, globalSeen) {
   while (out.length < count && attempts < 12000) {
     attempts++;
     const grid = emptyGrid();
-    const positions = shuffle(indices, rng).slice(0, span);
+    const positions = heatmap
+      ? pickPositionsWeighted(span, heatmap, rng)
+      : shuffle(indices, rng).slice(0, span);
     const usePlus = condition === 'remember_distractor' && span >= 2;
     const numPlus = usePlus ? 1 : 0;
     const rest = span - numPlus;
@@ -151,7 +165,11 @@ function generateTargetMaps(span, condition, count, rng, globalSeen) {
     if (condition !== 'remember_distractor' && xoBalance(grid) > 1) continue;
     seen.add(key);
     if (globalSeen) globalSeen.add(key);
-    out.push(grid.slice());
+    const layout = grid.slice();
+    out.push(layout);
+    if (heatmap) {
+      for (let i = 0; i < 16; i++) if (layout[i]) heatmap[i]++;
+    }
   }
   return out;
 }
@@ -175,10 +193,11 @@ function main() {
   const bank = [];
   const spans = [...BASE_SPANS, OVERLOAD_SPAN];
   const globalLayoutSeen = new Set();
+  const heatmap = Array(16).fill(0);
 
   for (const condition of CONDITIONS) {
     for (const span of spans) {
-      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng, globalLayoutSeen);
+      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng, globalLayoutSeen, heatmap);
       for (const target_map of targetMaps) {
         const distractor_map = condition === 'ignore_distractor'
           ? addDistractors(target_map, span, rng)
