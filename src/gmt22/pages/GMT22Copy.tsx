@@ -45,7 +45,7 @@ export default function GMT22Copy() {
           };
           flushSync(() => {
             setCopyResult(result);
-            setPhase('memory');
+            setPhase('memory_instructions');
           });
         }
         return;
@@ -73,7 +73,7 @@ export default function GMT22Copy() {
         copy_target_map: [...COPY_TARGET_MAP],
         copy_response_map: response,
       });
-      setPhase('memory');
+      setPhase('memory_instructions');
     });
   }
 

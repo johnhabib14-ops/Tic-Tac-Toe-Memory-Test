@@ -5,7 +5,9 @@
 export type GMT22Phase =
   | 'consent'
   | 'demographics'
+  | 'copy_instructions'
   | 'copy'
+  | 'memory_instructions'
   | 'memory'
   | 'results';
 

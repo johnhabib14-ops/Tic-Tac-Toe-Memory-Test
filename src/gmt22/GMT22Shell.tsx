@@ -1,7 +1,9 @@
 import { GMT22StateProvider, useGMT22State } from './GMT22State';
 import GMT22Consent from './pages/GMT22Consent';
 import GMT22Demographics from './pages/GMT22Demographics';
+import GMT22CopyInstructions from './pages/GMT22CopyInstructions';
 import GMT22Copy from './pages/GMT22Copy';
+import GMT22MemoryInstructions from './pages/GMT22MemoryInstructions';
 import GMT22Memory from './pages/GMT22Memory';
 import GMT22Results from './pages/GMT22Results';
 
@@ -13,8 +15,12 @@ function GMT22ShellContent() {
       return <GMT22Consent />;
     case 'demographics':
       return <GMT22Demographics />;
+    case 'copy_instructions':
+      return <GMT22CopyInstructions />;
     case 'copy':
       return <GMT22Copy />;
+    case 'memory_instructions':
+      return <GMT22MemoryInstructions />;
     case 'memory':
       return <GMT22Memory />;
     case 'results':
