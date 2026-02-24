@@ -9,21 +9,21 @@ export default function Landing() {
       <p className="subtitle">
         A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
       </p>
-      <button onClick={() => navigate('/demographics')}>Begin</button>
+      <button onClick={() => navigate('/demographics')}>Begin game</button>
       <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <button
           type="button"
           className="secondary"
           onClick={() => navigate('/gmt2')}
         >
-          Start GMT 2.1 (research version)
+          GMT 2.1
         </button>
         <button
           type="button"
           className="secondary"
           onClick={() => navigate('/gmt22')}
         >
-          Start GMT 2.2 (harder research version)
+          GMT 2.2
         </button>
       </div>
     </div>
