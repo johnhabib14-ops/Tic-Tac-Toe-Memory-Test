@@ -1,0 +1,24 @@
+-- Run this in Supabase SQL editor to create the GMT 2.1 submissions table.
+-- Table: gmt2_submissions (do not mix with existing submissions table).
+
+CREATE TABLE IF NOT EXISTS gmt2_submissions (
+  id BIGSERIAL PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  birth_year INTEGER NOT NULL DEFAULT 0,
+  gender TEXT NOT NULL DEFAULT '',
+  education TEXT NOT NULL DEFAULT '',
+  device_type TEXT NOT NULL DEFAULT '',
+  copy_hits INTEGER NOT NULL DEFAULT 0,
+  copy_total_rt_ms INTEGER NOT NULL DEFAULT 0,
+  copy_target_map JSONB NOT NULL DEFAULT '[]',
+  copy_response_map JSONB NOT NULL DEFAULT '[]',
+  memory_trials JSONB NOT NULL DEFAULT '[]',
+  mean_accuracy_per_condition JSONB NOT NULL DEFAULT '{}',
+  mean_rt_per_condition JSONB NOT NULL DEFAULT '{}',
+  global_accuracy NUMERIC NOT NULL DEFAULT 0,
+  global_mean_rt NUMERIC NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Optional: enable RLS and add policy if you use Supabase auth.
+-- For anonymous submissions, the default may allow inserts with anon key depending on your project settings.

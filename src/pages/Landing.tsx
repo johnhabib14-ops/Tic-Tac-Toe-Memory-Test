@@ -10,6 +10,15 @@ export default function Landing() {
         A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
       </p>
       <button onClick={() => navigate('/demographics')}>Begin</button>
+      <p style={{ marginTop: '1rem' }}>
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => navigate('/gmt2')}
+        >
+          Start GMT 2.1 (research version)
+        </button>
+      </p>
     </div>
   );
 }

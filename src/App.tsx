@@ -12,6 +12,7 @@ import Copy from './pages/Copy';
 import Results from './pages/Results';
 import PinGate from './pages/PinGate';
 import Data from './pages/Data';
+import GMT2Shell from './gmt2/GMT2Shell';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/results" element={<Results />} />
       <Route path="/pin" element={<PinGate />} />
       <Route path="/data" element={<Data />} />
+      <Route path="/gmt2" element={<GMT2Shell />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
