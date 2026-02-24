@@ -9,6 +9,7 @@ const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 export interface GMT2SubmitPayload {
   session_id: string;
+  participant_id: string;
   birth_year: number;
   gender: string;
   education: string;
@@ -42,6 +43,7 @@ export function buildGMT2Payload(
 ): GMT2SubmitPayload {
   return {
     session_id: participant.session_id,
+    participant_id: participant.participant_id,
     birth_year: participant.birth_year,
     gender: participant.gender,
     education: participant.education,

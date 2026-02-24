@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { useGMT2State } from '../GMT2State';
 import type { GMT2CellSymbol, GMT2Condition, GMT2GridMap } from '../types';
 import type { GMT2ItemBankEntry } from '../lib/memoryTask';
@@ -13,6 +14,7 @@ import GMT2DisplayGrid from '../components/GMT2DisplayGrid';
 import GMT2ShapePalette from '../components/GMT2ShapePalette';
 import GMT2ReconstructionGrid from '../components/GMT2ReconstructionGrid';
 import FixationCross from '../../components/FixationCross';
+import { pushDebugLog } from '../../lib/debugLog';
 
 const DELAY_FIXATION_MS = 4000;
 
@@ -80,33 +82,60 @@ export default function GMT2Memory() {
     return () => clearTimeout(t);
   }, [currentItem, phase]);
 
-  // Reconstruction countdown and timeout submit
+  // Reconstruction countdown via recursive setTimeout (logic at 0 runs in callback, not in setState updater)
   useEffect(() => {
     if (!currentItem || phase !== 'reconstructing') return;
-    const interval = setInterval(() => {
-      setTimeLeftSec((s) => {
-        if (s <= 1) {
-          clearInterval(interval);
-          if (recordedForTrialRef.current !== trialIndex) {
-            recordedForTrialRef.current = trialIndex;
-            recordTrial(true);
-          }
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
+    // #region agent log
+    const _p1 = { sessionId: 'b9aa2a', location: 'GMT2Memory.tsx:reconEffect', message: 'recon interval started', data: { trialIndex, condition: currentItem?.condition, span: currentItem?.span }, timestamp: Date.now(), hypothesisId: 'H1' };
+    pushDebugLog(_p1);
+    fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p1)}).catch(()=>{});
+    // #endregion
+    let secondsLeft = Math.floor(reconLimitMs(currentItem.span) / 1000);
+    setTimeLeftSec(secondsLeft);
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    function tick() {
+      if (cancelled) return;
+      secondsLeft -= 1;
+      setTimeLeftSec(secondsLeft);
+      if (secondsLeft <= 0) {
+        const willCall = recordedForTrialRef.current !== trialIndex;
+        const _p2 = { sessionId: 'b9aa2a', location: 'GMT2Memory.tsx:timeoutBranch', message: 'timer hit 0', data: { trialIndex, recordedForTrialRef: recordedForTrialRef.current, willCallRecordTrial: willCall }, timestamp: Date.now(), hypothesisId: 'H1', runId: 'post-fix' };
+        pushDebugLog(_p2);
+        console.log('[GMT2Memory] timer hit 0', { trialIndex, willCall });
+        fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p2)}).catch(()=>{});
+        if (willCall) recordTrial(true);
+        return;
+      }
+      timeoutId = setTimeout(tick, 1000);
+    }
+    timeoutId = setTimeout(tick, 1000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [currentItem, phase, trialIndex]);
 
   function recordTrial(timeout: boolean) {
-    if (!currentItem || !participant) return;
-    if (recordedForTrialRef.current === trialIndex) return;
+    // #region agent log
+    const _p3 = { sessionId: 'b9aa2a', location: 'GMT2Memory.tsx:recordTrial', message: 'recordTrial called', data: { timeout, trialIndex, recordedRef: recordedForTrialRef.current, willSkip: recordedForTrialRef.current === trialIndex }, timestamp: Date.now(), hypothesisId: 'H1' };
+    pushDebugLog(_p3);
+    fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p3)}).catch(()=>{});
+    // #endregion
+    if (!currentItem || !participant) {
+      console.log('[GMT2Memory] recordTrial early return: no currentItem or participant');
+      return;
+    }
+    if (recordedForTrialRef.current === trialIndex) {
+      console.log('[GMT2Memory] recordTrial early return: already recorded for trial', trialIndex);
+      return;
+    }
+    console.log('[GMT2Memory] recordTrial proceeding', { trialIndex, timeout });
     recordedForTrialRef.current = trialIndex;
     const response = normalizeResponseMap(responseMapRef.current);
     const { hits, commissions, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
-    addMemoryTrial({
+    const trialPayload = {
       condition: currentItem.condition,
       span: currentItem.span,
       target_map: currentItem.target_map,
@@ -116,14 +145,18 @@ export default function GMT2Memory() {
       commissions,
       accuracy_raw,
       timeout,
+    };
+    const last = isLastTrial;
+    flushSync(() => {
+      addMemoryTrial(trialPayload);
+      setResponseMap({});
+      if (last) {
+        setPhase('results');
+      } else {
+        setTrialIndex((i) => i + 1);
+        setPhaseLocal('encoding');
+      }
     });
-    setResponseMap({});
-    if (isLastTrial) {
-      setPhase('results');
-    } else {
-      setTrialIndex((i) => i + 1);
-      setPhaseLocal('encoding');
-    }
   }
 
   function handlePlace(cellIndex: number, symbol: GMT2CellSymbol) {
@@ -131,8 +164,14 @@ export default function GMT2Memory() {
   }
 
   function handleSubmit() {
+    // #region agent log
+    const _p4 = { sessionId: 'b9aa2a', location: 'GMT2Memory.tsx:handleSubmit', message: 'Submit button clicked', data: { hasCurrentItem: !!currentItem, phase }, timestamp: Date.now(), hypothesisId: 'H3' };
+    pushDebugLog(_p4);
+    console.log('[GMT2Memory] Submit clicked', { hasCurrentItem: !!currentItem, phase });
+    fetch('http://127.0.0.1:7618/ingest/d02cffea-2b2e-4a1e-93c8-0016355962bd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'b9aa2a'},body:JSON.stringify(_p4)}).catch(()=>{});
+    // #endregion
     if (!currentItem || phase !== 'reconstructing') return;
-    recordTrial(false);
+    flushSync(() => recordTrial(false));
   }
 
   if (!participant || trials.length === 0) return null;

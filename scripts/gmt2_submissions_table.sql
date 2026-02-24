@@ -4,6 +4,7 @@
 CREATE TABLE IF NOT EXISTS gmt2_submissions (
   id BIGSERIAL PRIMARY KEY,
   session_id TEXT NOT NULL,
+  participant_id TEXT NOT NULL DEFAULT '',
   birth_year INTEGER NOT NULL DEFAULT 0,
   gender TEXT NOT NULL DEFAULT '',
   education TEXT NOT NULL DEFAULT '',
@@ -19,6 +20,9 @@ CREATE TABLE IF NOT EXISTS gmt2_submissions (
   global_mean_rt NUMERIC NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- If the table already exists, add the column with:
+-- ALTER TABLE gmt2_submissions ADD COLUMN IF NOT EXISTS participant_id TEXT NOT NULL DEFAULT '';
 
 -- Optional: enable RLS and add policy if you use Supabase auth.
 -- For anonymous submissions, the default may allow inserts with anon key depending on your project settings.

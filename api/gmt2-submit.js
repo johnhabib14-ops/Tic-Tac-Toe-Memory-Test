@@ -1,6 +1,6 @@
 /**
  * Vercel serverless: POST /api/gmt2-submit
- * Body: JSON (session_id, birth_year, gender, education, device_type,
+ * Body: JSON (session_id, participant_id, birth_year, gender, education, device_type,
  *       copy_hits, copy_total_rt_ms, copy_target_map, copy_response_map,
  *       memory_trials[], mean_accuracy_per_condition, mean_rt_per_condition,
  *       global_accuracy, global_mean_rt)
@@ -32,6 +32,7 @@ export default async function handler(req, res) {
 
   const row = {
     session_id: body.session_id ?? '',
+    participant_id: body.participant_id ?? '',
     birth_year: Number(body.birth_year) || 0,
     gender: body.gender ?? '',
     education: body.education ?? '',

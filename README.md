@@ -43,6 +43,8 @@ Store every submission in Supabase and view/export from a PIN-protected page.
 3. **Base path (optional):** By default the app is served under `/Tic-Tac-Toe-Memory-Test/`. To serve at the Vercel root (e.g. `https://your-app.vercel.app/`), set `VITE_BASE_PATH=/` in Vercel and redeploy.
 4. Deploy. Test: open your app URL (with or without `/Tic-Tac-Toe-Memory-Test/` per step 3), complete the participant flow and submit; then open `/pin` (same base path), enter `DATA_SECRET`, and use the Data page to Export JSON or CSV.
 
+**Data not saving?** (1) Set `VITE_API_URL` in Vercel (your app URL, no trailing slash) and **redeploy** so the frontend is built with it. (2) Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel. (3) In Supabase, ensure the `submissions` table exists and, if RLS is enabled, add policies allowing `anon` to insert and select.
+
 ## Sending results to Google Sheets
 
 To skip the Google Form and have each participant’s results appended as one row in a Google Sheet:

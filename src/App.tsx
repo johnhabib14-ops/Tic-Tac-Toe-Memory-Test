@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import DebugOverlay from './components/DebugOverlay';
 import Landing from './pages/Landing';
 import Demographics from './pages/Demographics';
 import TwoPartsIntro from './pages/TwoPartsIntro';
@@ -16,6 +17,7 @@ import GMT2Shell from './gmt2/GMT2Shell';
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/demographics" element={<Demographics />} />
@@ -33,5 +35,7 @@ export default function App() {
       <Route path="/gmt2" element={<GMT2Shell />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    <DebugOverlay />
+    </>
   );
 }

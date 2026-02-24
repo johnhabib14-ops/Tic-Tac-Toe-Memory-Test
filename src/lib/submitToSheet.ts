@@ -73,8 +73,21 @@ export function submitToBackend(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-  }).then((r) => {
-    if (!r.ok) throw new Error(r.status === 502 ? 'Failed to save submission' : `Request failed: ${r.status}`);
+  }).then(async (r) => {
+    if (r.ok) return;
+    const status = r.status;
+    let detail = '';
+    try {
+      const text = await r.text();
+      const parsed = text ? JSON.parse(text) : null;
+      if (parsed && typeof parsed.error === 'string') detail = `: ${parsed.error}`;
+      else if (text && text.length < 120) detail = `: ${text}`;
+    } catch {
+      // ignore
+    }
+    if (status === 500) throw new Error(`Server misconfiguration (500)${detail}`);
+    if (status === 502) throw new Error(`Failed to save submission (502)${detail}`);
+    throw new Error(`Request failed: ${status}${detail}`);
   });
 }
 

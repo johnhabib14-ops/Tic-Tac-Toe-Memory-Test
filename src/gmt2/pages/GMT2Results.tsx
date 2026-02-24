@@ -72,6 +72,7 @@ export default function GMT2Results() {
 
         <div className="results-score-block">
           <h3>Overall</h3>
+          <p><strong>Participant ID:</strong> {participant.participant_id}</p>
           <p>Total trials completed: {memoryTrials.length}</p>
         </div>
 

@@ -127,6 +127,16 @@ export default function Results() {
           ) : !isBackendConfigured() ? (
             <button onClick={doSubmit}>Submit results to study</button>
           ) : null}
+          {!isBackendConfigured() && (
+            <p className="results-api-hint" style={{ marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.85 }}>
+              Server save is off. Set VITE_API_URL and redeploy to save to Supabase.
+            </p>
+          )}
+          {import.meta.env.DEV && (
+            <p className="results-api-diagnostic" style={{ marginTop: '0.25rem', fontSize: '0.8rem', opacity: 0.7 }}>
+              API: {isBackendConfigured() ? 'configured' : 'not set'}
+            </p>
+          )}
           <button type="button" className="secondary link-style" onClick={handleTakeTestAgain}>
             Take the test again
           </button>
