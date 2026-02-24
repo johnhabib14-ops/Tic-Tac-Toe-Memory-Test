@@ -35,6 +35,11 @@ export default function GMT22Results() {
 
   const conditionOrder = getConditionOrder(participant.condition_order);
 
+  const totalTargets = memoryTrials.reduce((s, t) => s + t.total_targets, 0);
+  const totalHits = memoryTrials.reduce((s, t) => s + t.hits, 0);
+  const overallPct =
+    totalTargets > 0 ? ((totalHits / totalTargets) * 100).toFixed(1) : null;
+
   async function handleSubmit() {
     if (!isGMT22BackendConfigured()) return;
     if (!participant) return;
@@ -63,8 +68,13 @@ export default function GMT22Results() {
   return (
     <div className="page">
       <div className="results-card">
-        <h1 className="results-title">Thank you for completing GMT 2</h1>
-        <p className="subtitle" style={{ marginTop: '0.25rem', marginBottom: '1rem' }}>
+        <h1 className="results-title" style={{ whiteSpace: 'nowrap' }}>
+          Thank you for completing GMT 2
+        </h1>
+        <p className="subtitle" style={{ marginTop: '0.25rem', marginBottom: '0.25rem', fontWeight: 600 }}>
+          {overallPct != null ? `Overall: ${overallPct}% accuracy` : 'Overall: —'}
+        </p>
+        <p className="subtitle" style={{ marginTop: 0, marginBottom: '1rem' }}>
           This task measures visual–spatial memory span under different task demands.
         </p>
 

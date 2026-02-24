@@ -91,7 +91,7 @@ function validTargetGrid(grid, span) {
   if (r.some(n => n > 2) || c.some(n => n > 2)) return false;
   if (count2x2BlocksWithTargets(grid, 3) > 0) return false;
   if (adjacentPairs(grid) > Math.floor(span / 2)) return false;
-  const minRC = span >= 4 ? 3 : 2;
+  const minRC = span >= 6 ? 4 : (span >= 4 ? 3 : 2);
   if (rowsWithTarget(grid) < minRC || colsWithTarget(grid) < minRC) return false;
   if (isMirrorSymmetric(grid)) return false;
   return true;
@@ -128,7 +128,17 @@ function pickPositionsWeighted(span, heatmap, rng) {
   return sorted.slice(0, span);
 }
 
-function generateTargetMaps(span, condition, count, rng, globalSeen, heatmap) {
+/**
+ * Pick one position from the list to assign Plus, favoring lower plusHeatmap counts.
+ */
+function pickPlusPositionWeighted(positions, plusHeatmap, rng) {
+  const penalty = 0.12;
+  const withKeys = positions.map((p) => ({ p, key: rng() - penalty * (plusHeatmap[p] || 0) }));
+  withKeys.sort((a, b) => b.key - a.key);
+  return withKeys[0].p;
+}
+
+function generateTargetMaps(span, condition, count, rng, globalSeen, heatmap, plusHeatmap) {
   const out = [];
   const indices = [...Array(16).keys()];
   const seen = new Set();
@@ -148,13 +158,23 @@ function generateTargetMaps(span, condition, count, rng, globalSeen, heatmap) {
     const targetX = extraIsX ? Math.ceil(rest / 2) : Math.floor(rest / 2);
     const targetO = rest - targetX;
 
-    let xC = 0, oC = 0, plusC = 0;
-    for (let i = 0; i < span; i++) {
-      let sym;
-      if (numPlus > 0 && plusC < numPlus) { sym = 'Plus'; plusC++; }
-      else if (xC < targetX) { sym = 'X'; xC++; }
-      else { sym = 'O'; oC++; }
-      grid[positions[i]] = sym;
+    if (usePlus && numPlus === 1 && plusHeatmap) {
+      // Balance Plus position: choose which of the span positions gets Plus
+      const plusPosition = pickPlusPositionWeighted(positions, plusHeatmap, rng);
+      const otherPositions = positions.filter((p) => p !== plusPosition).sort((a, b) => a - b);
+      grid[plusPosition] = 'Plus';
+      for (let i = 0; i < otherPositions.length; i++) {
+        grid[otherPositions[i]] = i < targetX ? 'X' : 'O';
+      }
+    } else {
+      let xC = 0, oC = 0, plusC = 0;
+      for (let i = 0; i < span; i++) {
+        let sym;
+        if (numPlus > 0 && plusC < numPlus) { sym = 'Plus'; plusC++; }
+        else if (xC < targetX) { sym = 'X'; xC++; }
+        else { sym = 'O'; oC++; }
+        grid[positions[i]] = sym;
+      }
     }
 
     const key = grid.join(',');
@@ -170,6 +190,9 @@ function generateTargetMaps(span, condition, count, rng, globalSeen, heatmap) {
     if (heatmap) {
       for (let i = 0; i < 16; i++) if (layout[i]) heatmap[i]++;
     }
+    if (plusHeatmap && condition === 'remember_distractor') {
+      for (let i = 0; i < 16; i++) if (layout[i] === 'Plus') plusHeatmap[i]++;
+    }
   }
   return out;
 }
@@ -178,13 +201,27 @@ function distractorCount(span) {
   return Math.max(1, Math.ceil(span / 2) - 1);
 }
 
-function addDistractors(targetMap, span, rng) {
+/**
+ * Pick which empty cells get distractor Plus, favoring lower heatmap counts.
+ */
+function pickDistractorPositionsWeighted(emptyIndices, n, heatmap, rng) {
+  if (!heatmap || emptyIndices.length === 0) {
+    const shuffled = shuffle(emptyIndices, rng);
+    return shuffled.slice(0, n);
+  }
+  const penalty = 0.22;
+  const withKeys = emptyIndices.map((i) => ({ i, key: rng() - penalty * (heatmap[i] || 0) }));
+  withKeys.sort((a, b) => b.key - a.key);
+  return withKeys.slice(0, n).map((x) => x.i);
+}
+
+function addDistractors(targetMap, span, rng, distractorPlusHeatmap) {
   const distractorMap = emptyGrid();
   const emptyIndices = [];
   for (let i = 0; i < 16; i++) if (!targetMap[i]) emptyIndices.push(i);
   const n = Math.min(distractorCount(span), emptyIndices.length);
-  const shuffled = shuffle(emptyIndices, rng);
-  for (let i = 0; i < n; i++) distractorMap[shuffled[i]] = 'Plus';
+  const chosen = pickDistractorPositionsWeighted(emptyIndices, n, distractorPlusHeatmap, rng);
+  for (const i of chosen) distractorMap[i] = 'Plus';
   return distractorMap;
 }
 
@@ -194,19 +231,28 @@ function main() {
   const spans = [...BASE_SPANS, OVERLOAD_SPAN];
   const globalLayoutSeen = new Set();
   const heatmap = Array(16).fill(0);
+  const plusHeatmap = Array(16).fill(0);
+  const distractorPlusHeatmap = Array(16).fill(0);
 
   for (const condition of CONDITIONS) {
     for (const span of spans) {
-      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng, globalLayoutSeen, heatmap);
+      const targetMaps = generateTargetMaps(span, condition, ITEMS_PER_KEY, rng, globalLayoutSeen, heatmap, plusHeatmap);
       for (const target_map of targetMaps) {
         const distractor_map = condition === 'ignore_distractor'
-          ? addDistractors(target_map, span, rng)
+          ? addDistractors(target_map, span, rng, distractorPlusHeatmap)
           : emptyGrid();
+        if (condition === 'ignore_distractor') {
+          for (let i = 0; i < 16; i++) if (distractor_map[i] === 'Plus') distractorPlusHeatmap[i]++;
+        }
+        const targetMapArr = target_map.map((c) => c || '');
         bank.push({
           condition,
           span,
-          target_map: target_map.map(c => c || ''),
-          distractor_map: distractor_map.map(c => c || ''),
+          target_map: targetMapArr,
+          distractor_map: distractor_map.map((c) => c || ''),
+          adjacent_pairs_count: adjacentPairs(target_map),
+          distinct_rows_used: rowsWithTarget(target_map),
+          distinct_cols_used: colsWithTarget(target_map),
         });
       }
     }
