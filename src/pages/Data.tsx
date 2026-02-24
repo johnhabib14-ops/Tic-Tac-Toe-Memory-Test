@@ -70,7 +70,7 @@ export default function Data() {
         Total submissions: <strong>{sessions.length}</strong>
       </p>
       <section className="history-section" style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Export</h2>
+        <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Export</h2>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
           <button
             type="button"

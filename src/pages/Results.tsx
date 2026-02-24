@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '../context/AppState';
 import { computeSummary } from '../lib/summary';
@@ -12,6 +12,7 @@ export default function Results() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const submittedOnceRef = useRef(false);
 
   if (!participant) {
     navigate('/');
@@ -20,7 +21,7 @@ export default function Results() {
 
   const summary = computeSummary(trials);
 
-  async function handleSubmitToStudy() {
+  async function doSubmit() {
     const p = participant;
     if (!p) return;
     setSubmitError(null);
@@ -50,6 +51,13 @@ export default function Results() {
       navigate('/');
     }
   }
+
+  useEffect(() => {
+    if (submittedOnceRef.current || !participant) return;
+    if (!isBackendConfigured()) return;
+    submittedOnceRef.current = true;
+    doSubmit();
+  }, [participant, trials, copyResult]);
 
   function handleTakeTestAgain() {
     setParticipant(null);
@@ -104,11 +112,13 @@ export default function Results() {
       <div className="results-actions">
         {submitted ? (
           <p className="results-success">Your results have been saved. Thank you for participating.</p>
-        ) : (
-          <button onClick={handleSubmitToStudy} disabled={submitting}>
-            {submitting ? 'Submitting…' : 'Submit results to study'}
-          </button>
-        )}
+        ) : submitting ? (
+          <p className="results-saving">Saving your results…</p>
+        ) : submitError && isBackendConfigured() ? (
+          <button onClick={doSubmit}>Retry</button>
+        ) : !isBackendConfigured() ? (
+          <button onClick={doSubmit}>Submit results to study</button>
+        ) : null}
         <button type="button" className="secondary link-style" onClick={handleTakeTestAgain}>
           Take the test again
         </button>

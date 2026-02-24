@@ -5,6 +5,7 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 18px;
   background: #f0eef2;
   color: #2d2d2d;
   min-height: 100vh;
@@ -20,12 +21,12 @@ body {
 }
 
 h1 {
-  font-size: 1.75rem;
+  font-size: 2rem;
   margin: 0 0 0.5rem;
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin: 0 0 1rem;
 }
 
@@ -56,7 +57,7 @@ label {
 
 input, select {
   padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  font-size: 1.05rem;
   border: 1px solid #888;
   border-radius: 6px;
   background: #fff;
@@ -71,7 +72,7 @@ input:focus, select:focus {
 
 button {
   padding: 0.75rem 1.25rem;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   border: none;
   border-radius: 8px;
@@ -123,12 +124,12 @@ button.secondary:hover {
 }
 
 .page-instructions h1 {
-  font-size: 2rem;
+  font-size: 2.25rem;
   margin-bottom: 0.75rem;
 }
 
 .instructions {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1.7;
   max-width: 480px;
   margin-left: auto;
@@ -153,7 +154,7 @@ button.secondary:hover {
 
 .instructions-example-label {
   margin-bottom: 0.5rem;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
 }
 
 .instructions-example-grid {
@@ -206,7 +207,7 @@ button.secondary:hover {
 .copy-section-label {
   font-weight: 600;
   margin: 0 0 0.5rem;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 .copy-grid-wrap {
@@ -244,7 +245,7 @@ button.secondary:hover {
 }
 
 .grid-title {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
@@ -273,7 +274,7 @@ button.secondary:hover {
   position: absolute;
   top: 2px;
   left: 2px;
-  font-size: 10px;
+  font-size: 11px;
   color: #888;
   line-height: 1;
 }
@@ -381,7 +382,7 @@ button.secondary:hover {
 
 .results-section h3 {
   margin: 0 0 0.75rem;
-  font-size: 1rem;
+  font-size: 1.125rem;
   text-align: center;
 }
 
@@ -397,6 +398,11 @@ button.secondary:hover {
   color: #2a7;
   font-weight: 500;
   margin: 0;
+}
+
+.results-saving {
+  margin: 0;
+  color: var(--text-secondary, #666);
 }
 
 button.link-style {
@@ -423,17 +429,17 @@ button.link-style:hover {
 .results-details summary {
   cursor: pointer;
   color: #6af;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 .reminder {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #555;
   margin-top: 0.5rem;
 }
 
 .timer {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
