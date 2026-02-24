@@ -5,7 +5,7 @@ export default function GMT22Consent() {
 
   return (
     <div className="page">
-      <h1>GMT 2.2 — Research Study (Harder)</h1>
+      <h1>GMT 2.2</h1>
       <p className="subtitle">
         This is a visual working memory task. You will see grids with symbols and be asked to remember and reconstruct their positions. This version is more challenging.
       </p>
