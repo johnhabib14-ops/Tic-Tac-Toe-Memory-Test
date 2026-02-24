@@ -2,6 +2,8 @@
 
 A web app that measures visual spatial working memory: participants briefly see grids with X and O (and sometimes distractor shapes), then reconstruct the layout by placing shapes from a palette into the grid. Results can be submitted to a Google Form (one row per participant).
 
+**Version 1.1.0** — GMT 2 protocol frozen at 1.0.0; 1.1 adds PWA (installable app, icon, “GMT” on home screen).
+
 ## Tech stack
 
 - React 18 + Vite + TypeScript
