@@ -30,12 +30,15 @@ export interface GMT22SubmitPayload {
     recon_rt_ms: number;
     hits: number;
     commissions: number;
+    omissions: number;
+    binding_errors: number;
     total_targets: number;
     accuracy_raw: number;
     passed: boolean;
     near_passed: boolean;
     timeout: boolean;
   }>;
+  copy_item_id: string;
   copy_hits: number;
   copy_total_rt_ms: number;
   copy_target_map: string[];
@@ -51,6 +54,8 @@ export interface GMT22SubmitPayload {
     recon_rt_ms: number;
     hits: number;
     commissions: number;
+    omissions: number;
+    binding_errors: number;
     total_targets: number;
     accuracy_raw: number;
     passed: boolean;
@@ -78,6 +83,8 @@ export interface GMT22SubmitPayload {
     memory_early_stopped: boolean;
     practice_failed: boolean;
     practice_passed_first_try: boolean;
+    attention_check_failed: boolean;
+    pairing_fallback_used: boolean;
   };
 }
 
@@ -95,6 +102,8 @@ function mapTrial(
     recon_rt_ms: t.recon_rt_ms,
     hits: t.hits,
     commissions: t.commissions,
+    omissions: t.omissions,
+    binding_errors: t.binding_errors,
     total_targets: t.total_targets,
     accuracy_raw: t.accuracy_raw,
     passed: t.passed,
@@ -136,6 +145,7 @@ export function buildGMT22Payload(
     practice_failed: summary.practice_failed,
     practice_passed_first_try: summary.practice_passed_first_try,
     practice_trials: practiceTrials.map(mapTrial),
+    copy_item_id: copyResult?.copy_item_id ?? '',
     copy_hits: copyResult?.copy_hits ?? 0,
     copy_total_rt_ms: copyResult?.copy_total_rt_ms ?? 0,
     copy_target_map: copyResult?.copy_target_map ?? Array(16).fill(''),
@@ -149,6 +159,8 @@ export function buildGMT22Payload(
       memory_early_stopped: summary.memory_early_stopped,
       practice_failed: summary.practice_failed,
       practice_passed_first_try: summary.practice_passed_first_try,
+      attention_check_failed: summary.attention_check_failed,
+      pairing_fallback_used: summary.pairing_fallback_used,
     },
   };
 }

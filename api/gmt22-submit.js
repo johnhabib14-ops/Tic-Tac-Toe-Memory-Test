@@ -61,6 +61,9 @@ export default async function handler(req, res) {
   const practiceFailed = typeof body.practice_failed === 'boolean' ? body.practice_failed : (summary && typeof summary.practice_failed === 'boolean' ? summary.practice_failed : false);
   const practicePassedFirstTry = typeof body.practice_passed_first_try === 'boolean' ? body.practice_passed_first_try : (summary && typeof summary.practice_passed_first_try === 'boolean' ? summary.practice_passed_first_try : false);
 
+  const attentionCheckFailed = typeof body.attention_check_failed === 'boolean' ? body.attention_check_failed : (summary && typeof summary.attention_check_failed === 'boolean' ? summary.attention_check_failed : false);
+  const pairingFallbackUsed = typeof body.pairing_fallback_used === 'boolean' ? body.pairing_fallback_used : (summary && typeof summary.pairing_fallback_used === 'boolean' ? summary.pairing_fallback_used : false);
+
   const row = {
     session_id: body.session_id ?? '',
     participant_id: body.participant_id ?? '',
@@ -72,6 +75,7 @@ export default async function handler(req, res) {
     condition_order: String(body.condition_order ?? ''),
     practice_failed: practiceFailed,
     practice_passed_first_try: practicePassedFirstTry,
+    copy_item_id: String(body.copy_item_id ?? ''),
     copy_hits: Number(body.copy_hits) || 0,
     copy_total_rt_ms: Number(body.copy_total_rt_ms) || 0,
     copy_rt_sec: Number(body.copy_total_rt_ms) ? Number(body.copy_total_rt_ms) / 1000 : 0,
@@ -105,6 +109,8 @@ export default async function handler(req, res) {
     span_consistency_flag_ignore_distractor: !!spanConsistency.ignore_distractor,
     span_consistency_flag_remember_distractor: !!spanConsistency.remember_distractor,
     span_consistency_flag_delay: !!spanConsistency.delay,
+    attention_check_failed: attentionCheckFailed,
+    pairing_fallback_used: pairingFallbackUsed,
   };
 
   const response = await fetch(`${supabaseUrl}/rest/v1/gmt22_submissions`, {

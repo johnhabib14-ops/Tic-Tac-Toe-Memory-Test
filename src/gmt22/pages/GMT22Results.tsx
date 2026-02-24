@@ -6,6 +6,7 @@ import {
   submitGMT22,
   isGMT22BackendConfigured,
 } from '../lib/submitGmt22';
+import { getPairingFallbackUsed } from '../lib/memoryTask';
 import { GMT22_CONDITIONS } from '../types';
 import type { GMT22Condition } from '../types';
 import { COPY_NUM_TARGETS } from '../types';
@@ -26,6 +27,7 @@ export default function GMT22Results() {
     practiceFailed,
     practicePassedFirstTry,
     memoryEarlyStopped,
+    attentionCheckFailed,
   } = useGMT22State();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -37,6 +39,8 @@ export default function GMT22Results() {
     memory_early_stopped: memoryEarlyStopped,
     practice_failed: practiceFailed,
     practice_passed_first_try: practicePassedFirstTry,
+    attention_check_failed: attentionCheckFailed,
+    pairing_fallback_used: getPairingFallbackUsed(),
   });
 
   async function handleSubmit() {

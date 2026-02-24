@@ -103,7 +103,7 @@ export default function GMT22Practice() {
     recordedForTrialRef.current = trialIndex;
     const source = responseMapOverride ?? responseMapRef.current;
     const response = normalizeResponseMap(source);
-    const { hits, commissions, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
+    const { hits, commissions, omissions, binding_errors, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
     const passed = isPassed(commissions, accuracy_raw);
     const near_passed = isNearPassed(accuracy_raw);
@@ -118,6 +118,8 @@ export default function GMT22Practice() {
       recon_rt_ms,
       hits,
       commissions,
+      omissions,
+      binding_errors,
       total_targets,
       accuracy_raw,
       passed,

@@ -1,5 +1,5 @@
 /**
- * GMT 2 Span 7: 4 conditions, spans 2–7, 2 trials per span, discontinue + smart start.
+ * GMT 2 Span 7: 4 conditions, spans 2–7, 2 trials per span, discontinue. All conditions start at span 2.
  */
 
 export type GMT22Phase =
@@ -52,6 +52,7 @@ export interface GMT22Participant {
 }
 
 export interface GMT22CopyResult {
+  copy_item_id: string;
   copy_hits: number;
   copy_total_rt_ms: number;
   copy_target_map: GMT22GridMap;
@@ -69,6 +70,8 @@ export interface GMT22MemoryTrialRecord {
   recon_rt_ms: number;
   hits: number;
   commissions: number;
+  omissions: number;
+  binding_errors: number;
   total_targets: number;
   accuracy_raw: number;
   passed: boolean;
@@ -88,6 +91,8 @@ export interface GMT22PracticeTrialRecord {
   recon_rt_ms: number;
   hits: number;
   commissions: number;
+  omissions: number;
+  binding_errors: number;
   total_targets: number;
   accuracy_raw: number;
   passed: boolean;
@@ -115,6 +120,8 @@ export interface GMT22Summary {
   memory_early_stopped: boolean;
   practice_failed: boolean;
   practice_passed_first_try: boolean;
+  attention_check_failed: boolean;
+  pairing_fallback_used: boolean;
 }
 
 export interface GMT22ItemBankEntry {
@@ -123,6 +130,10 @@ export interface GMT22ItemBankEntry {
   span: number;
   target_map: GMT22GridMap;
   distractor_map: GMT22GridMap;
+  /** Optional metadata for span 6–7 pairing; computed at load if missing. */
+  adjacent_pairs_count?: number;
+  distinct_rows_used?: number;
+  distinct_cols_used?: number;
 }
 
 export const GMT22_CONDITIONS: GMT22Condition[] = [

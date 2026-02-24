@@ -33,14 +33,6 @@ function paletteIncludesPlus(condition: GMT22Condition): boolean {
   return condition === 'remember_distractor';
 }
 
-function getStartSpan(conditionIndex: number, memoryTrials: { condition: GMT22Condition; span: number; passed: boolean }[]): number {
-  if (conditionIndex === 0) return 2;
-  const baselineTrials = memoryTrials.filter((t) => t.condition === 'baseline');
-  let baselineSpanEstimate = 0;
-  for (const t of baselineTrials) if (t.passed && t.span > baselineSpanEstimate) baselineSpanEstimate = t.span;
-  return Math.max(2, baselineSpanEstimate - 1);
-}
-
 export default function GMT22Memory() {
   const {
     participant,
@@ -48,8 +40,10 @@ export default function GMT22Memory() {
     addMemoryTrial,
     setPhase,
     setMemoryEarlyStopped,
+    setAttentionCheckFailed,
   } = useGMT22State();
 
+  const [showAttentionCheck, setShowAttentionCheck] = useState(true);
   const [conditionIndex, setConditionIndex] = useState(0);
   const [span, setSpan] = useState(2);
   const [trialIndexInSpan, setTrialIndexInSpan] = useState(1 as 1 | 2);
@@ -71,7 +65,7 @@ export default function GMT22Memory() {
   const conditionOrder = participant ? getConditionOrder(participant.condition_order) : [];
   const condition = conditionOrder[conditionIndex];
   const currentItem: GMT22ItemBankEntry | null =
-    participant && conditionIndex < conditionOrder.length
+    participant && conditionIndex < conditionOrder.length && !showAttentionCheck
       ? getItemForTrial(condition, span, trialIndexInSpan, participant.session_seed)
       : null;
 
@@ -131,7 +125,7 @@ export default function GMT22Memory() {
     recordedForCurrentRef.current = trialKey;
     const source = responseMapOverride ?? responseMapRef.current;
     const response = normalizeResponseMap(source);
-    const { hits, commissions, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
+    const { hits, commissions, omissions, binding_errors, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
     const recon_rt_ms = reconStartRef.current > 0 ? Date.now() - reconStartRef.current : 0;
     const passed = isPassed(commissions, accuracy_raw);
     const near_passed = isNearPassed(accuracy_raw);
@@ -146,6 +140,8 @@ export default function GMT22Memory() {
       recon_rt_ms,
       hits,
       commissions,
+      omissions,
+      binding_errors,
       total_targets,
       accuracy_raw,
       passed,
@@ -176,9 +172,8 @@ export default function GMT22Memory() {
         if (nextConditionIndex >= conditionOrder.length) {
           setPhase('results');
         } else {
-          const nextStart = getStartSpan(nextConditionIndex, [...memoryTrials, trialPayload]);
           setConditionIndex(nextConditionIndex);
-          setSpan(nextStart);
+          setSpan(2);
           setTrialIndexInSpan(1);
           setPhaseLocal('encoding');
         }
@@ -199,10 +194,18 @@ export default function GMT22Memory() {
       return;
     }
     setDiscontinueCount(newDiscontinueCount);
-    const nextStart = getStartSpan(nextConditionIndex, [...memoryTrials, trialPayload]);
     setConditionIndex(nextConditionIndex);
-    setSpan(nextStart);
+    setSpan(2);
     setTrialIndexInSpan(1);
+    setPhaseLocal('encoding');
+  }
+
+  function handleAttentionCheckSubmit() {
+    const response = normalizeResponseMap(responseMapRef.current);
+    const pass = response[0] === 'X' && response.slice(1).every((c) => c === '');
+    setAttentionCheckFailed(!pass);
+    setShowAttentionCheck(false);
+    setResponseMap({});
     setPhaseLocal('encoding');
   }
 
@@ -216,6 +219,35 @@ export default function GMT22Memory() {
   }
 
   if (!participant) return null;
+
+  if (showAttentionCheck) {
+    return (
+      <div className="page">
+        <h2 className="grid-title">Attention check</h2>
+        <p className="subtitle">
+          Place X in the top left cell then press Submit.
+        </p>
+        <GMT22ShapePalette
+          includePlus={false}
+          selectedSymbol={selectedSymbol}
+          onSelectSymbol={setSelectedSymbol}
+        />
+        <div className="grid-container">
+          <GMT22ReconstructionGrid
+            responseMap={responseMap}
+            onPlace={handlePlace}
+            onDrop={handlePlace}
+            onCellClick={(cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
+            paletteIncludesPlus={false}
+          />
+        </div>
+        <button type="button" onClick={handleAttentionCheckSubmit} className="copy-submit">
+          Submit
+        </button>
+      </div>
+    );
+  }
+
   if (conditionIndex >= conditionOrder.length || !currentItem) {
     return (
       <div className="page">

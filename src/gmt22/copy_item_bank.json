@@ -1,0 +1,26 @@
+[
+  {
+    "copy_item_id": "copy-1",
+    "target_map": ["X", "O", "", "", "", "X", "O", "", "O", "", "X", "", "X", "", "", "O"]
+  },
+  {
+    "copy_item_id": "copy-2",
+    "target_map": ["O", "", "X", "", "X", "O", "", "", "", "", "O", "X", "O", "", "X", ""]
+  },
+  {
+    "copy_item_id": "copy-3",
+    "target_map": ["", "X", "O", "", "O", "", "X", "", "X", "", "", "O", "", "X", "O", ""]
+  },
+  {
+    "copy_item_id": "copy-4",
+    "target_map": ["X", "", "O", "", "", "X", "O", "X", "O", "X", "", "O", "", "", "X", ""]
+  },
+  {
+    "copy_item_id": "copy-5",
+    "target_map": ["", "O", "X", "O", "X", "", "O", "", "", "X", "O", "", "O", "", "X", ""]
+  },
+  {
+    "copy_item_id": "copy-6",
+    "target_map": ["O", "X", "", "", "", "O", "X", "", "X", "", "O", "X", "", "O", "", ""]
+  }
+]

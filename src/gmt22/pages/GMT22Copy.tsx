@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useGMT22State } from '../GMT22State';
 import type { GMT22CellSymbol } from '../types';
-import { COPY_TARGET_MAP, scoreCopyTask, toResponseGridMap } from '../lib/copyTask';
+import { getCopyItemForSession, scoreCopyTask, toResponseGridMap } from '../lib/copyTask';
 import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
 import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
@@ -10,6 +10,11 @@ import { COPY_TIME_LIMIT_MS } from '../types';
 
 export default function GMT22Copy() {
   const { participant, setCopyResult, setPhase } = useGMT22State();
+  const copyItem = useMemo(
+    () => (participant ? getCopyItemForSession(participant.session_seed) : null),
+    [participant]
+  );
+  const targetMap = copyItem ? copyItem.target_map : [];
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
   const [timeLeftSec, setTimeLeftSec] = useState(Math.floor(COPY_TIME_LIMIT_MS / 1000));
   const submittedRef = useRef(false);
@@ -21,6 +26,9 @@ export default function GMT22Copy() {
   }, [responseMap]);
 
   useEffect(() => {
+    if (!copyItem) return;
+    const item = copyItem;
+    const target = item.target_map;
     startTimeRef.current = Date.now();
     const limitSec = Math.floor(COPY_TIME_LIMIT_MS / 1000);
     let secondsLeft = limitSec;
@@ -35,12 +43,13 @@ export default function GMT22Copy() {
         if (!submittedRef.current) {
           submittedRef.current = true;
           const response = toResponseGridMap(responseMapRef.current);
-          const { copy_hits } = scoreCopyTask(COPY_TARGET_MAP, response);
+          const { copy_hits } = scoreCopyTask(target, response);
           const copy_total_rt_ms = Date.now() - startTimeRef.current;
           const result = {
+            copy_item_id: item.copy_item_id,
             copy_hits,
             copy_total_rt_ms,
-            copy_target_map: [...COPY_TARGET_MAP],
+            copy_target_map: [...target],
             copy_response_map: response,
           };
           flushSync(() => {
@@ -57,20 +66,21 @@ export default function GMT22Copy() {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [setCopyResult, setPhase]);
+  }, [copyItem, setCopyResult, setPhase]);
 
   function submitCopy(responseMapOverride?: Record<number, GMT22CellSymbol>) {
-    if (submittedRef.current) return;
+    if (submittedRef.current || !copyItem) return;
     submittedRef.current = true;
     const source = responseMapOverride ?? responseMapRef.current;
     const response = toResponseGridMap(source);
-    const { copy_hits } = scoreCopyTask(COPY_TARGET_MAP, response);
+    const { copy_hits } = scoreCopyTask(targetMap, response);
     const copy_total_rt_ms = startTimeRef.current > 0 ? Date.now() - startTimeRef.current : 0;
     flushSync(() => {
       setCopyResult({
+        copy_item_id: copyItem.copy_item_id,
         copy_hits,
         copy_total_rt_ms,
-        copy_target_map: [...COPY_TARGET_MAP],
+        copy_target_map: [...targetMap],
         copy_response_map: response,
       });
       setPhase('memory_instructions');
@@ -87,7 +97,7 @@ export default function GMT22Copy() {
 
   const [selected, setSelected] = useState<GMT22CellSymbol | null>(null);
 
-  if (!participant) return null;
+  if (!participant || !copyItem) return null;
 
   return (
     <div className="page copy-page">
@@ -99,7 +109,7 @@ export default function GMT22Copy() {
         <div className="copy-reference">
           <p className="copy-section-label">Reference (copy this)</p>
           <div className="grid-container copy-grid-wrap">
-            <GMT22DisplayGrid gridMap={COPY_TARGET_MAP} />
+            <GMT22DisplayGrid gridMap={targetMap} />
           </div>
         </div>
         <div className="copy-response">
