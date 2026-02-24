@@ -250,6 +250,9 @@ export default function GMT22Memory() {
     return (
       <div className="page">
         <FixationCross />
+        <p className="subtitle" style={{ marginTop: '1rem' }}>
+          Brief pause — then you will place the symbols.
+        </p>
       </div>
     );
   }

@@ -39,6 +39,7 @@ export default function GMT22Practice() {
     setPracticeFailed,
   } = useGMT22State();
 
+  const [showIntro, setShowIntro] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const [showClarification, setShowClarification] = useState(false);
   const [trialIndex, setTrialIndex] = useState(0);
@@ -159,6 +160,7 @@ export default function GMT22Practice() {
   function handleTryAgain() {
     setShowClarification(false);
     setRetryCount(1);
+    setShowIntro(false);
     setPracticeTrials([]);
     setTrialIndex(0);
     setPhaseLocal('encoding');
@@ -168,12 +170,32 @@ export default function GMT22Practice() {
 
   if (!participant) return null;
 
+  if (showIntro) {
+    return (
+      <div className="page">
+        <h1>Practice (2 trials)</h1>
+        <p className="subtitle">
+          You will see a grid with symbols. It will disappear, then you place the same symbols in the same positions in the empty grid.
+        </p>
+        <p>
+          First trial: only X and O. Second trial: you may see + symbols on the grid — only place X and O and ignore the +. You have a time limit to place your answers. Select a symbol from the palette, then click a cell to place it.
+        </p>
+        <button type="button" onClick={() => setShowIntro(false)}>
+          Start practice
+        </button>
+      </div>
+    );
+  }
+
   if (showClarification) {
     return (
       <div className="page">
         <h1>Practice</h1>
         <p className="subtitle">
           Both practice trials were incorrect. Remember: place symbols in the exact positions you saw. You need 85% or more correct with no extra symbols to pass a trial.
+        </p>
+        <p>
+          Select X or O from the palette, then click a cell to place it. Only place symbols where you saw them.
         </p>
         <button type="button" onClick={handleTryAgain}>
           Try again
