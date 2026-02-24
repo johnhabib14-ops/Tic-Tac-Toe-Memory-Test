@@ -24,5 +24,4 @@ CREATE TABLE IF NOT EXISTS gmt2_submissions (
 -- If the table already exists, add the column with:
 -- ALTER TABLE gmt2_submissions ADD COLUMN IF NOT EXISTS participant_id TEXT NOT NULL DEFAULT '';
 
--- Optional: enable RLS and add policy if you use Supabase auth.
--- For anonymous submissions, the default may allow inserts with anon key depending on your project settings.
+-- If RLS is enabled and you get "new row violates row-level security policy", run scripts/gmt2_submissions_rls.sql in the SQL Editor.
