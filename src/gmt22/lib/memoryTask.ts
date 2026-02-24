@@ -147,6 +147,17 @@ const pairCache = new Map<string, { item1: GMT22ItemBankEntry; item2: GMT22ItemB
  * Trial 1 and trial 2 at same span get different item_id.
  * For span 6 and 7, pairs are selected to match on metadata when possible; otherwise fallback is used.
  */
+/** For remember_distractor, only use items that have at least one Plus in target_map (so the grid shows +). */
+function getOptionsForCondition(condition: string, span: number): GMT22ItemBankEntry[] {
+  const key = `${condition},${span}`;
+  const options = groupedBank.get(key) ?? [];
+  if (condition === 'remember_distractor') {
+    const withPlus = options.filter((item) => (item.target_map || []).some((c) => c === 'Plus'));
+    return withPlus.length >= 2 ? withPlus : options;
+  }
+  return options;
+}
+
 export function getItemForTrial(
   condition: GMT22Condition,
   span: number,
@@ -154,7 +165,7 @@ export function getItemForTrial(
   sessionSeed: number
 ): GMT22ItemBankEntry {
   const key = `${condition},${span}`;
-  const options = groupedBank.get(key);
+  const options = getOptionsForCondition(condition, span);
   if (!options || options.length < 2) throw new Error(`Insufficient items for ${key}`);
   const baseSeed = sessionSeed + 10000 * GMT22_CONDITIONS.indexOf(condition) + 100 * span;
   const rng = createSeededRandom(baseSeed);
