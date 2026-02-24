@@ -18,6 +18,14 @@ export default function Landing() {
         >
           Start GMT 2.1 (research version)
         </button>
+        {' '}
+        <button
+          type="button"
+          className="secondary"
+          onClick={() => navigate('/gmt22')}
+        >
+          Start GMT 2.2 (harder research version)
+        </button>
       </p>
     </div>
   );
