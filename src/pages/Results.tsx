@@ -114,7 +114,6 @@ export default function Results() {
             <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
           </div>
         </details>
-      </div>
 
         {submitError && <p className="form-error" style={{ marginTop: '1rem' }}>{submitError}</p>}
 
