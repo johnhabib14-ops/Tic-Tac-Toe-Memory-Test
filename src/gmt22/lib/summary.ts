@@ -18,18 +18,19 @@ function computeConditionSummary(conditionTrials: GMT22MemoryTrialRecord[]): GMT
   if (conditionTrials.length === 0) {
     return { span_estimate: 0, span_consistency_flag: false, mean_accuracy: 0, mean_rt_ms: 0 };
   }
-  const spans = [...new Set(conditionTrials.map((t) => t.span))].sort((a, b) => a - b);
+  const sorted = [...conditionTrials].sort((a, b) => a.span - b.span);
+  const spans = [...new Set(sorted.map((t) => t.span))].sort((a, b) => a - b);
   let span_estimate = 0;
   for (const s of spans) {
-    const atSpan = conditionTrials.filter((t) => t.span === s);
+    const atSpan = sorted.filter((t) => t.span === s);
     if (atSpan.some((t) => t.passed)) span_estimate = s;
   }
-  const atSpanEstimate = conditionTrials.filter((t) => t.span === span_estimate);
+  const atSpanEstimate = sorted.filter((t) => t.span === span_estimate);
   const span_consistency_flag =
     span_estimate > 0 && atSpanEstimate.length >= 2 && atSpanEstimate.every((t) => t.passed);
-  const n = conditionTrials.length;
-  const mean_accuracy = n > 0 ? conditionTrials.reduce((a, t) => a + t.accuracy_raw, 0) / n : 0;
-  const mean_rt_ms = n > 0 ? conditionTrials.reduce((a, t) => a + t.recon_rt_ms, 0) / n : 0;
+  const n = sorted.length;
+  const mean_accuracy = n > 0 ? sorted.reduce((a, t) => a + t.accuracy_raw, 0) / n : 0;
+  const mean_rt_ms = n > 0 ? sorted.reduce((a, t) => a + t.recon_rt_ms, 0) / n : 0;
   return { span_estimate, span_consistency_flag, mean_accuracy, mean_rt_ms };
 }
 

@@ -52,8 +52,22 @@ export default async function handler(req, res) {
   const delay_cost = Number(summary?.delay_cost) ?? 0;
   const condition_order = String(body.condition_order ?? summary?.condition_order ?? '');
 
+  const sessionId = body.session_id ?? '';
+  if (sessionId) {
+    const checkRes = await fetch(
+      `${supabaseUrl}/rest/v1/gmt22_submissions?session_id=eq.${encodeURIComponent(sessionId)}&select=session_id`,
+      { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+    );
+    if (checkRes.ok) {
+      const existing = await checkRes.json();
+      if (Array.isArray(existing) && existing.length > 0) {
+        return res.status(409).setHeader('Access-Control-Allow-Origin', '*').json({ error: 'Duplicate submission', code: 'CONFLICT' });
+      }
+    }
+  }
+
   const row = {
-    session_id: body.session_id ?? '',
+    session_id: sessionId,
     participant_id: body.participant_id ?? '',
     birth_year: Number(body.birth_year) || 0,
     age: Number(body.age) || 0,

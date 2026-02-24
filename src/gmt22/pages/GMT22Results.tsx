@@ -6,16 +6,9 @@ import {
   submitGMT22,
   isGMT22BackendConfigured,
 } from '../lib/submitGmt22';
-import { GMT22_CONDITIONS } from '../types';
+import { getConditionOrder } from '../types';
 import type { GMT22Condition } from '../types';
 import { COPY_NUM_TARGETS } from '../types';
-
-const CONDITION_LABELS: Record<string, string> = {
-  baseline: 'Baseline',
-  ignore_distractor: 'Ignore Distractor',
-  remember_distractor: 'Remember Distractor',
-  delay: 'Delay',
-};
 
 export default function GMT22Results() {
   const {
@@ -40,12 +33,12 @@ export default function GMT22Results() {
     condition_order: participant.condition_order,
   });
 
+  const conditionOrder = getConditionOrder(participant.condition_order);
+
   async function handleSubmit() {
-    if (!isGMT22BackendConfigured()) {
-      setSubmitError('Backend not configured (VITE_API_URL).');
-      return;
-    }
+    if (!isGMT22BackendConfigured()) return;
     if (!participant) return;
+    if (submitting || submitted) return;
     setSubmitError(null);
     setSubmitting(true);
     try {
@@ -59,7 +52,9 @@ export default function GMT22Results() {
       await submitGMT22(payload);
       setSubmitted(true);
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : 'Failed to submit');
+      if (e instanceof Error) console.error('Submit error:', e.message, e);
+      else console.error('Submit error:', e);
+      setSubmitError('Submission failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -72,40 +67,38 @@ export default function GMT22Results() {
 
         <div className="results-score-block">
           <h3>Copy</h3>
-          <p>
-            Correct: {copyResult?.copy_hits ?? 0} out of {COPY_NUM_TARGETS}
-          </p>
-          <p>
-            Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : '—'} seconds
-          </p>
+          <p>Hits: {copyResult?.copy_hits ?? 0} / {COPY_NUM_TARGETS}</p>
+          <p>Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : '—'} seconds</p>
         </div>
 
         <div className="results-score-block">
           <h3>Memory</h3>
-          {GMT22_CONDITIONS.map((condition) => {
+          {conditionOrder.map((condition, idx) => {
             const c = summary.by_condition[condition as GMT22Condition];
             if (!c) return null;
             return (
-              <p key={condition}>
-                <strong>{CONDITION_LABELS[condition] ?? condition}:</strong>{' '}
-                Span estimate {c.span_estimate}, span consistency {c.span_consistency_flag ? 'yes' : 'no'}. Mean accuracy{' '}
-                {(c.mean_accuracy * 100).toFixed(1)}%, Mean RT {(c.mean_rt_ms / 1000).toFixed(1)}s
-              </p>
+              <div key={condition} className="results-condition-row">
+                <p><strong>Block {idx + 1}</strong></p>
+                <p>Span: {c.span_estimate}</p>
+                <p>Consistency: {c.span_consistency_flag ? 'Stable' : 'Boundary'}</p>
+                <p>Mean Accuracy: {(c.mean_accuracy * 100).toFixed(1)}%</p>
+                <p>Mean RT: {(c.mean_rt_ms / 1000).toFixed(1)}s</p>
+              </div>
             );
           })}
         </div>
 
         <div className="results-score-block">
           <h3>Costs</h3>
-          <p><strong>Interference cost:</strong> {summary.interference_cost}</p>
-          <p><strong>Binding cost:</strong> {summary.binding_cost}</p>
-          <p><strong>Delay cost:</strong> {summary.delay_cost}</p>
+          <p>Interference Cost: {summary.interference_cost}</p>
+          <p>Binding Cost: {summary.binding_cost}</p>
+          <p>Delay Cost: {summary.delay_cost}</p>
         </div>
 
         <div className="results-score-block">
           <h3>Participant</h3>
-          <p><strong>Participant ID:</strong> {participant.participant_id}</p>
-          <p><strong>Condition order:</strong> {summary.condition_order}</p>
+          <p>Participant ID: {participant.participant_id}</p>
+          <p>Condition order: Order {summary.condition_order}</p>
         </div>
 
         {isGMT22BackendConfigured() && (

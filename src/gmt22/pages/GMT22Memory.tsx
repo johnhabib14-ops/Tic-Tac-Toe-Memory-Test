@@ -50,14 +50,20 @@ export default function GMT22Memory() {
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
   const [timeLeftSec, setTimeLeftSec] = useState(0);
   const [selectedSymbol, setSelectedSymbol] = useState<GMT22CellSymbol | null>(null);
+  const [gridFrozen, setGridFrozen] = useState(false);
   const reconStartRef = useRef(0);
   const responseMapRef = useRef<Record<number, GMT22CellSymbol>>({});
-  const recordedForCurrentRef = useRef<string | null>(null);
+  const alreadyRecordedRef = useRef<Record<string, boolean>>({});
+  const reconTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   responseMapRef.current = responseMap;
   useEffect(() => {
     responseMapRef.current = responseMap;
   }, [responseMap]);
+
+  useEffect(() => {
+    if (phase === 'encoding') setGridFrozen(false);
+  }, [phase]);
 
   const conditionOrder = participant ? getConditionOrder(participant.condition_order) : [];
   const condition = conditionOrder[conditionIndex];
@@ -95,31 +101,38 @@ export default function GMT22Memory() {
 
   useEffect(() => {
     if (!currentItem || phase !== 'reconstructing') return;
+    if (reconTimeoutIdRef.current) {
+      clearTimeout(reconTimeoutIdRef.current);
+      reconTimeoutIdRef.current = null;
+    }
     let secondsLeft = Math.floor(reconLimitMs(currentItem.span) / 1000);
     setTimeLeftSec(secondsLeft);
     let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout>;
     function tick() {
       if (cancelled) return;
       secondsLeft -= 1;
       setTimeLeftSec(secondsLeft);
       if (secondsLeft <= 0) {
-        if (recordedForCurrentRef.current !== trialKey) recordTrial(true);
+        if (!alreadyRecordedRef.current[trialKey]) recordTrial(true);
         return;
       }
-      timeoutId = setTimeout(tick, 1000);
+      reconTimeoutIdRef.current = setTimeout(tick, 1000);
     }
-    timeoutId = setTimeout(tick, 1000);
+    reconTimeoutIdRef.current = setTimeout(tick, 1000);
     return () => {
       cancelled = true;
-      clearTimeout(timeoutId);
+      if (reconTimeoutIdRef.current) {
+        clearTimeout(reconTimeoutIdRef.current);
+        reconTimeoutIdRef.current = null;
+      }
     };
   }, [currentItem, phase, trialKey]);
 
   function recordTrial(timeout: boolean, responseMapOverride?: Record<number, GMT22CellSymbol>) {
     if (!currentItem || !participant) return;
-    if (recordedForCurrentRef.current === trialKey) return;
-    recordedForCurrentRef.current = trialKey;
+    const key = trialKey;
+    if (alreadyRecordedRef.current[key]) return;
+    alreadyRecordedRef.current[key] = true;
     const source = responseMapOverride ?? responseMapRef.current;
     const response = normalizeResponseMap(source);
     const { hits, commissions, omissions, binding_errors, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
@@ -190,7 +203,7 @@ export default function GMT22Memory() {
   function handleAttentionCheckSubmit() {
     const response = normalizeResponseMap(responseMapRef.current);
     const pass = response[0] === 'X' && response.slice(1).every((c) => c === '');
-    setAttentionCheckFailed(!pass);
+    if (!pass) setAttentionCheckFailed(true);
     setShowAttentionCheck(false);
     setResponseMap({});
     setPhaseLocal('encoding');
@@ -201,8 +214,10 @@ export default function GMT22Memory() {
   }
 
   function handleSubmit() {
-    if (!currentItem || phase !== 'reconstructing') return;
-    flushSync(() => recordTrial(false, responseMap));
+    if (!currentItem || phase !== 'reconstructing' || gridFrozen) return;
+    const captured = { ...responseMapRef.current };
+    setGridFrozen(true);
+    flushSync(() => recordTrial(false, captured));
   }
 
   if (!participant) return null;
@@ -245,21 +260,16 @@ export default function GMT22Memory() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
-    const instructionStyle = { color: 'red' as const, fontWeight: 'bold' as const };
+    const cond = currentItem.condition;
+    const encodingInstruction =
+      cond === 'ignore_distractor' ? 'Ignore the plus signs.' :
+      cond === 'remember_distractor' ? 'Remember the plus signs.' :
+      'Place the symbols you saw.';
     return (
       <div className="page">
         <h2 className="grid-title">Remember the grid</h2>
-        <p className="subtitle">
-          {currentItem.condition === 'ignore_distractor' && (
-            <>Remember only the X and O positions. <span style={instructionStyle}>Ignore the + symbols.</span></>
-          )}
-          {currentItem.condition === 'remember_distractor' && (
-            <span style={instructionStyle}>Remember the positions of X, O, and +.</span>
-          )}
-          {currentItem.condition === 'baseline' && 'Watch the positions carefully.'}
-          {currentItem.condition === 'delay' && 'Watch the positions carefully.'}
-        </p>
-        <div className="grid-container">
+        <p className="subtitle">{encodingInstruction}</p>
+        <div className="grid-container" style={{ pointerEvents: 'none' }} aria-hidden="false">
           <GMT22DisplayGrid gridMap={displayMap} />
         </div>
       </div>
@@ -278,27 +288,28 @@ export default function GMT22Memory() {
   }
 
   const includePlus = paletteIncludesPlus(currentItem.condition);
+  const disabled = gridFrozen;
   return (
     <div className="page">
       <h2 className="grid-title">Reconstruct the grid</h2>
       <p className="subtitle">
-        Place the symbols in the correct positions. Time left: {timeLeftSec}s
+        Place the symbols you saw. Time left: {timeLeftSec}s
       </p>
       <GMT22ShapePalette
         includePlus={includePlus}
         selectedSymbol={selectedSymbol}
-        onSelectSymbol={setSelectedSymbol}
+        onSelectSymbol={disabled ? () => {} : setSelectedSymbol}
       />
       <div className="grid-container">
         <GMT22ReconstructionGrid
           responseMap={responseMap}
-          onPlace={handlePlace}
-          onDrop={handlePlace}
-          onCellClick={(cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
+          onPlace={disabled ? () => {} : handlePlace}
+          onDrop={disabled ? () => {} : handlePlace}
+          onCellClick={disabled ? () => {} : (cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
         />
       </div>
-      <button type="button" onClick={handleSubmit} className="copy-submit">
+      <button type="button" onClick={handleSubmit} className="copy-submit" disabled={disabled}>
         Submit
       </button>
     </div>

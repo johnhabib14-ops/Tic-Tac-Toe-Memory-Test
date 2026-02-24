@@ -99,13 +99,15 @@ export function reconLimitMs(span: number): number {
   return 2500 + 1700 * span;
 }
 
-export function normalizeResponseMap(response: Record<number, string> | GMT22GridMap): GMT22GridMap {
+/** Always returns exactly 16-length array; fills undefined with ''; never returns null. */
+export function normalizeResponseMap(response: Record<number, string> | GMT22GridMap | null | undefined): GMT22GridMap {
+  const safe = response == null ? {} : Array.isArray(response) ? response : response;
   const out: GMT22GridMap = [];
   for (let i = 0; i < 16; i++) {
-    const v = Array.isArray(response) ? response[i] : response[i];
+    const v = Array.isArray(safe) ? safe[i] : (safe as Record<number, string>)[i];
     out.push(v === 'X' || v === 'O' || v === 'Plus' ? v : '');
   }
-  return out;
+  return out.length === 16 ? out : Array.from({ length: 16 }, (_, i) => out[i] ?? '');
 }
 
 export function scoreTrial(

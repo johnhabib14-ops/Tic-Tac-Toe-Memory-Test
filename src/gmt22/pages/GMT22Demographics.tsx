@@ -64,11 +64,14 @@ export default function GMT22Demographics() {
     !Number.isNaN(birthDate.getTime()) &&
     birthDate >= MIN_BIRTH_DATE &&
     birthDate <= MAX_BIRTH_DATE;
+  const age = birthDate && dateOfBirthValid ? ageFromDateOfBirth(birthDate) : null;
+  const ageValid = age !== null && age >= 10 && age <= 90;
   const educationNum = education === '' ? null : parseInt(education, 10);
   const educationValid = educationNum !== null && educationNum >= 10 && educationNum <= 20;
   const valid =
     participantId.trim() !== '' &&
     dateOfBirthValid &&
+    ageValid &&
     gender !== '' &&
     educationValid &&
     (gender !== 'Self describe' || genderSelfDescribe.trim() !== '') &&
@@ -77,12 +80,16 @@ export default function GMT22Demographics() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid || !birthDate) return;
+    const submitAge = ageFromDateOfBirth(birthDate);
+    if (submitAge < 10 || submitAge > 90) {
+      return;
+    }
     const genderValue =
       gender === 'Self describe'
         ? (genderSelfDescribe.trim() ? `Self describe: ${genderSelfDescribe.trim()}` : 'Self describe')
         : gender;
     const birth_year = birthDate.getFullYear();
-    const age = ageFromDateOfBirth(birthDate);
+    const age = submitAge;
     const p: GMT22Participant = {
       session_id: generateSessionId(),
       participant_id: participantId.trim(),
@@ -131,6 +138,11 @@ export default function GMT22Demographics() {
         {dateOfBirth.trim() !== '' && !dateOfBirthValid && (
           <p id="dob-error" className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
             Date must be between {MIN_DATE_STR} and {MAX_DATE_STR} (age 10–90).
+          </p>
+        )}
+        {dateOfBirth.trim() !== '' && dateOfBirthValid && age !== null && (age < 10 || age > 90) && (
+          <p id="age-error" className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
+            Age must be between 10 and 90.
           </p>
         )}
         <label>

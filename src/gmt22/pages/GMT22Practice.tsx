@@ -222,11 +222,11 @@ export default function GMT22Practice() {
         <h2 className="grid-title">Practice — Remember the grid</h2>
         <p className="subtitle">
           {currentItem.condition === 'ignore_distractor' && (
-            <>Remember only the X and O positions. <span style={instructionStyle}>Ignore the + symbols.</span></>
+            <span style={instructionStyle}>Ignore the plus signs.</span>
           )}
-          {currentItem.condition === 'baseline' && 'Watch the positions carefully.'}
+          {currentItem.condition === 'baseline' && 'Place the symbols you saw.'}
         </p>
-        <div className="grid-container">
+        <div className="grid-container" style={{ pointerEvents: 'none' }}>
           <GMT22DisplayGrid gridMap={displayMap} />
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function GMT22Practice() {
     <div className="page">
       <h2 className="grid-title">Practice — Reconstruct the grid</h2>
       <p className="subtitle">
-        Place the symbols in the correct positions. Time left: {timeLeftSec}s
+        Place the symbols you saw. Time left: {timeLeftSec}s
       </p>
       <GMT22ShapePalette
         includePlus={includePlus}

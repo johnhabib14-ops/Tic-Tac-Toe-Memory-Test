@@ -44,7 +44,7 @@ export default function GMT22Copy() {
           submittedRef.current = true;
           const response = toResponseGridMap(responseMapRef.current);
           const { copy_hits } = scoreCopyTask(target, response);
-          const copy_total_rt_ms = Date.now() - startTimeRef.current;
+          const copy_total_rt_ms = Math.max(0, Date.now() - startTimeRef.current);
           const result = {
             copy_item_id: item.copy_item_id,
             copy_hits,
@@ -74,7 +74,7 @@ export default function GMT22Copy() {
     const source = responseMapOverride ?? responseMapRef.current;
     const response = toResponseGridMap(source);
     const { copy_hits } = scoreCopyTask(targetMap, response);
-    const copy_total_rt_ms = startTimeRef.current > 0 ? Date.now() - startTimeRef.current : 0;
+    const copy_total_rt_ms = Math.max(0, startTimeRef.current > 0 ? Date.now() - startTimeRef.current : 0);
     flushSync(() => {
       setCopyResult({
         copy_item_id: copyItem.copy_item_id,
