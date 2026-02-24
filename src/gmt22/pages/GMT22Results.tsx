@@ -64,6 +64,9 @@ export default function GMT22Results() {
     <div className="page">
       <div className="results-card">
         <h1 className="results-title">Thank you for completing GMT 2</h1>
+        <p className="subtitle" style={{ marginTop: '0.25rem', marginBottom: '1rem' }}>
+          This task measures visual–spatial memory span under different task demands.
+        </p>
 
         <div className="results-score-block">
           <h3>Copy</h3>

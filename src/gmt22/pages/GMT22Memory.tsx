@@ -262,12 +262,13 @@ export default function GMT22Memory() {
     const displayMap = getEncodingDisplayMap(currentItem);
     const cond = currentItem.condition;
     const encodingInstruction =
-      cond === 'ignore_distractor' ? 'Ignore the plus signs.' :
-      cond === 'remember_distractor' ? 'Remember the plus signs.' :
+      cond === 'ignore_distractor' ? 'IGNORE the plus signs.' :
+      cond === 'remember_distractor' ? 'REMEMBER the plus signs.' :
+      cond === 'delay' ? 'There will be a brief pause before placement.' :
       'Place the symbols you saw.';
     const instructionStyle =
-      cond === 'ignore_distractor' ? { color: 'red' as const, fontWeight: 'bold' as const } :
-      cond === 'remember_distractor' ? { color: 'green' as const, fontWeight: 'bold' as const } :
+      cond === 'ignore_distractor' ? { color: '#1f77b4' as const, fontWeight: 600 as const } :
+      cond === 'remember_distractor' ? { color: '#ff7f0e' as const, fontWeight: 600 as const } :
       undefined;
     return (
       <div className="page">
@@ -287,7 +288,7 @@ export default function GMT22Memory() {
       <div className="page">
         <FixationCross />
         <p className="subtitle" style={{ marginTop: '1rem' }}>
-          Brief pause — then you will place the symbols.
+          There will be a brief pause before placement.
         </p>
       </div>
     );
@@ -299,7 +300,7 @@ export default function GMT22Memory() {
     <div className="page">
       <h2 className="grid-title">Reconstruct the grid</h2>
       <p className="subtitle">
-        Place the symbols you saw. Time left: {timeLeftSec}s
+        Place the symbols you saw. {timeLeftSec > 5 ? 'You have limited time.' : `Time left: ${timeLeftSec}s`}
       </p>
       <GMT22ShapePalette
         includePlus={includePlus}

@@ -216,13 +216,13 @@ export default function GMT22Practice() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
-    const instructionStyle = { color: 'red' as const, fontWeight: 'bold' as const };
+    const instructionStyle = { color: '#1f77b4' as const, fontWeight: 600 as const };
     return (
       <div className="page">
         <h2 className="grid-title">Practice — Remember the grid</h2>
         <p className="subtitle">
           {currentItem.condition === 'ignore_distractor' && (
-            <span style={instructionStyle}>Ignore the plus signs.</span>
+            <span style={instructionStyle}>IGNORE the plus signs.</span>
           )}
           {currentItem.condition === 'baseline' && 'Place the symbols you saw.'}
         </p>
@@ -238,7 +238,7 @@ export default function GMT22Practice() {
     <div className="page">
       <h2 className="grid-title">Practice — Reconstruct the grid</h2>
       <p className="subtitle">
-        Place the symbols you saw. Time left: {timeLeftSec}s
+        Place the symbols you saw. {timeLeftSec > 5 ? 'You have limited time.' : `Time left: ${timeLeftSec}s`}
       </p>
       <GMT22ShapePalette
         includePlus={includePlus}
