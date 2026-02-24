@@ -45,10 +45,16 @@ export default function GMT22Results() {
     }
   }
 
+  const accuracyPercent = (summary.global_accuracy * 100).toFixed(1);
+
   return (
     <div className="page">
       <div className="results-card">
         <h1 className="results-title">Thank you for completing GMT 2.2</h1>
+        <div className="results-accuracy" aria-label={`Overall accuracy: ${accuracyPercent}%`}>
+          <span className="results-accuracy-value">{accuracyPercent}%</span>
+          <span className="results-accuracy-label">Overall accuracy</span>
+        </div>
 
         <div className="results-score-block">
           <h3>Copy</h3>
