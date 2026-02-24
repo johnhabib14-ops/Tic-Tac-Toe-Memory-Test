@@ -265,10 +265,16 @@ export default function GMT22Memory() {
       cond === 'ignore_distractor' ? 'Ignore the plus signs.' :
       cond === 'remember_distractor' ? 'Remember the plus signs.' :
       'Place the symbols you saw.';
+    const instructionStyle =
+      cond === 'ignore_distractor' ? { color: 'red' as const, fontWeight: 'bold' as const } :
+      cond === 'remember_distractor' ? { color: 'green' as const, fontWeight: 'bold' as const } :
+      undefined;
     return (
       <div className="page">
         <h2 className="grid-title">Remember the grid</h2>
-        <p className="subtitle">{encodingInstruction}</p>
+        <p className="subtitle">
+          {instructionStyle ? <span style={instructionStyle}>{encodingInstruction}</span> : encodingInstruction}
+        </p>
         <div className="grid-container" style={{ pointerEvents: 'none' }} aria-hidden="false">
           <GMT22DisplayGrid gridMap={displayMap} />
         </div>
