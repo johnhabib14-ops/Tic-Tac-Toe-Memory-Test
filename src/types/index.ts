@@ -13,7 +13,8 @@ export interface Participant {
   id: string;
   name: string;
   age: number;
-  gender: Gender;
+  /** Gender option or "Self describe: …" when custom text is entered. */
+  gender: string;
   education: string;
   timestamp: string; // ISO
   sessionSeed: number;

@@ -14,15 +14,7 @@ const GENDERS: GMT2Gender[] = [
   'Self describe',
 ];
 
-const EDUCATION_OPTIONS = [
-  'Less than high school',
-  'High school / GED',
-  'Some college',
-  "Bachelor's degree",
-  "Master's degree",
-  'Doctorate or professional degree',
-  'Prefer not to say',
-];
+const EDUCATION_YEARS = Array.from({ length: 11 }, (_, i) => 10 + i); // 10 to 20
 
 const DEVICE_TYPES: GMT2DeviceType[] = [
   'Desktop',
@@ -38,8 +30,10 @@ const MAX_BIRTH_YEAR = CURRENT_YEAR - 10;
 
 export default function GMT2Demographics() {
   const { setParticipant, setPhase } = useGMT2State();
+  const [participantId, setParticipantId] = useState('');
   const [birthYear, setBirthYear] = useState<string>('');
   const [gender, setGender] = useState<GMT2Gender | ''>('');
+  const [genderSelfDescribe, setGenderSelfDescribe] = useState('');
   const [education, setEducation] = useState('');
   const [deviceType, setDeviceType] = useState<GMT2DeviceType | ''>('');
 
@@ -49,19 +43,28 @@ export default function GMT2Demographics() {
     !Number.isNaN(birthYearNum) &&
     birthYearNum >= MIN_BIRTH_YEAR &&
     birthYearNum <= MAX_BIRTH_YEAR;
+  const educationNum = education === '' ? null : parseInt(education, 10);
+  const educationValid = educationNum !== null && educationNum >= 10 && educationNum <= 20;
   const valid =
+    participantId.trim() !== '' &&
     birthYearValid &&
     gender !== '' &&
-    education !== '' &&
+    educationValid &&
+    (gender !== 'Self describe' || genderSelfDescribe.trim() !== '') &&
     deviceType !== '';
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid || birthYearNum === null) return;
+    const genderValue =
+      gender === 'Self describe'
+        ? (genderSelfDescribe.trim() ? `Self describe: ${genderSelfDescribe.trim()}` : 'Self describe')
+        : gender;
     const p: GMT2Participant = {
       session_id: generateSessionId(),
+      participant_id: participantId.trim(),
       birth_year: birthYearNum,
-      gender: gender as GMT2Gender,
+      gender: genderValue,
       education: education.trim(),
       device_type: deviceType as GMT2DeviceType,
       session_seed: Date.now(),
@@ -77,6 +80,17 @@ export default function GMT2Demographics() {
         Please answer a few questions before starting. Your responses are anonymous.
       </p>
       <form onSubmit={handleSubmit}>
+        <label>
+          Participant ID *
+          <input
+            type="text"
+            value={participantId}
+            onChange={(e) => setParticipantId(e.target.value)}
+            required
+            placeholder="e.g. P001 or your study ID"
+            autoComplete="off"
+          />
+        </label>
         <label>
           Year of birth *
           <input
@@ -107,19 +121,36 @@ export default function GMT2Demographics() {
             ))}
           </select>
         </label>
+        {gender === 'Self describe' && (
+          <label>
+            Please describe *
+            <input
+              type="text"
+              value={genderSelfDescribe}
+              onChange={(e) => setGenderSelfDescribe(e.target.value)}
+              placeholder="e.g. non-binary, other"
+              autoComplete="off"
+            />
+          </label>
+        )}
         <label>
-          Level of education *
+          Years of education (10–20) *
           <select
             value={education}
             onChange={(e) => setEducation(e.target.value)}
             required
           >
             <option value="">Select...</option>
-            {EDUCATION_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+            {EDUCATION_YEARS.map((y) => (
+              <option key={y} value={String(y)}>{y}</option>
             ))}
           </select>
         </label>
+        {education !== '' && !educationValid && (
+          <p className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
+            Please select between 10 and 20 years.
+          </p>
+        )}
         <label>
           Device type *
           <select

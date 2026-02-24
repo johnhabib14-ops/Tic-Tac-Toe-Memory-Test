@@ -29,15 +29,7 @@ const GENDERS: Gender[] = [
   'Self describe',
 ];
 
-const EDUCATION_OPTIONS = [
-  'Less than high school',
-  'High school / GED',
-  'Some college',
-  "Bachelor's degree",
-  "Master's degree",
-  'Doctorate or professional degree',
-  'Prefer not to say',
-];
+const EDUCATION_YEARS = Array.from({ length: 11 }, (_, i) => 10 + i); // 10 to 20
 
 export default function Demographics() {
   const navigate = useNavigate();
@@ -45,20 +37,32 @@ export default function Demographics() {
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [gender, setGender] = useState<Gender | ''>('');
+  const [genderSelfDescribe, setGenderSelfDescribe] = useState('');
   const [education, setEducation] = useState('');
 
   const age = dateOfBirth ? ageFromDob(dateOfBirth) : null;
   const ageValid = age !== null && age >= 10 && age <= 90;
-  const valid = name.trim() !== '' && ageValid && gender !== '' && education !== '';
+  const educationNum = education === '' ? null : parseInt(education, 10);
+  const educationValid = educationNum !== null && educationNum >= 10 && educationNum <= 20;
+  const valid =
+    name.trim() !== '' &&
+    ageValid &&
+    gender !== '' &&
+    educationValid &&
+    (gender !== 'Self describe' || genderSelfDescribe.trim() !== '');
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid || age === null) return;
+    const genderValue =
+      gender === 'Self describe'
+        ? (genderSelfDescribe.trim() ? `Self describe: ${genderSelfDescribe.trim()}` : 'Self describe')
+        : gender;
     const p: Participant = {
       id: generateId(),
       name: name.trim(),
       age,
-      gender: gender as Gender,
+      gender: genderValue,
       education: education.trim(),
       timestamp: new Date().toISOString(),
       sessionSeed: Date.now(),
@@ -114,19 +118,36 @@ export default function Demographics() {
             ))}
           </select>
         </label>
+        {gender === 'Self describe' && (
+          <label>
+            Please describe *
+            <input
+              type="text"
+              value={genderSelfDescribe}
+              onChange={(e) => setGenderSelfDescribe(e.target.value)}
+              placeholder="e.g. non-binary, other"
+              autoComplete="off"
+            />
+          </label>
+        )}
         <label>
-          Level of education *
+          Years of education (10–20) *
           <select
             value={education}
             onChange={(e) => setEducation(e.target.value)}
             required
           >
             <option value="">Select...</option>
-            {EDUCATION_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+            {EDUCATION_YEARS.map((y) => (
+              <option key={y} value={String(y)}>{y}</option>
             ))}
           </select>
         </label>
+        {education !== '' && !educationValid && (
+          <p className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
+            Please select between 10 and 20 years.
+          </p>
+        )}
         <button type="submit" disabled={!valid}>
           Start Test
         </button>

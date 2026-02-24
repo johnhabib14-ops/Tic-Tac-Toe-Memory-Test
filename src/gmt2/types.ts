@@ -37,8 +37,11 @@ export type GMT2DeviceType =
 
 export interface GMT2Participant {
   session_id: string;
+  /** User-entered or researcher-assigned ID. */
+  participant_id: string;
   birth_year: number;
-  gender: GMT2Gender;
+  /** Gender option or "Self describe: …" when custom text is entered. */
+  gender: string;
   education: string;
   device_type: GMT2DeviceType;
   /** Used for seeded item selection. */
