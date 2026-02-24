@@ -369,15 +369,68 @@ button.secondary:hover {
   text-align: center;
 }
 
-/* Results */
+/* Results – game-style card */
+.results-card {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1.75rem;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #c4b8d4;
+  box-shadow: 0 8px 24px rgba(90, 61, 138, 0.12);
+}
+
+.results-title {
+  font-size: 1.5rem;
+  text-align: center;
+  margin: 0 0 1.25rem;
+  color: #2d2d2d;
+}
+
+.results-accuracy {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f0eef2 0%, #e8e4ee 100%);
+  border-radius: 12px;
+  border: 1px solid #c4b8d4;
+}
+
+.results-accuracy-value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #5a3d8a;
+  line-height: 1.1;
+}
+
+.results-accuracy-label {
+  font-size: 1rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.results-score-block {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  color: #2d2d2d;
+}
+
+.results-score-block p {
+  margin: 0.35rem 0;
+}
+
+/* Results – inner sections (details) */
 .results-section {
   text-align: left;
   max-width: 400px;
   margin: 0 auto 1.5rem;
   padding: 1rem;
-  background: #fff;
+  background: #faf9fb;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #e0dce6;
 }
 
 .results-section h3 {

@@ -69,59 +69,69 @@ export default function Results() {
   const dateStr = new Date(participant.timestamp).toLocaleString();
   const memoryPoints = summary.memoryPoints ?? 0;
   const highestLevel = summary.highestLevelPassed ?? 0;
+  const accuracyPercent = (summary.overallAccuracyPercent ?? 0).toFixed(1);
 
   return (
     <div className="page">
-      <h1>Thank you for completing the test</h1>
+      <div className="results-card">
+        <h1 className="results-title">Thank you for completing the test</h1>
 
-      <div className="results-section">
-        <p><strong>Your score:</strong> {memoryPoints} / 31 memory points</p>
-        <p><strong>Highest level passed:</strong> {highestLevel}</p>
+        <div className="results-accuracy" aria-label={`Accuracy: ${accuracyPercent}%`}>
+          <span className="results-accuracy-value">{accuracyPercent}%</span>
+          <span className="results-accuracy-label">Accuracy</span>
+        </div>
+
+        <div className="results-score-block">
+          <p><strong>Memory:</strong> {memoryPoints} / 31</p>
+          <p><strong>Highest level:</strong> {highestLevel}</p>
+          <p><strong>Copy:</strong> {copyResult != null ? `${copyResult.score} / 9` : '—'} {copyResult != null ? `in ${(copyResult.timeMs / 1000).toFixed(1)}s` : ''}</p>
+        </div>
+
+        <details
+          className="results-details"
+          open={detailsOpen}
+          onToggle={(e) => setDetailsOpen((e.target as HTMLDetailsElement).open)}
+        >
+          <summary>See detailed results</summary>
+          <div className="results-section">
+            <h3>Your information</h3>
+            <p><strong>Name:</strong> {participant.name}</p>
+            <p><strong>Age:</strong> {participant.age}</p>
+            <p><strong>Gender:</strong> {participant.gender}</p>
+            <p><strong>Education:</strong> {participant.education}</p>
+            <p><strong>Date:</strong> {dateStr}</p>
+          </div>
+          <div className="results-section">
+            <h3>Memory test</h3>
+            <p><strong>Memory points:</strong> {memoryPoints} / 31</p>
+            <p><strong>Highest level passed:</strong> {highestLevel}</p>
+            <p><strong>Overall accuracy:</strong> {accuracyPercent}%</p>
+            <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
+          </div>
+          <div className="results-section">
+            <h3>Copy task</h3>
+            <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 9` : '—'}</p>
+            <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
+          </div>
+        </details>
       </div>
 
-      <details
-        className="results-details"
-        open={detailsOpen}
-        onToggle={(e) => setDetailsOpen((e.target as HTMLDetailsElement).open)}
-      >
-        <summary>See detailed results</summary>
-        <div className="results-section">
-          <h3>Your information</h3>
-          <p><strong>Name:</strong> {participant.name}</p>
-          <p><strong>Age:</strong> {participant.age}</p>
-          <p><strong>Gender:</strong> {participant.gender}</p>
-          <p><strong>Education:</strong> {participant.education}</p>
-          <p><strong>Date:</strong> {dateStr}</p>
-        </div>
-        <div className="results-section">
-          <h3>Memory test</h3>
-          <p><strong>Memory points:</strong> {memoryPoints} / 31</p>
-          <p><strong>Highest level passed:</strong> {highestLevel}</p>
-          <p><strong>Overall accuracy:</strong> {(summary.overallAccuracyPercent ?? 0).toFixed(1)}%</p>
-          <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
-        </div>
-        <div className="results-section">
-          <h3>Copy task</h3>
-          <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 16` : '—'}</p>
-          <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
-        </div>
-      </details>
+        {submitError && <p className="form-error" style={{ marginTop: '1rem' }}>{submitError}</p>}
 
-      {submitError && <p className="form-error" style={{ marginTop: '1rem' }}>{submitError}</p>}
-
-      <div className="results-actions">
-        {submitted ? (
-          <p className="results-success">Your results have been saved. Thank you for participating.</p>
-        ) : submitting ? (
-          <p className="results-saving">Saving your results…</p>
-        ) : submitError && isBackendConfigured() ? (
-          <button onClick={doSubmit}>Retry</button>
-        ) : !isBackendConfigured() ? (
-          <button onClick={doSubmit}>Submit results to study</button>
-        ) : null}
-        <button type="button" className="secondary link-style" onClick={handleTakeTestAgain}>
-          Take the test again
-        </button>
+        <div className="results-actions">
+          {submitted ? (
+            <p className="results-success">Your results have been saved. Thank you for participating.</p>
+          ) : submitting ? (
+            <p className="results-saving">Saving your results…</p>
+          ) : submitError && isBackendConfigured() ? (
+            <button onClick={doSubmit}>Retry</button>
+          ) : !isBackendConfigured() ? (
+            <button onClick={doSubmit}>Submit results to study</button>
+          ) : null}
+          <button type="button" className="secondary link-style" onClick={handleTakeTestAgain}>
+            Take the test again
+          </button>
+        </div>
       </div>
     </div>
   );

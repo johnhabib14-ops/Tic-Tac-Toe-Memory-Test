@@ -266,9 +266,6 @@ export default function Test() {
     return (
       <div className="page grid-container">
         <h2 className="grid-title">Rebuild the grid</h2>
-        {trialConfig.responseDecoysEnabled && (
-          <p className="reminder">Only X and O count. Ignore other shapes (e.g. the + symbol).</p>
-        )}
         <div className="timer">Time left: {timeLeftSec}s</div>
         <ShapePalette
           decoysEnabled={trialConfig.responseDecoysEnabled}
