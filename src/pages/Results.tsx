@@ -10,6 +10,8 @@ export default function Results() {
   const { participant, trials, copyResult, setTrials, setCopyResult, setParticipant } = useAppState();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   if (!participant) {
     navigate('/');
@@ -17,40 +19,6 @@ export default function Results() {
   }
 
   const summary = computeSummary(trials);
-
-  function handleDownloadJSON() {
-    const p = participant;
-    if (!p) return;
-    const data = { participant: p, trials, copyResult };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `memory-test-${p.id}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function handleDownloadCSV() {
-    const p = participant;
-    if (!p) return;
-    const headers = [
-      'participantId', 'level', 'trialIndex', 'gridIndex', 'correctPlacements',
-      'commissionErrors', 'wrongShapeInTarget', 'omissionErrors', 'accuracyPercent', 'reactionTimeMs', 'trialCorrectBinary',
-    ];
-    const rows = trials.map((t) =>
-      [t.participantId, t.level, t.trialIndex, t.gridIndex, t.correctPlacements,
-        t.commissionErrors, t.wrongShapeInTarget ?? 0, t.omissionErrors, (t.accuracyPercent ?? 0).toFixed(1), t.reactionTimeMs, t.trialCorrectBinary].join(',')
-    );
-    const csv = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `memory-test-${p.id}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
   async function handleSubmitToStudy() {
     const p = participant;
@@ -60,10 +28,7 @@ export default function Results() {
       setSubmitting(true);
       try {
         await submitToBackend(p, summary, copyResult ?? null);
-        setParticipant(null);
-        setTrials([]);
-        setCopyResult(null);
-        navigate('/');
+        setSubmitted(true);
       } catch (e) {
         setSubmitError(e instanceof Error ? e.message : 'Failed to submit');
       } finally {
@@ -87,48 +52,66 @@ export default function Results() {
   }
 
   function handleTakeTestAgain() {
+    setParticipant(null);
     setTrials([]);
     setCopyResult(null);
-    navigate('/intro');
+    navigate('/');
   }
 
   const dateStr = new Date(participant.timestamp).toLocaleString();
+  const memoryPoints = summary.memoryPoints ?? 0;
+  const highestLevel = summary.highestLevelPassed ?? 0;
 
   return (
     <div className="page">
-      <h1>Results</h1>
+      <h1>Thank you for completing the test</h1>
+
       <div className="results-section">
-        <h3>Your information</h3>
-        <p><strong>Name:</strong> {participant.name}</p>
-        <p><strong>Age:</strong> {participant.age}</p>
-        <p><strong>Gender:</strong> {participant.gender}</p>
-        <p><strong>Education:</strong> {participant.education}</p>
-        <p><strong>Date:</strong> {dateStr}</p>
+        <p><strong>Your score:</strong> {memoryPoints} / 31 memory points</p>
+        <p><strong>Highest level passed:</strong> {highestLevel}</p>
       </div>
-      <div className="results-section">
-        <h3>Memory test</h3>
-        <p><strong>Memory points:</strong> {summary.memoryPoints ?? 0} / 31</p>
-        <p><strong>Highest level passed:</strong> {summary.highestLevelPassed ?? 0}</p>
-        <p><strong>Overall accuracy:</strong> {(summary.overallAccuracyPercent ?? 0).toFixed(1)}%</p>
-        <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
-      </div>
-      <div className="results-section">
-        <h3>Copy task</h3>
-        <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 16` : '—'}</p>
-        <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
-      </div>
-      <div className="results-section">
-        <h3>Comparison</h3>
-        <p>Normative comparison not available yet. This tool requires a larger validation sample.</p>
-      </div>
+
+      <details
+        className="results-details"
+        open={detailsOpen}
+        onToggle={(e) => setDetailsOpen((e.target as HTMLDetailsElement).open)}
+      >
+        <summary>See detailed results</summary>
+        <div className="results-section">
+          <h3>Your information</h3>
+          <p><strong>Name:</strong> {participant.name}</p>
+          <p><strong>Age:</strong> {participant.age}</p>
+          <p><strong>Gender:</strong> {participant.gender}</p>
+          <p><strong>Education:</strong> {participant.education}</p>
+          <p><strong>Date:</strong> {dateStr}</p>
+        </div>
+        <div className="results-section">
+          <h3>Memory test</h3>
+          <p><strong>Memory points:</strong> {memoryPoints} / 31</p>
+          <p><strong>Highest level passed:</strong> {highestLevel}</p>
+          <p><strong>Overall accuracy:</strong> {(summary.overallAccuracyPercent ?? 0).toFixed(1)}%</p>
+          <p><strong>Mean reaction time:</strong> {Math.round(summary.meanReactionTimeMs ?? 0)} ms</p>
+        </div>
+        <div className="results-section">
+          <h3>Copy task</h3>
+          <p><strong>Copy score:</strong> {copyResult != null ? `${copyResult.score} / 16` : '—'}</p>
+          <p><strong>Time:</strong> {copyResult ? `${(copyResult.timeMs / 1000).toFixed(1)} s` : '—'}</p>
+        </div>
+      </details>
+
       {submitError && <p className="form-error" style={{ marginTop: '1rem' }}>{submitError}</p>}
+
       <div className="results-actions">
-        <button onClick={handleSubmitToStudy} disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Submit results to study'}
+        {submitted ? (
+          <p className="results-success">Your results have been saved. Thank you for participating.</p>
+        ) : (
+          <button onClick={handleSubmitToStudy} disabled={submitting}>
+            {submitting ? 'Submitting…' : 'Submit results to study'}
+          </button>
+        )}
+        <button type="button" className="secondary link-style" onClick={handleTakeTestAgain}>
+          Take the test again
         </button>
-        <button onClick={handleTakeTestAgain}>Take the test again</button>
-        <button className="secondary" onClick={handleDownloadJSON}>Download results as JSON</button>
-        <button className="secondary" onClick={handleDownloadCSV}>Download results as CSV</button>
       </div>
     </div>
   );

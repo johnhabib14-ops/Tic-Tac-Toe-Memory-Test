@@ -393,6 +393,39 @@ button.secondary:hover {
   align-items: center;
 }
 
+.results-success {
+  color: #2a7;
+  font-weight: 500;
+  margin: 0;
+}
+
+button.link-style {
+  background: none;
+  border: none;
+  color: var(--link-color, #6af);
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+button.link-style:hover {
+  color: var(--link-hover-color, #8cf);
+}
+
+.results-details {
+  margin-top: 1rem;
+  text-align: left;
+  width: 100%;
+  max-width: 520px;
+}
+
+.results-details summary {
+  cursor: pointer;
+  color: #6af;
+  font-size: 0.95rem;
+}
+
 .reminder {
   font-size: 0.9rem;
   color: #555;
