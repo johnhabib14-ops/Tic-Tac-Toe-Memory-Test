@@ -1,6 +1,7 @@
 /**
  * Vercel serverless: POST /api/gmt22-submit
- * GMT 2.2 submissions (harder variant). Inserts one row into Supabase gmt22_submissions table.
+ * GMT 2 submissions. Inserts one row into Supabase gmt22_submissions table.
+ * Accepts new payload shape: summary.by_condition, practice_failed, practice_trials.
  */
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,10 +27,33 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON' });
   }
 
-  const acc = body.mean_accuracy_per_condition && typeof body.mean_accuracy_per_condition === 'object' ? body.mean_accuracy_per_condition : {};
-  const rt = body.mean_rt_per_condition && typeof body.mean_rt_per_condition === 'object' ? body.mean_rt_per_condition : {};
-  const comm = body.total_commissions_per_condition && typeof body.total_commissions_per_condition === 'object' ? body.total_commissions_per_condition : {};
-  const clean = body.clean_trial_rate_per_condition && typeof body.clean_trial_rate_per_condition === 'object' ? body.clean_trial_rate_per_condition : {};
+  const summary = body.summary && typeof body.summary === 'object' ? body.summary : null;
+  let acc, rt, comm, clean;
+  let globalAccuracy, globalMeanRt, globalCleanTrialRate;
+
+  if (summary && summary.by_condition) {
+    acc = {};
+    rt = {};
+    comm = {};
+    clean = {};
+    for (const [c, s] of Object.entries(summary.by_condition)) {
+      if (s && typeof s.mean_accuracy === 'number') acc[c] = s.mean_accuracy;
+      if (s && typeof s.mean_rt_ms === 'number') rt[c] = s.mean_rt_ms / 1000;
+      if (s && typeof s.total_commissions === 'number') comm[c] = s.total_commissions;
+      clean[c] = 0;
+    }
+    globalAccuracy = Number(summary.global_accuracy) || 0;
+    globalMeanRt = Number(summary.global_mean_rt_ms) != null ? Number(summary.global_mean_rt_ms) / 1000 : 0;
+    globalCleanTrialRate = 0;
+  } else {
+    acc = body.mean_accuracy_per_condition && typeof body.mean_accuracy_per_condition === 'object' ? body.mean_accuracy_per_condition : {};
+    rt = body.mean_rt_per_condition && typeof body.mean_rt_per_condition === 'object' ? body.mean_rt_per_condition : {};
+    comm = body.total_commissions_per_condition && typeof body.total_commissions_per_condition === 'object' ? body.total_commissions_per_condition : {};
+    clean = body.clean_trial_rate_per_condition && typeof body.clean_trial_rate_per_condition === 'object' ? body.clean_trial_rate_per_condition : {};
+    globalAccuracy = Number(body.global_accuracy) || 0;
+    globalMeanRt = Number(body.global_mean_rt) || 0;
+    globalCleanTrialRate = Number(body.global_clean_trial_rate) || 0;
+  }
 
   const row = {
     session_id: body.session_id ?? '',
@@ -49,10 +73,9 @@ export default async function handler(req, res) {
     mean_rt_per_condition: rt,
     total_commissions_per_condition: comm,
     clean_trial_rate_per_condition: clean,
-    global_accuracy: Number(body.global_accuracy) || 0,
-    global_mean_rt: Number(body.global_mean_rt) || 0,
-    global_clean_trial_rate: Number(body.global_clean_trial_rate) || 0,
-    // SPSS-friendly flat columns
+    global_accuracy: globalAccuracy,
+    global_mean_rt: globalMeanRt,
+    global_clean_trial_rate: globalCleanTrialRate,
     mean_accuracy_baseline: Number(acc.baseline) || 0,
     mean_accuracy_ignore_distractor: Number(acc.ignore_distractor) || 0,
     mean_accuracy_remember_distractor: Number(acc.remember_distractor) || 0,

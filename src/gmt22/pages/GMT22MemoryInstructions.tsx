@@ -15,7 +15,6 @@ export default function GMT22MemoryInstructions() {
       <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
         <li><span style={{ color: 'red', fontWeight: 'bold' }}>Ignore the +</span> — Only place X and O. Do not place +.</li>
         <li><span style={{ color: 'red', fontWeight: 'bold' }}>Remember X, O, and +</span> — Place all three in the correct spots.</li>
-        <li><span style={{ color: 'red', fontWeight: 'bold' }}>No +</span> — Just place X and O.</li>
       </ul>
       <p>
         During the task, this instruction will appear in <strong style={{ color: 'red' }}>red and bold</strong> above each grid so you can tell at a glance whether to ignore or place the +.

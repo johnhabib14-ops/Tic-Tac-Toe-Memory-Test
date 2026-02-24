@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useGMT22State } from '../GMT22State';
-import type { GMT22CellSymbol, GMT22Condition, GMT22GridMap } from '../types';
+import type { GMT22CellSymbol, GMT22GridMap } from '../types';
 import type { GMT22ItemBankEntry } from '../lib/memoryTask';
 import {
-  getItemForTrial,
+  getPracticeItems,
   encodingMs,
   reconLimitMs,
   normalizeResponseMap,
@@ -15,10 +15,7 @@ import {
 import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
 import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
-import FixationCross from '../../components/FixationCross';
-import { DELAY_FIXATION_MS, GMT22_CONDITIONS } from '../types';
 
-/** Encoding display: ignore_distractor = target + distractor; else target only (remember has Plus in target_map). */
 function getEncodingDisplayMap(item: GMT22ItemBankEntry): GMT22GridMap {
   const out: GMT22GridMap = [];
   for (let i = 0; i < 16; i++) {
@@ -29,77 +26,51 @@ function getEncodingDisplayMap(item: GMT22ItemBankEntry): GMT22GridMap {
   return out;
 }
 
-function paletteIncludesPlus(condition: GMT22Condition): boolean {
+function paletteIncludesPlus(condition: string): boolean {
   return condition === 'remember_distractor';
 }
 
-function getStartSpan(conditionIndex: number, memoryTrials: { condition: GMT22Condition; span: number; passed: boolean }[]): number {
-  if (conditionIndex === 0) return 2;
-  const baselineTrials = memoryTrials.filter((t) => t.condition === 'baseline');
-  let baselineSpanEstimate = 0;
-  for (const t of baselineTrials) if (t.passed && t.span > baselineSpanEstimate) baselineSpanEstimate = t.span;
-  return Math.max(2, baselineSpanEstimate - 1);
-}
-
-export default function GMT22Memory() {
+export default function GMT22Practice() {
   const {
     participant,
-    memoryTrials,
-    addMemoryTrial,
     setPhase,
-    setMemoryEarlyStopped,
+    setPracticeTrials,
+    practiceTrials,
+    setPracticeFailed,
   } = useGMT22State();
 
-  const [conditionIndex, setConditionIndex] = useState(0);
-  const [span, setSpan] = useState(2);
-  const [trialIndexInSpan, setTrialIndexInSpan] = useState(1 as 1 | 2);
-  const [discontinueCount, setDiscontinueCount] = useState(0);
-
-  const [phase, setPhaseLocal] = useState<'encoding' | 'delay_fixation' | 'reconstructing'>('encoding');
+  const [retryCount, setRetryCount] = useState(0);
+  const [showClarification, setShowClarification] = useState(false);
+  const [trialIndex, setTrialIndex] = useState(0);
+  const [phase, setPhaseLocal] = useState<'encoding' | 'reconstructing'>('encoding');
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
   const [timeLeftSec, setTimeLeftSec] = useState(0);
   const [selectedSymbol, setSelectedSymbol] = useState<GMT22CellSymbol | null>(null);
   const reconStartRef = useRef(0);
   const responseMapRef = useRef<Record<number, GMT22CellSymbol>>({});
-  const recordedForCurrentRef = useRef<string | null>(null);
+  const recordedForTrialRef = useRef(-1);
 
   responseMapRef.current = responseMap;
   useEffect(() => {
     responseMapRef.current = responseMap;
   }, [responseMap]);
 
-  const condition = GMT22_CONDITIONS[conditionIndex];
-  const currentItem: GMT22ItemBankEntry | null =
-    participant && conditionIndex < GMT22_CONDITIONS.length
-      ? getItemForTrial(condition, span, trialIndexInSpan, participant.session_seed)
-      : null;
-
-  const trialKey = `${conditionIndex}-${span}-${trialIndexInSpan}`;
+  const items: GMT22ItemBankEntry[] =
+    participant && retryCount <= 1
+      ? getPracticeItems(participant.session_seed)
+      : [];
+  const currentItem: GMT22ItemBankEntry | null = items[trialIndex] ?? null;
 
   useEffect(() => {
     if (!currentItem || phase !== 'encoding') return;
     const ms = encodingMs(currentItem.span);
     const t = setTimeout(() => {
-      if (currentItem.condition === 'delay') {
-        setPhaseLocal('delay_fixation');
-      } else {
-        setPhaseLocal('reconstructing');
-        reconStartRef.current = Date.now();
-        setTimeLeftSec(Math.floor(reconLimitMs(currentItem.span) / 1000));
-      }
-    }, ms);
-    return () => clearTimeout(t);
-  }, [currentItem, phase, trialKey]);
-
-  useEffect(() => {
-    if (!currentItem || phase !== 'delay_fixation') return;
-    const t = setTimeout(() => {
       setPhaseLocal('reconstructing');
       reconStartRef.current = Date.now();
       setTimeLeftSec(Math.floor(reconLimitMs(currentItem.span) / 1000));
-    }, DELAY_FIXATION_MS);
+    }, ms);
     return () => clearTimeout(t);
-  }, [currentItem, phase]);
+  }, [currentItem, phase, trialIndex]);
 
   useEffect(() => {
     if (!currentItem || phase !== 'reconstructing') return;
@@ -112,7 +83,7 @@ export default function GMT22Memory() {
       secondsLeft -= 1;
       setTimeLeftSec(secondsLeft);
       if (secondsLeft <= 0) {
-        if (recordedForCurrentRef.current !== trialKey) recordTrial(true);
+        if (recordedForTrialRef.current !== trialIndex) recordTrial(true);
         return;
       }
       timeoutId = setTimeout(tick, 1000);
@@ -122,12 +93,12 @@ export default function GMT22Memory() {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [currentItem, phase, trialKey]);
+  }, [currentItem, phase, trialIndex]);
 
   function recordTrial(timeout: boolean, responseMapOverride?: Record<number, GMT22CellSymbol>) {
     if (!currentItem || !participant) return;
-    if (recordedForCurrentRef.current === trialKey) return;
-    recordedForCurrentRef.current = trialKey;
+    if (recordedForTrialRef.current === trialIndex) return;
+    recordedForTrialRef.current = trialIndex;
     const source = responseMapOverride ?? responseMapRef.current;
     const response = normalizeResponseMap(source);
     const { hits, commissions, total_targets, accuracy_raw } = scoreTrial(currentItem.target_map, response);
@@ -137,7 +108,7 @@ export default function GMT22Memory() {
     const trialPayload = {
       condition: currentItem.condition,
       span: currentItem.span,
-      trial_index: trialIndexInSpan,
+      trial_index: (trialIndex + 1) as 1 | 2,
       item_id: currentItem.item_id,
       target_map: currentItem.target_map,
       distractor_map: currentItem.distractor_map,
@@ -151,58 +122,29 @@ export default function GMT22Memory() {
       near_passed,
       timeout,
     };
+    const nextTrials = [...practiceTrials, trialPayload];
     flushSync(() => {
-      addMemoryTrial(trialPayload);
+      setPracticeTrials(nextTrials);
       setResponseMap({});
     });
 
-    if (trialIndexInSpan === 1) {
-      setTrialIndexInSpan(2);
+    if (trialIndex < items.length - 1) {
+      setTrialIndex(trialIndex + 1);
       setPhaseLocal('encoding');
       return;
     }
 
-    const conditionTrials = [...memoryTrials, trialPayload].filter((t) => t.condition === condition && t.span === span);
-    const atLeastOnePassed = conditionTrials.some((t) => t.passed);
-
+    const atLeastOnePassed = nextTrials.some((t) => t.passed);
     if (atLeastOnePassed) {
-      if (span < 7) {
-        setSpan(span + 1);
-        setTrialIndexInSpan(1);
-        setPhaseLocal('encoding');
-      } else {
-        const nextConditionIndex = conditionIndex + 1;
-        if (nextConditionIndex >= GMT22_CONDITIONS.length) {
-          setPhase('results');
-        } else {
-          const nextStart = getStartSpan(nextConditionIndex, [...memoryTrials, trialPayload]);
-          setConditionIndex(nextConditionIndex);
-          setSpan(nextStart);
-          setTrialIndexInSpan(1);
-          setPhaseLocal('encoding');
-        }
-      }
+      setPhase('copy_instructions');
       return;
     }
-
-    const discontinuedAtSpan = span;
-    const nextConditionIndex = conditionIndex + 1;
-    if (nextConditionIndex >= GMT22_CONDITIONS.length) {
-      setPhase('results');
+    if (retryCount === 0) {
+      setShowClarification(true);
       return;
     }
-    const newDiscontinueCount = discontinuedAtSpan <= 3 ? discontinueCount + 1 : discontinueCount;
-    if (newDiscontinueCount >= 2) {
-      setMemoryEarlyStopped(true);
-      setPhase('results');
-      return;
-    }
-    setDiscontinueCount(newDiscontinueCount);
-    const nextStart = getStartSpan(nextConditionIndex, [...memoryTrials, trialPayload]);
-    setConditionIndex(nextConditionIndex);
-    setSpan(nextStart);
-    setTrialIndexInSpan(1);
-    setPhaseLocal('encoding');
+    setPracticeFailed(true);
+    setPhase('copy_instructions');
   }
 
   function handlePlace(cellIndex: number, symbol: GMT22CellSymbol) {
@@ -214,8 +156,33 @@ export default function GMT22Memory() {
     flushSync(() => recordTrial(false, responseMap));
   }
 
+  function handleTryAgain() {
+    setShowClarification(false);
+    setRetryCount(1);
+    setPracticeTrials([]);
+    setTrialIndex(0);
+    setPhaseLocal('encoding');
+    setResponseMap({});
+    recordedForTrialRef.current = -1;
+  }
+
   if (!participant) return null;
-  if (conditionIndex >= GMT22_CONDITIONS.length || !currentItem) {
+
+  if (showClarification) {
+    return (
+      <div className="page">
+        <h1>Practice</h1>
+        <p className="subtitle">
+          Both practice trials were incorrect. Remember: place symbols in the exact positions you saw. You need 85% or more correct with no extra symbols to pass a trial.
+        </p>
+        <button type="button" onClick={handleTryAgain}>
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  if (items.length === 0 || !currentItem) {
     return (
       <div className="page">
         <p>Loading…</p>
@@ -228,16 +195,12 @@ export default function GMT22Memory() {
     const instructionStyle = { color: 'red' as const, fontWeight: 'bold' as const };
     return (
       <div className="page">
-        <h2 className="grid-title">Remember the grid</h2>
+        <h2 className="grid-title">Practice — Remember the grid</h2>
         <p className="subtitle">
           {currentItem.condition === 'ignore_distractor' && (
             <>Remember only the X and O positions. <span style={instructionStyle}>Ignore the + symbols.</span></>
           )}
-          {currentItem.condition === 'remember_distractor' && (
-            <span style={instructionStyle}>Remember the positions of X, O, and +.</span>
-          )}
           {currentItem.condition === 'baseline' && 'Watch the positions carefully.'}
-          {currentItem.condition === 'delay' && 'Watch the positions carefully.'}
         </p>
         <div className="grid-container">
           <GMT22DisplayGrid gridMap={displayMap} />
@@ -246,18 +209,10 @@ export default function GMT22Memory() {
     );
   }
 
-  if (phase === 'delay_fixation') {
-    return (
-      <div className="page">
-        <FixationCross />
-      </div>
-    );
-  }
-
   const includePlus = paletteIncludesPlus(currentItem.condition);
   return (
     <div className="page">
-      <h2 className="grid-title">Reconstruct the grid</h2>
+      <h2 className="grid-title">Practice — Reconstruct the grid</h2>
       <p className="subtitle">
         Place the symbols in the correct positions. Time left: {timeLeftSec}s
       </p>

@@ -1,5 +1,5 @@
 import type { GMT22GridMap, GMT22Condition, GMT22ItemBankEntry } from '../types';
-import { GMT22_CONDITIONS, GMT22_SPANS } from '../types';
+import { GMT22_CONDITIONS } from '../types';
 
 import itemBankRaw from '../gmt22_item_bank.json';
 
