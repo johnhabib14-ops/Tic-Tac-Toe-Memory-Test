@@ -29,6 +29,7 @@ function computeConditionSummary(
       mean_accuracy: 0,
       mean_rt_ms: 0,
       total_commissions: 0,
+      span_consistency_flag: false,
     };
   }
   const spans = [...new Set(conditionTrials.map((t) => t.span))].sort((a, b) => a - b);
@@ -38,6 +39,9 @@ function computeConditionSummary(
     const atSpan = conditionTrials.filter((t) => t.span === s);
     if (atSpan.some((t) => t.passed)) span_estimate = s;
   }
+  const atSpanEstimate = conditionTrials.filter((t) => t.span === span_estimate);
+  const span_consistency_flag =
+    span_estimate > 0 && atSpanEstimate.length >= 2 && atSpanEstimate.every((t) => t.passed);
   const lastSpanTrials = conditionTrials.filter((t) => t.span === span_reached);
   const discontinued_at_span =
     span_reached < 7 && lastSpanTrials.length >= 2 && lastSpanTrials.every((t) => !t.passed)
@@ -56,12 +60,17 @@ function computeConditionSummary(
     mean_accuracy,
     mean_rt_ms,
     total_commissions,
+    span_consistency_flag,
   };
 }
 
 export function computeGMT22Summary(
   trials: GMT22MemoryTrialRecord[],
-  options: { memory_early_stopped?: boolean; practice_failed?: boolean } = {}
+  options: {
+    memory_early_stopped?: boolean;
+    practice_failed?: boolean;
+    practice_passed_first_try?: boolean;
+  } = {}
 ): GMT22Summary {
   const byCondition = getTrialsByCondition(trials);
   const baselineTrials = byCondition.get('baseline') ?? [];
@@ -105,5 +114,6 @@ export function computeGMT22Summary(
     global_total_commissions: totalCommissions,
     memory_early_stopped: options.memory_early_stopped ?? false,
     practice_failed: options.practice_failed ?? false,
+    practice_passed_first_try: options.practice_passed_first_try ?? false,
   };
 }

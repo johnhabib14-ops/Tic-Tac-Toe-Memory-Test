@@ -16,7 +16,7 @@ import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
 import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
 import FixationCross from '../../components/FixationCross';
-import { DELAY_FIXATION_MS, GMT22_CONDITIONS } from '../types';
+import { DELAY_FIXATION_MS, getConditionOrder } from '../types';
 
 /** Encoding display: ignore_distractor = target + distractor; else target only (remember has Plus in target_map). */
 function getEncodingDisplayMap(item: GMT22ItemBankEntry): GMT22GridMap {
@@ -68,9 +68,10 @@ export default function GMT22Memory() {
     responseMapRef.current = responseMap;
   }, [responseMap]);
 
-  const condition = GMT22_CONDITIONS[conditionIndex];
+  const conditionOrder = participant ? getConditionOrder(participant.condition_order) : [];
+  const condition = conditionOrder[conditionIndex];
   const currentItem: GMT22ItemBankEntry | null =
-    participant && conditionIndex < GMT22_CONDITIONS.length
+    participant && conditionIndex < conditionOrder.length
       ? getItemForTrial(condition, span, trialIndexInSpan, participant.session_seed)
       : null;
 
@@ -172,7 +173,7 @@ export default function GMT22Memory() {
         setPhaseLocal('encoding');
       } else {
         const nextConditionIndex = conditionIndex + 1;
-        if (nextConditionIndex >= GMT22_CONDITIONS.length) {
+        if (nextConditionIndex >= conditionOrder.length) {
           setPhase('results');
         } else {
           const nextStart = getStartSpan(nextConditionIndex, [...memoryTrials, trialPayload]);
@@ -187,11 +188,11 @@ export default function GMT22Memory() {
 
     const discontinuedAtSpan = span;
     const nextConditionIndex = conditionIndex + 1;
-    if (nextConditionIndex >= GMT22_CONDITIONS.length) {
+    if (nextConditionIndex >= conditionOrder.length) {
       setPhase('results');
       return;
     }
-    const newDiscontinueCount = discontinuedAtSpan <= 3 ? discontinueCount + 1 : discontinueCount;
+    const newDiscontinueCount = discontinuedAtSpan <= 2 ? discontinueCount + 1 : discontinueCount;
     if (newDiscontinueCount >= 2) {
       setMemoryEarlyStopped(true);
       setPhase('results');
@@ -215,7 +216,7 @@ export default function GMT22Memory() {
   }
 
   if (!participant) return null;
-  if (conditionIndex >= GMT22_CONDITIONS.length || !currentItem) {
+  if (conditionIndex >= conditionOrder.length || !currentItem) {
     return (
       <div className="page">
         <p>Loading…</p>

@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   }
 
   const summary = body.summary && typeof body.summary === 'object' ? body.summary : null;
-  let acc, rt, comm, clean;
+  let acc, rt, comm, clean, spanConsistency = {};
   let globalAccuracy, globalMeanRt, globalCleanTrialRate;
 
   if (summary && summary.by_condition) {
@@ -36,11 +36,13 @@ export default async function handler(req, res) {
     rt = {};
     comm = {};
     clean = {};
+    spanConsistency = {};
     for (const [c, s] of Object.entries(summary.by_condition)) {
       if (s && typeof s.mean_accuracy === 'number') acc[c] = s.mean_accuracy;
       if (s && typeof s.mean_rt_ms === 'number') rt[c] = s.mean_rt_ms / 1000;
       if (s && typeof s.total_commissions === 'number') comm[c] = s.total_commissions;
       clean[c] = 0;
+      spanConsistency[c] = !!(s && s.span_consistency_flag === true);
     }
     globalAccuracy = Number(summary.global_accuracy) || 0;
     globalMeanRt = Number(summary.global_mean_rt_ms) != null ? Number(summary.global_mean_rt_ms) / 1000 : 0;
@@ -50,10 +52,14 @@ export default async function handler(req, res) {
     rt = body.mean_rt_per_condition && typeof body.mean_rt_per_condition === 'object' ? body.mean_rt_per_condition : {};
     comm = body.total_commissions_per_condition && typeof body.total_commissions_per_condition === 'object' ? body.total_commissions_per_condition : {};
     clean = body.clean_trial_rate_per_condition && typeof body.clean_trial_rate_per_condition === 'object' ? body.clean_trial_rate_per_condition : {};
+    spanConsistency = {};
     globalAccuracy = Number(body.global_accuracy) || 0;
     globalMeanRt = Number(body.global_mean_rt) || 0;
     globalCleanTrialRate = Number(body.global_clean_trial_rate) || 0;
   }
+
+  const practiceFailed = typeof body.practice_failed === 'boolean' ? body.practice_failed : (summary && typeof summary.practice_failed === 'boolean' ? summary.practice_failed : false);
+  const practicePassedFirstTry = typeof body.practice_passed_first_try === 'boolean' ? body.practice_passed_first_try : (summary && typeof summary.practice_passed_first_try === 'boolean' ? summary.practice_passed_first_try : false);
 
   const row = {
     session_id: body.session_id ?? '',
@@ -63,6 +69,9 @@ export default async function handler(req, res) {
     gender: body.gender ?? '',
     education: body.education ?? '',
     device_type: body.device_type ?? '',
+    condition_order: String(body.condition_order ?? ''),
+    practice_failed: practiceFailed,
+    practice_passed_first_try: practicePassedFirstTry,
     copy_hits: Number(body.copy_hits) || 0,
     copy_total_rt_ms: Number(body.copy_total_rt_ms) || 0,
     copy_rt_sec: Number(body.copy_total_rt_ms) ? Number(body.copy_total_rt_ms) / 1000 : 0,
@@ -92,6 +101,10 @@ export default async function handler(req, res) {
     clean_trial_rate_ignore_distractor: Number(clean.ignore_distractor) || 0,
     clean_trial_rate_remember_distractor: Number(clean.remember_distractor) || 0,
     clean_trial_rate_delay: Number(clean.delay) || 0,
+    span_consistency_flag_baseline: !!spanConsistency.baseline,
+    span_consistency_flag_ignore_distractor: !!spanConsistency.ignore_distractor,
+    span_consistency_flag_remember_distractor: !!spanConsistency.remember_distractor,
+    span_consistency_flag_delay: !!spanConsistency.delay,
   };
 
   const response = await fetch(`${supabaseUrl}/rest/v1/gmt22_submissions`, {

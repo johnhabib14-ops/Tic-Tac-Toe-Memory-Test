@@ -37,6 +37,8 @@ export type GMT22DeviceType =
   | 'Other'
   | 'Prefer not to say';
 
+export type GMT22ConditionOrder = 'A' | 'B';
+
 export interface GMT22Participant {
   session_id: string;
   participant_id: string;
@@ -46,6 +48,7 @@ export interface GMT22Participant {
   education: string;
   device_type: GMT22DeviceType;
   session_seed: number;
+  condition_order: GMT22ConditionOrder;
 }
 
 export interface GMT22CopyResult {
@@ -101,6 +104,7 @@ export interface GMT22ConditionSummary {
   mean_accuracy: number;
   mean_rt_ms: number;
   total_commissions: number;
+  span_consistency_flag: boolean;
 }
 
 export interface GMT22Summary {
@@ -110,6 +114,7 @@ export interface GMT22Summary {
   global_total_commissions: number;
   memory_early_stopped: boolean;
   practice_failed: boolean;
+  practice_passed_first_try: boolean;
 }
 
 export interface GMT22ItemBankEntry {
@@ -126,6 +131,13 @@ export const GMT22_CONDITIONS: GMT22Condition[] = [
   'remember_distractor',
   'delay',
 ];
+
+/** Order A: baseline, ignore_distractor, remember_distractor, delay. Order B: baseline, delay, ignore_distractor, remember_distractor. */
+export function getConditionOrder(order: GMT22ConditionOrder): GMT22Condition[] {
+  return order === 'A'
+    ? ['baseline', 'ignore_distractor', 'remember_distractor', 'delay']
+    : ['baseline', 'delay', 'ignore_distractor', 'remember_distractor'];
+}
 
 export const GMT22_SPANS = [2, 3, 4, 5, 6, 7] as const;
 export const GMT22_TRIALS_PER_SPAN = 2;

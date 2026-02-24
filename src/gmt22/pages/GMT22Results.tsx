@@ -24,6 +24,7 @@ export default function GMT22Results() {
     memoryTrials,
     practiceTrials,
     practiceFailed,
+    practicePassedFirstTry,
     memoryEarlyStopped,
   } = useGMT22State();
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export default function GMT22Results() {
   const summary = computeGMT22Summary(memoryTrials, {
     memory_early_stopped: memoryEarlyStopped,
     practice_failed: practiceFailed,
+    practice_passed_first_try: practicePassedFirstTry,
   });
 
   async function handleSubmit() {

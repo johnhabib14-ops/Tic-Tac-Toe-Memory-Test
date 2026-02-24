@@ -27,6 +27,8 @@ interface GMT22StateValue {
   setPracticeTrials: (t: GMT22PracticeTrialRecord[]) => void;
   practiceFailed: boolean;
   setPracticeFailed: (v: boolean) => void;
+  practicePassedFirstTry: boolean;
+  setPracticePassedFirstTry: (v: boolean) => void;
   memoryEarlyStopped: boolean;
   setMemoryEarlyStopped: (v: boolean) => void;
 }
@@ -40,6 +42,7 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
   const [memoryTrials, setMemoryTrials] = useState<GMT22MemoryTrialRecord[]>([]);
   const [practiceTrials, setPracticeTrials] = useState<GMT22PracticeTrialRecord[]>([]);
   const [practiceFailed, setPracticeFailed] = useState(false);
+  const [practicePassedFirstTry, setPracticePassedFirstTry] = useState(false);
   const [memoryEarlyStopped, setMemoryEarlyStopped] = useState(false);
 
   const addMemoryTrial = useCallback((t: GMT22MemoryTrialRecord) => {
@@ -60,6 +63,8 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
     setPracticeTrials,
     practiceFailed,
     setPracticeFailed,
+    practicePassedFirstTry,
+    setPracticePassedFirstTry,
     memoryEarlyStopped,
     setMemoryEarlyStopped,
   };

@@ -92,6 +92,7 @@ export default function GMT22Demographics() {
       education: education.trim(),
       device_type: deviceType as GMT22DeviceType,
       session_seed: Date.now(),
+      condition_order: Math.random() < 0.5 ? 'A' : 'B',
     };
     setParticipant(p);
     setPhase('practice');

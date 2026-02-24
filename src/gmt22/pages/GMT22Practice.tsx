@@ -37,6 +37,7 @@ export default function GMT22Practice() {
     setPracticeTrials,
     practiceTrials,
     setPracticeFailed,
+    setPracticePassedFirstTry,
   } = useGMT22State();
 
   const [showIntro, setShowIntro] = useState(true);
@@ -137,6 +138,7 @@ export default function GMT22Practice() {
 
     const atLeastOnePassed = nextTrials.some((t) => t.passed);
     if (atLeastOnePassed) {
+      setPracticePassedFirstTry(retryCount === 0);
       setPhase('copy_instructions');
       return;
     }
@@ -144,6 +146,7 @@ export default function GMT22Practice() {
       setShowClarification(true);
       return;
     }
+    setPracticePassedFirstTry(false);
     setPracticeFailed(true);
     setPhase('copy_instructions');
   }

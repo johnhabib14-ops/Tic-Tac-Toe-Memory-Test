@@ -16,7 +16,9 @@ export interface GMT22SubmitPayload {
   gender: string;
   education: string;
   device_type: string;
+  condition_order: string;
   practice_failed: boolean;
+  practice_passed_first_try: boolean;
   practice_trials: Array<{
     condition: string;
     span: number;
@@ -67,6 +69,7 @@ export interface GMT22SubmitPayload {
         mean_accuracy: number;
         mean_rt_ms: number;
         total_commissions: number;
+        span_consistency_flag: boolean;
       }
     >;
     global_accuracy: number;
@@ -74,6 +77,7 @@ export interface GMT22SubmitPayload {
     global_total_commissions: number;
     memory_early_stopped: boolean;
     practice_failed: boolean;
+    practice_passed_first_try: boolean;
   };
 }
 
@@ -117,6 +121,7 @@ export function buildGMT22Payload(
       mean_accuracy: s.mean_accuracy,
       mean_rt_ms: s.mean_rt_ms,
       total_commissions: s.total_commissions,
+      span_consistency_flag: s.span_consistency_flag,
     };
   }
   return {
@@ -127,7 +132,9 @@ export function buildGMT22Payload(
     gender: participant.gender,
     education: participant.education,
     device_type: participant.device_type,
+    condition_order: participant.condition_order,
     practice_failed: summary.practice_failed,
+    practice_passed_first_try: summary.practice_passed_first_try,
     practice_trials: practiceTrials.map(mapTrial),
     copy_hits: copyResult?.copy_hits ?? 0,
     copy_total_rt_ms: copyResult?.copy_total_rt_ms ?? 0,
@@ -141,6 +148,7 @@ export function buildGMT22Payload(
       global_total_commissions: summary.global_total_commissions,
       memory_early_stopped: summary.memory_early_stopped,
       practice_failed: summary.practice_failed,
+      practice_passed_first_try: summary.practice_passed_first_try,
     },
   };
 }
