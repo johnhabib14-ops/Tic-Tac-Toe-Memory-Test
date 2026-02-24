@@ -5,7 +5,7 @@ export default function Landing() {
 
   return (
     <div className="page">
-      <h1>Grid Memory</h1>
+      <h1>Grid Memory Test (GMT)</h1>
       <p className="subtitle">
         A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
       </p>
