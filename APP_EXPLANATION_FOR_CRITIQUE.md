@@ -2,7 +2,7 @@
 
 This document describes the **Tic-Tac-Toe Memory Test** web application in enough detail for an external reviewer (e.g. ChatGPT) to critique its design, implementation, and research validity. The app exists in two versions: **GMT 1.0** (original) and **GMT 2** (streamlined research version). The explanation focuses on GMT 2 as the primary research protocol; GMT 1.0 is summarized for context.
 
-**Protocol freeze:** The GMT 2 research protocol (span 2–7, four conditions, discontinue, span-centered summary) is frozen as of app version **1.0.0**. Task logic, scoring, and summary structure are stable for data collection.
+**Protocol freeze:** The GMT 2 research protocol (span 2–7, four conditions, discontinue, span-centered summary) is frozen as of app version **1.0.0**. Task logic, scoring, and summary structure are stable for data collection. **Version 1.1.0** adds PWA support (installable app, icon, “GMT” on home screen); the protocol is unchanged.
 
 ---
 
@@ -23,6 +23,7 @@ This document describes the **Tic-Tac-Toe Memory Test** web application in enoug
   - **Option C:** Pre-filled Google Form (fallback).
 - **Env:** `VITE_API_URL` (app URL for API calls, required for Supabase save), `VITE_BASE_PATH` (e.g. `/` on Vercel, `/Tic-Tac-Toe-Memory-Test/` on GitHub Pages), `SUPABASE_URL`, `SUPABASE_ANON_KEY` on Vercel for the API.
 - **Routing:** Single-page app. GMT 2 lives at `/gmt2` and `/gmt22` (both render the same shell). GMT 1.0 uses `/`, `/demographics`, `/intro`, `/copy`, `/test`, `/results`, etc.
+- **PWA (installable app):** A web app manifest (`public/manifest.json`) and icon (`public/icon.svg`) allow “Add to Home Screen” / “Install app.” **Name** “Grid Memory Test,” **short_name** “GMT” (label under the icon on phone). **start_url** `/` (opens landing page). **display** `standalone`. One icon serves both the favicon (browser tab) and the installed app icon.
 
 ---
 
@@ -48,7 +49,7 @@ The rest of this document details **GMT 2** unless noted.
 4. **Practice** – Intro screen (2 trials, grid disappears then place symbols; first trial X/O only, second may show + but place only X/O; time limit). Then 2 trials: baseline span 2, ignore_distractor span 2. If both fail, clarification screen and one “Try again”; if both fail again, proceed with `practice_failed` set.
 5. **Copy instructions** – Then **Copy task**: reference grid from a small bank (8 targets: X and O), selected by session seed; 30 s; Submit or auto-submit on timeout. `copy_item_id` stored.
 6. **Memory instructions** – Then **Memory task**: one **attention check** (“Place X in the top left cell then press Submit”), then 4 conditions, spans 2–7, 2 trials per span; every condition starts at span 2; discontinue within each condition only (no global early stop). Each trial: encoding → optional delay fixation (“Brief pause”) → reconstruction with countdown; Submit or auto-record on timeout.
-7. **Results** – Copy: Hits / 8, Time (seconds). Memory: per condition (Block 1–4 in run order): Span, Consistency (Stable / Boundary), Mean Accuracy, Mean RT. Costs: Interference Cost, Binding Cost, Delay Cost. Participant ID and Condition order (e.g. “Order A”). No internal condition names or global accuracy/commissions. “Submit results” (if backend configured); duplicate submission prevented (button disabled, 409 from server if session_id already exists).
+7. **Results** – Title: “Thank you for completing GMT 2” (one line). Under it: **Overall: X% accuracy** (hits/targets across all memory trials), then a neutral line: “This task measures visual–spatial memory span under different task demands.” Copy: Hits / 8, Time (seconds). Memory: per condition (Block 1–4 in run order): Span, Consistency (Stable / Boundary), Mean Accuracy, Mean RT. Costs: Interference Cost, Binding Cost, Delay Cost. Participant ID and Condition order (e.g. “Order A”). No internal condition names. “Submit results” (if backend configured); duplicate submission prevented (button disabled, 409 from server if session_id already exists).
 
 ---
 
@@ -147,6 +148,7 @@ The rest of this document details **GMT 2** unless noted.
 - **Logic:** `src/gmt22/lib/memoryTask.ts` (item bank, getItemForTrial, getOptionsForCondition, getPracticeItems, encodingMs, reconLimitMs, normalizeResponseMap, scoreTrial, isPassed; span 6–7 pairing with getPairingFallbackUsed), `src/gmt22/lib/copyTask.ts` (getCopyItemForSession, copy_item_bank.json, scoreCopyTask, toResponseGridMap), `src/gmt22/lib/summary.ts` (computeGMT22Summary(trials, options) with condition_order required), `src/gmt22/lib/submitGmt22.ts` (buildGMT22Payload, submitGMT22).
 - **Components:** `src/gmt22/components/` — display grid, reconstruction grid (with drag/drop and click), shape palette, SymbolPlus, etc.
 - **Data:** `src/gmt22/gmt22_item_bank.json` (pre-generated items), `src/gmt22/copy_item_bank.json` (copy patterns).
+- **PWA:** `public/manifest.json` (name, short_name “GMT”, start_url, icons), `public/icon.svg` (favicon and app icon), `index.html` (manifest and favicon links, theme-color).
 - **API:** `api/gmt22-submit.js` (Vercel serverless).
 - **DB scripts:** `scripts/gmt22_submissions_table.sql`, `scripts/gmt22_submissions_add_flat_columns.sql`, `scripts/gmt22_submissions_refinement_columns.sql`, `scripts/gmt22_submissions_validity_columns.sql`, `scripts/gmt22_submissions_span_summary_columns.sql`, `scripts/gmt22_submissions_rls.sql`, `gmt22_submissions` table.
 
