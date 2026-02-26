@@ -5,6 +5,7 @@ import {
   buildGMT22Payload,
   submitGMT22,
   isGMT22BackendConfigured,
+  GMT22SubmitError,
 } from '../lib/submitGmt22';
 import { getConditionOrder } from '../types';
 import type { GMT22Condition } from '../types';
@@ -59,7 +60,18 @@ export default function GMT22Results() {
     } catch (e) {
       if (e instanceof Error) console.error('Submit error:', e.message, e);
       else console.error('Submit error:', e);
-      setSubmitError('Submission failed. Please try again.');
+      const message = e instanceof GMT22SubmitError && e.status === 409
+        ? 'Results were already submitted for this session.'
+        : e instanceof GMT22SubmitError && e.status === 502
+          ? 'Could not save results. Please try again or contact the researcher.'
+          : e instanceof GMT22SubmitError && e.status === 500
+            ? 'Server error. Please try again later.'
+            : e instanceof Error && (e.message.includes('VITE_API_URL') || e.message.includes('not set'))
+              ? 'Submission is not configured.'
+              : e instanceof Error && (e.message.includes('Network') || e.message.includes('fetch'))
+                ? 'Connection error. Check your connection and try again.'
+                : 'Submission failed. Please try again.';
+      setSubmitError(message);
     } finally {
       setSubmitting(false);
     }

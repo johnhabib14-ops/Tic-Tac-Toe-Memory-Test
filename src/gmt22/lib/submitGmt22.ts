@@ -162,27 +162,45 @@ export function isGMT22BackendConfigured(): boolean {
   return API_URL.length > 0;
 }
 
+/** Error thrown by submitGMT22; message may include status for UI handling. */
+export class GMT22SubmitError extends Error {
+  constructor(
+    message: string,
+    public readonly status?: number
+  ) {
+    super(message);
+    this.name = 'GMT22SubmitError';
+  }
+}
+
 export function submitGMT22(payload: GMT22SubmitPayload): Promise<void> {
-  if (!API_URL) return Promise.reject(new Error('VITE_API_URL is not set'));
+  if (!API_URL) return Promise.reject(new GMT22SubmitError('VITE_API_URL is not set'));
   return fetch(`${API_URL}/api/gmt22-submit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-  }).then(async (r) => {
-    if (r.ok) return;
-    const status = r.status;
-    let detail = '';
-    try {
-      const text = await r.text();
-      const parsed = text ? JSON.parse(text) : null;
-      if (parsed && typeof parsed.error === 'string') detail = `: ${parsed.error}`;
-      if (parsed && typeof parsed.detail === 'string' && parsed.detail) detail += ` — ${parsed.detail}`;
-      else if (!detail && text && text.length < 120) detail = `: ${text}`;
-    } catch {
-      // ignore
-    }
-    if (status === 500) throw new Error(`Server misconfiguration (500)${detail}`);
-    if (status === 502) throw new Error(`Failed to save submission (502)${detail}`);
-    throw new Error(`Request failed: ${status}${detail}`);
-  });
+  })
+    .then(async (r) => {
+      if (r.ok) return;
+      const status = r.status;
+      let detail = '';
+      try {
+        const text = await r.text();
+        const parsed = text ? JSON.parse(text) : null;
+        if (parsed && typeof parsed.error === 'string') detail = `: ${parsed.error}`;
+        if (parsed && typeof parsed.detail === 'string' && parsed.detail) detail += ` — ${parsed.detail}`;
+        else if (!detail && text && text.length < 120) detail = `: ${text}`;
+      } catch {
+        // ignore
+      }
+      if (status === 409) throw new GMT22SubmitError(`Duplicate submission${detail}`, 409);
+      if (status === 500) throw new GMT22SubmitError(`Server misconfiguration (500)${detail}`, 500);
+      if (status === 502) throw new GMT22SubmitError(`Failed to save submission (502)${detail}`, 502);
+      throw new GMT22SubmitError(`Request failed: ${status}${detail}`, status);
+    })
+    .catch((err) => {
+      if (err instanceof GMT22SubmitError) throw err;
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new GMT22SubmitError(msg.includes('fetch') || msg.includes('Network') ? 'Network error' : msg);
+    });
 }
