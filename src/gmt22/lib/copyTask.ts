@@ -30,8 +30,10 @@ export const COPY_TARGET_MAP: GMT22GridMap = COPY_BANK[0]
   ? [...COPY_BANK[0].target_map]
   : Array(16).fill('');
 
+const COPY_NUM_TARGETS = 8;
+
 /**
- * Compute copy score: hits = correct placements (max 8).
+ * Compute copy score: hits = correct placements (capped at 8).
  */
 export function scoreCopyTask(
   targetMap: GMT22GridMap,
@@ -43,7 +45,7 @@ export function scoreCopyTask(
     const r = responseMap[i] || '';
     if (t !== '' && r === t) copy_hits++;
   }
-  return { copy_hits };
+  return { copy_hits: Math.min(copy_hits, COPY_NUM_TARGETS) };
 }
 
 export function toResponseGridMap(response: Record<number, string> | GMT22GridMap): GMT22GridMap {
