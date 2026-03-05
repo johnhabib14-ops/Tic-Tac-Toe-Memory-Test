@@ -9,14 +9,14 @@ export default function Landing() {
       <p className="subtitle">
         A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
       </p>
-      <button onClick={() => navigate('/demographics')}>Begin game</button>
+      <button onClick={() => navigate('/gmt2')}>Begin test</button>
       <button
         type="button"
         className="secondary"
         style={{ marginTop: '1rem' }}
-        onClick={() => navigate('/gmt2')}
+        onClick={() => navigate('/demographics')}
       >
-        GMT 2
+        Demo
       </button>
     </div>
   );
