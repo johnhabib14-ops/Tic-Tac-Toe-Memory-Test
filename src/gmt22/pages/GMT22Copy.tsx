@@ -124,7 +124,7 @@ export default function GMT22Copy() {
               responseMap={responseMap}
               onPlace={handlePlace}
               onDrop={handleDrop}
-              onCellClick={(cellIndex: number) => selected && handlePlace(cellIndex, selected)}
+              onCellClick={(cellIndex: number) => selected !== null && handlePlace(cellIndex, selected)}
               paletteIncludesPlus={false}
             />
           </div>

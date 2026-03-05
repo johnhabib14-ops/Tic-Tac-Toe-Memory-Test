@@ -239,7 +239,7 @@ export default function GMT22Memory() {
             responseMap={responseMap}
             onPlace={handlePlace}
             onDrop={handlePlace}
-            onCellClick={(cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
+            onCellClick={(cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
             paletteIncludesPlus={false}
           />
         </div>
@@ -312,7 +312,7 @@ export default function GMT22Memory() {
           responseMap={responseMap}
           onPlace={disabled ? () => {} : handlePlace}
           onDrop={disabled ? () => {} : handlePlace}
-          onCellClick={disabled ? () => {} : (cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
+          onCellClick={disabled ? () => {} : (cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
         />
       </div>

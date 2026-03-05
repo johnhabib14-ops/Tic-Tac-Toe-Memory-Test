@@ -250,7 +250,7 @@ export default function GMT22Practice() {
           responseMap={responseMap}
           onPlace={handlePlace}
           onDrop={handlePlace}
-          onCellClick={(cellIndex: number) => selectedSymbol && handlePlace(cellIndex, selectedSymbol)}
+          onCellClick={(cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
         />
       </div>
