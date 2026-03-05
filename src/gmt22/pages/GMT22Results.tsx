@@ -90,6 +90,28 @@ export default function GMT22Results() {
           This task measures visual–spatial memory span under different task demands.
         </p>
 
+        {isGMT22BackendConfigured() && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            {submitError && <p className="form-error">{submitError}</p>}
+            {submitted ? (
+              <p>Your responses have been submitted.</p>
+            ) : (
+              <>
+                <p className="subtitle" style={{ marginBottom: '0.5rem' }}>
+                  Please submit your results to complete the task.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                >
+                  {submitting ? 'Submitting…' : 'Submit results'}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="results-score-block">
           <h3>Copy</h3>
           <p>Hits: {copyResult?.copy_hits ?? 0} / {COPY_NUM_TARGETS}</p>
@@ -125,23 +147,6 @@ export default function GMT22Results() {
           <p>Participant ID: {participant.participant_id}</p>
           <p>Condition order: Order {summary.condition_order}</p>
         </div>
-
-        {isGMT22BackendConfigured() && (
-          <>
-            {submitError && <p className="form-error">{submitError}</p>}
-            {submitted ? (
-              <p>Your responses have been submitted.</p>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={submitting}
-              >
-                {submitting ? 'Submitting…' : 'Submit results'}
-              </button>
-            )}
-          </>
-        )}
       </div>
     </div>
   );
