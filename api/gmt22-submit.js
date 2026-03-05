@@ -52,6 +52,36 @@ export default async function handler(req, res) {
   const delay_cost = Number(summary?.delay_cost) ?? 0;
   const condition_order = String(body.condition_order ?? summary?.condition_order ?? '');
 
+  // Compute total_commissions, clean_trial_rate, and global metrics from memory_trials
+  const memoryTrials = Array.isArray(body.memory_trials) ? body.memory_trials : [];
+  const totalCommissionsByCond = { baseline: 0, ignore_distractor: 0, remember_distractor: 0, delay: 0 };
+  const cleanCountByCond = { baseline: 0, ignore_distractor: 0, remember_distractor: 0, delay: 0 };
+  const totalCountByCond = { baseline: 0, ignore_distractor: 0, remember_distractor: 0, delay: 0 };
+  let globalAccuracySum = 0;
+  let globalRtSumMs = 0;
+  let globalCleanCount = 0;
+  const nTrials = memoryTrials.length;
+  for (const t of memoryTrials) {
+    const c = t && t.condition;
+    if (c && totalCommissionsByCond[c] !== undefined) {
+      totalCommissionsByCond[c] += Number(t.commissions) || 0;
+      totalCountByCond[c]++;
+      if (t.passed === true) cleanCountByCond[c]++;
+    }
+    if (typeof t.accuracy_raw === 'number') globalAccuracySum += t.accuracy_raw;
+    if (typeof t.recon_rt_ms === 'number') globalRtSumMs += t.recon_rt_ms;
+    if (t.passed === true) globalCleanCount++;
+  }
+  const totalCommissionsPerCondition = totalCommissionsByCond;
+  const cleanTrialRatePerCondition = {};
+  for (const c of Object.keys(totalCountByCond)) {
+    const n = totalCountByCond[c];
+    cleanTrialRatePerCondition[c] = n > 0 ? cleanCountByCond[c] / n : 0;
+  }
+  const globalAccuracy = nTrials > 0 ? globalAccuracySum / nTrials : 0;
+  const globalMeanRtSec = nTrials > 0 ? globalRtSumMs / 1000 / nTrials : 0;
+  const globalCleanTrialRate = nTrials > 0 ? globalCleanCount / nTrials : 0;
+
   const sessionId = body.session_id ?? '';
   if (sessionId) {
     const checkRes = await fetch(
@@ -83,14 +113,14 @@ export default async function handler(req, res) {
     copy_rt_sec: Number(body.copy_total_rt_ms) ? Number(body.copy_total_rt_ms) / 1000 : 0,
     copy_target_map: Array.isArray(body.copy_target_map) ? body.copy_target_map : [],
     copy_response_map: Array.isArray(body.copy_response_map) ? body.copy_response_map : [],
-    memory_trials: Array.isArray(body.memory_trials) ? body.memory_trials : [],
+    memory_trials: memoryTrials,
     mean_accuracy_per_condition: acc,
     mean_rt_per_condition: rt,
-    total_commissions_per_condition: {},
-    clean_trial_rate_per_condition: {},
-    global_accuracy: 0,
-    global_mean_rt: 0,
-    global_clean_trial_rate: 0,
+    total_commissions_per_condition: totalCommissionsPerCondition,
+    clean_trial_rate_per_condition: cleanTrialRatePerCondition,
+    global_accuracy: globalAccuracy,
+    global_mean_rt: globalMeanRtSec,
+    global_clean_trial_rate: globalCleanTrialRate,
     mean_accuracy_baseline: Number(acc.baseline) || 0,
     mean_accuracy_ignore_distractor: Number(acc.ignore_distractor) || 0,
     mean_accuracy_remember_distractor: Number(acc.remember_distractor) || 0,
@@ -99,14 +129,14 @@ export default async function handler(req, res) {
     mean_rt_ignore_distractor: Number(rt.ignore_distractor) || 0,
     mean_rt_remember_distractor: Number(rt.remember_distractor) || 0,
     mean_rt_delay: Number(rt.delay) || 0,
-    total_commissions_baseline: 0,
-    total_commissions_ignore_distractor: 0,
-    total_commissions_remember_distractor: 0,
-    total_commissions_delay: 0,
-    clean_trial_rate_baseline: 0,
-    clean_trial_rate_ignore_distractor: 0,
-    clean_trial_rate_remember_distractor: 0,
-    clean_trial_rate_delay: 0,
+    total_commissions_baseline: totalCommissionsByCond.baseline ?? 0,
+    total_commissions_ignore_distractor: totalCommissionsByCond.ignore_distractor ?? 0,
+    total_commissions_remember_distractor: totalCommissionsByCond.remember_distractor ?? 0,
+    total_commissions_delay: totalCommissionsByCond.delay ?? 0,
+    clean_trial_rate_baseline: cleanTrialRatePerCondition.baseline ?? 0,
+    clean_trial_rate_ignore_distractor: cleanTrialRatePerCondition.ignore_distractor ?? 0,
+    clean_trial_rate_remember_distractor: cleanTrialRatePerCondition.remember_distractor ?? 0,
+    clean_trial_rate_delay: cleanTrialRatePerCondition.delay ?? 0,
     span_consistency_flag_baseline: !!spanConsistency.baseline,
     span_consistency_flag_ignore_distractor: !!spanConsistency.ignore_distractor,
     span_consistency_flag_remember_distractor: !!spanConsistency.remember_distractor,
@@ -119,8 +149,8 @@ export default async function handler(req, res) {
     interference_cost,
     binding_cost,
     delay_cost,
-    pairing_fallback_used: false,
-    memory_early_stopped: false,
+    pairing_fallback_used: typeof body.pairing_fallback_used === 'boolean' ? body.pairing_fallback_used : false,
+    memory_early_stopped: typeof body.memory_early_stopped === 'boolean' ? body.memory_early_stopped : false,
   };
 
   const response = await fetch(`${supabaseUrl}/rest/v1/gmt22_submissions`, {
