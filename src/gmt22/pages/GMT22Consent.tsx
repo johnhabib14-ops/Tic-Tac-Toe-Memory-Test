@@ -10,7 +10,7 @@ export default function GMT22Consent() {
         You will see grids with symbols and reconstruct their positions. By continuing, you agree that your responses may be used for research.
       </p>
       <p>
-        The task has three parts: a short practice (2 trials), a copy task, then a memory task.
+        The task has three parts: Practice (2 trials), a copy task, then a memory task.
       </p>
       <button type="button" onClick={() => setPhase('demographics')}>
         I agree, continue

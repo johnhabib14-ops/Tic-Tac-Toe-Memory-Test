@@ -15,6 +15,8 @@ import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
 import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
 
+const PRACTICE_ENCODING_MS = 2500;
+
 function getEncodingDisplayMap(item: GMT22ItemBankEntry): GMT22GridMap {
   const out: GMT22GridMap = [];
   for (let i = 0; i < 16; i++) {
@@ -64,7 +66,7 @@ export default function GMT22Practice() {
 
   useEffect(() => {
     if (showIntro || showClarification || !currentItem || phase !== 'encoding') return;
-    const ms = encodingMs(currentItem.span);
+    const ms = Math.max(encodingMs(currentItem.span), PRACTICE_ENCODING_MS);
     const t = setTimeout(() => {
       setPhaseLocal('reconstructing');
       reconStartRef.current = Date.now();
@@ -180,7 +182,7 @@ export default function GMT22Practice() {
           You will see a grid with symbols. It will disappear, then you place the same symbols in the same positions in the empty grid.
         </p>
         <p>
-          First trial: only X and O. Second trial: you may see + symbols on the grid — only place X and O and ignore the +. You have a time limit to place your answers. Select a symbol from the palette, then click a cell to place it.
+          First trial: only X and O. Second trial: you may see + symbols on the grid — only place X and O and ignore the +. The + will not appear in the palette — only place X and O where you saw them. You have a time limit to place your answers. Select a symbol from the palette, then click a cell to place it.
         </p>
         <button type="button" onClick={() => setShowIntro(false)}>
           Start practice
@@ -194,7 +196,7 @@ export default function GMT22Practice() {
       <div className="page">
         <h1>Practice</h1>
         <p className="subtitle">
-          Both practice trials were incorrect. Remember: place symbols in the exact positions you saw. You need 85% or more correct with no extra symbols to pass a trial.
+          Both practice trials were incorrect. Place symbols in the exact positions you saw. To pass: at least 85% correct and no extra symbols.
         </p>
         <p>
           Select X or O from the palette, then click a cell to place it. Only place symbols where you saw them.
@@ -240,6 +242,11 @@ export default function GMT22Practice() {
       <p className="subtitle">
         Place the symbols you saw. {timeLeftSec > 5 ? 'You have limited time.' : `Time left: ${timeLeftSec}s`}
       </p>
+      {currentItem.condition === 'ignore_distractor' && (
+        <p className="subtitle" style={{ marginTop: 0 }}>
+          Only place X and O; the + is not in the palette (ignore it).
+        </p>
+      )}
       <GMT22ShapePalette
         includePlus={includePlus}
         selectedSymbol={selectedSymbol}

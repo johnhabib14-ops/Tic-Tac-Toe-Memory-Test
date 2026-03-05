@@ -7,7 +7,7 @@ export default function GMT22CopyInstructions() {
     <div className="page">
       <h1>Part 1: Copy task</h1>
       <p className="subtitle">
-        A reference grid will show 8 symbols (X and O). Your job is to copy it into the empty grid in the same positions.
+        Copy the reference grid (8 symbols: X and O) into the empty grid in the same positions.
       </p>
       <p>
         Choose X or O from the palette, then click a cell to place it. When your copy matches the reference, click <strong>Submit</strong>.

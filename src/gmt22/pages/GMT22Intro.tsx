@@ -11,12 +11,12 @@ export default function GMT22Intro() {
       </p>
       <p><strong>What will happen:</strong></p>
       <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1rem', lineHeight: 1.6 }}>
-        <li><strong>Practice</strong> — Two short trials so you can learn the task (see a grid, then place the same symbols in the same positions).</li>
-        <li><strong>Copy task</strong> — You copy a reference grid (2 symbols: X and O) into an empty grid. This checks that you can use the interface.</li>
-        <li><strong>Memory task</strong> — You see grids that disappear, then place the symbols from memory. Sometimes you will ignore extra symbols or remember them; the instructions on each screen tell you what to do.</li>
+        <li><strong>Practice</strong> — Two trials: see a grid, then place the same symbols in the same positions.</li>
+        <li><strong>Copy task</strong> — Copy a reference grid (X and O) into an empty grid.</li>
+        <li><strong>Memory task</strong> — See grids that disappear, then place symbols from memory. Instructions on each screen say whether to ignore or remember the +.</li>
       </ul>
       <p style={{ fontSize: '0.95rem', color: '#555' }}>
-        The whole session usually takes a few minutes. You can take your time on the instruction screens.
+        Takes a few minutes. Take your time on instructions.
       </p>
       <button type="button" onClick={() => setPhase('consent')}>
         Continue
