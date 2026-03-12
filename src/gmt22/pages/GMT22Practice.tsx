@@ -189,7 +189,7 @@ export default function GMT22Practice() {
           You will see a grid with symbols. It will disappear, then you place the same symbols in the same positions in the empty grid.
         </p>
         <p>
-          First trial: only X and O. Second trial: you may see + symbols on the grid — only place X and O and ignore the +. The + will not appear in the palette — only place X and O where you saw them. You have a time limit to place your answers. Select a symbol from the palette, then click a cell to place it.
+          See a grid. It disappears. Place the same symbols in the empty grid. First trial: only X and O. Second trial: you may see + but only place X and O. Pick a symbol, then click a cell.
         </p>
         <button type="button" onClick={() => setShowIntro(false)}>
           Start practice
@@ -224,7 +224,7 @@ export default function GMT22Practice() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
-    const instructionStyle = { color: '#737373' as const, fontWeight: 600 as const };
+    const instructionStyle = { color: '#1f77b4' as const, fontWeight: 600 as const };
     return (
       <div className="page">
         <h2 className="grid-title">Warm up: watch the grid</h2>

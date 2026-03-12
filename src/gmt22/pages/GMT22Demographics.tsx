@@ -137,7 +137,7 @@ export default function GMT22Demographics() {
         </label>
         {dateOfBirth.trim() !== '' && !dateOfBirthValid && (
           <p id="dob-error" className="form-error" style={{ marginTop: '-0.5rem', marginBottom: 0 }}>
-            Date must be between {MIN_DATE_STR} and {MAX_DATE_STR} (age 10–90).
+            Date must be between {MIN_DATE_STR} and {MAX_DATE_STR} (age 10 to 90).
           </p>
         )}
         {dateOfBirth.trim() !== '' && dateOfBirthValid && age !== null && (age < 10 || age > 90) && (
@@ -165,13 +165,13 @@ export default function GMT22Demographics() {
               type="text"
               value={genderSelfDescribe}
               onChange={(e) => setGenderSelfDescribe(e.target.value)}
-              placeholder="e.g. non-binary, other"
+              placeholder="e.g. other"
               autoComplete="off"
             />
           </label>
         )}
         <label>
-          Years of education (10–20) *
+          Years of education (10 to 20) *
           <select
             value={education}
             onChange={(e) => setEducation(e.target.value)}

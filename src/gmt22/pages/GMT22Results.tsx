@@ -86,7 +86,7 @@ export default function GMT22Results() {
 
   const warmUpLine = copyResult != null
     ? `Warm up: ${copyResult.copy_hits}/${COPY_NUM_TARGETS} in ${(copyResult.copy_total_rt_ms / 1000).toFixed(0)}s`
-    : 'Warm up: —';
+    : 'Warm up: n/a';
 
   return (
     <div className="page">
@@ -94,8 +94,8 @@ export default function GMT22Results() {
         <h1 className="results-title">You did it!</h1>
 
         <div className="results-hero">
-          <span className="results-hero-value" aria-label={`${overallPct ?? '—'}% accuracy`}>
-            {overallPct != null ? `${overallPct}%` : '—'}
+          <span className="results-hero-value" aria-label={`${overallPct ?? 'n/a'}% accuracy`}>
+            {overallPct != null ? `${overallPct}%` : 'n/a'}
           </span>
           <span className="results-hero-label">Memory score</span>
         </div>
@@ -126,7 +126,7 @@ export default function GMT22Results() {
           <div className="results-score-block">
             <h3>Copy</h3>
             <p>Hits: {copyResult?.copy_hits ?? 0} / {COPY_NUM_TARGETS}</p>
-            <p>Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : '—'} seconds</p>
+            <p>Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : 'n/a'} seconds</p>
           </div>
           <div className="results-score-block">
             <h3>Memory</h3>

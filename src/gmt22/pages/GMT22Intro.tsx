@@ -12,7 +12,7 @@ export default function GMT22Intro() {
       <p><strong>Here&apos;s how it works:</strong></p>
       <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1rem', lineHeight: 1.6 }}>
         <li><strong>Warm up:</strong> Match a grid.</li>
-        <li><strong>Main game:</strong> See a grid, then place the symbols from memory. Some rounds you place only X and O; others you also place +. Each screen will say which.</li>
+        <li><strong>Main game:</strong> See a grid, then place the symbols. Some rounds use only X and O, others also +. Each screen says which.</li>
       </ul>
       <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)' }}>
         Takes a few minutes.
