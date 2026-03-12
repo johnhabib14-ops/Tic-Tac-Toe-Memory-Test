@@ -10,14 +10,6 @@ export default function Landing() {
         Remember the grid. Place the symbols.
       </p>
       <button onClick={() => navigate('/gmt2')}>Play</button>
-      <button
-        type="button"
-        className="secondary"
-        style={{ marginTop: '1rem' }}
-        onClick={() => navigate('/demographics')}
-      >
-        Demo
-      </button>
     </div>
   );
 }

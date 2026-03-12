@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import DebugOverlay from './components/DebugOverlay';
 import Landing from './pages/Landing';
-import Demographics from './pages/Demographics';
 import TwoPartsIntro from './pages/TwoPartsIntro';
 import CopyInstructions from './pages/CopyInstructions';
 import Instructions from './pages/Instructions';
@@ -20,7 +19,6 @@ export default function App() {
     <>
     <Routes>
       <Route path="/" element={<Landing />} />
-      <Route path="/demographics" element={<Demographics />} />
       <Route path="/intro" element={<TwoPartsIntro />} />
       <Route path="/copy-instructions" element={<CopyInstructions />} />
       <Route path="/instructions" element={<Instructions />} />
