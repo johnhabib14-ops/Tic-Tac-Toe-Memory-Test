@@ -7,10 +7,10 @@ export default function GMT22Consent() {
     <div className="page">
       <h1>GMT 2</h1>
       <p className="subtitle">
-        You will see grids with symbols and reconstruct their positions. By continuing, you agree that your responses may be used for research.
+        You&apos;ll see grids and place symbols in the same positions. By continuing, you agree your responses may be used for research.
       </p>
       <p>
-        The task has three parts: Practice (2 trials), a copy task, then a memory task.
+        Three parts: practice (2 tries), copy task, then memory task.
       </p>
       <button type="button" onClick={() => setPhase('demographics')}>
         I agree, continue

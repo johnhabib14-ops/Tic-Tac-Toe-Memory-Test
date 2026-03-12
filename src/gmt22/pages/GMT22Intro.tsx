@@ -7,16 +7,16 @@ export default function GMT22Intro() {
     <div className="page">
       <h1>GMT 2 — Grid Memory Task</h1>
       <p className="subtitle">
-        This task measures how well you can remember and reproduce the positions of symbols in a grid. Your responses help researchers understand visual and spatial memory.
+        You&apos;ll see grids of symbols, then place them in the same spots from memory.
       </p>
       <p><strong>What will happen:</strong></p>
       <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1rem', lineHeight: 1.6 }}>
-        <li><strong>Practice</strong> — Two trials: see a grid, then place the same symbols in the same positions.</li>
-        <li><strong>Copy task</strong> — Copy a reference grid (X and O) into an empty grid.</li>
-        <li><strong>Memory task</strong> — See grids that disappear, then place symbols from memory. Instructions on each screen say whether to ignore or remember the +.</li>
+        <li><strong>Practice</strong> — See a grid, then place the same symbols in the same spots.</li>
+        <li><strong>Copy</strong> — Match the top grid in the empty grid below.</li>
+        <li><strong>Memory</strong> — Same idea, but the grid disappears first. Some rounds you&apos;ll only place X and O; others you&apos;ll also place +. Each screen will say which.</li>
       </ul>
       <p style={{ fontSize: '0.95rem', color: '#555' }}>
-        Takes a few minutes. Take your time on instructions.
+        Takes a few minutes.
       </p>
       <button type="button" onClick={() => setPhase('consent')}>
         Continue

@@ -196,10 +196,7 @@ export default function GMT22Practice() {
       <div className="page">
         <h1>Practice</h1>
         <p className="subtitle">
-          Both practice trials were incorrect. Place symbols in the exact positions you saw. To pass: at least 85% correct and no extra symbols.
-        </p>
-        <p>
-          Select X or O from the palette, then click a cell to place it. Only place symbols where you saw them.
+          Place the symbols in the exact positions you saw. Use only X and O where you saw them; don&apos;t add extras. Then try again.
         </p>
         <button type="button" onClick={handleTryAgain}>
           Try again
@@ -224,7 +221,7 @@ export default function GMT22Practice() {
         <h2 className="grid-title">Practice — Remember the grid</h2>
         <p className="subtitle">
           {currentItem.condition === 'ignore_distractor' && (
-            <span style={instructionStyle}>IGNORE the plus signs.</span>
+            <span style={instructionStyle}>Only place X and O. Ignore the +.</span>
           )}
           {currentItem.condition === 'baseline' && 'Place the symbols you saw.'}
         </p>
@@ -244,7 +241,7 @@ export default function GMT22Practice() {
       </p>
       {currentItem.condition === 'ignore_distractor' && (
         <p className="subtitle" style={{ marginTop: 0 }}>
-          Only place X and O; the + is not in the palette (ignore it).
+          Only place X and O (ignore the +).
         </p>
       )}
       <GMT22ShapePalette

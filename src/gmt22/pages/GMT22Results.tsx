@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGMT22State } from '../GMT22State';
 import { computeGMT22Summary } from '../lib/summary';
 import {
@@ -24,6 +24,7 @@ export default function GMT22Results() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const submittedOnceRef = useRef(false);
 
   if (!participant) return null;
 
@@ -77,6 +78,12 @@ export default function GMT22Results() {
     }
   }
 
+  useEffect(() => {
+    if (!isGMT22BackendConfigured() || !participant || submittedOnceRef.current) return;
+    submittedOnceRef.current = true;
+    handleSubmit();
+  }, [participant?.session_id]);
+
   return (
     <div className="page">
       <div className="results-card">
@@ -95,20 +102,17 @@ export default function GMT22Results() {
             {submitError && <p className="form-error">{submitError}</p>}
             {submitted ? (
               <p>Your responses have been submitted.</p>
-            ) : (
-              <>
-                <p className="subtitle" style={{ marginBottom: '0.5rem' }}>
-                  Please submit your results to complete the task.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                >
-                  {submitting ? 'Submitting…' : 'Submit results'}
-                </button>
-              </>
-            )}
+            ) : submitting ? (
+              <p>Saving your results…</p>
+            ) : submitError ? (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting}
+              >
+                Retry
+              </button>
+            ) : null}
           </div>
         )}
 
