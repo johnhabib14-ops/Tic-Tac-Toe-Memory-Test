@@ -51,6 +51,7 @@ export default function GMT22Memory() {
   const [timeLeftSec, setTimeLeftSec] = useState(0);
   const [selectedSymbol, setSelectedSymbol] = useState<GMT22CellSymbol | null>(null);
   const [gridFrozen, setGridFrozen] = useState(false);
+  const [highlightCell, setHighlightCell] = useState<number | null>(null);
   const reconStartRef = useRef(0);
   const responseMapRef = useRef<Record<number, GMT22CellSymbol>>({});
   const alreadyRecordedRef = useRef<Record<string, boolean>>({});
@@ -211,7 +212,13 @@ export default function GMT22Memory() {
 
   function handlePlace(cellIndex: number, symbol: GMT22CellSymbol) {
     setResponseMap((prev) => ({ ...prev, [cellIndex]: symbol }));
+    setHighlightCell(cellIndex);
   }
+  useEffect(() => {
+    if (highlightCell === null) return;
+    const t = setTimeout(() => setHighlightCell(null), 250);
+    return () => clearTimeout(t);
+  }, [highlightCell]);
 
   function handleSubmit() {
     if (!currentItem || phase !== 'reconstructing' || gridFrozen) return;
@@ -225,9 +232,9 @@ export default function GMT22Memory() {
   if (showAttentionCheck) {
     return (
       <div className="page">
-        <h2 className="grid-title">Attention check</h2>
+        <h2 className="grid-title">Quick check</h2>
         <p className="subtitle">
-          Place X in the top left cell then press Submit.
+          Place X in the top left cell, then press Done.
         </p>
         <GMT22ShapePalette
           includePlus={false}
@@ -241,10 +248,11 @@ export default function GMT22Memory() {
             onDrop={handlePlace}
             onCellClick={(cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
             paletteIncludesPlus={false}
+            highlightCell={highlightCell}
           />
         </div>
         <button type="button" onClick={handleAttentionCheckSubmit} className="copy-submit">
-          Submit
+          Done
         </button>
       </div>
     );
@@ -253,7 +261,9 @@ export default function GMT22Memory() {
   if (conditionIndex >= conditionOrder.length || !currentItem) {
     return (
       <div className="page">
-        <p>Loading…</p>
+        <div className="loading-dots" aria-label="Loading">
+          <span /><span /><span />
+        </div>
       </div>
     );
   }
@@ -272,7 +282,7 @@ export default function GMT22Memory() {
       undefined;
     return (
       <div className="page">
-        <h2 className="grid-title">Remember the grid</h2>
+        <h2 className="grid-title">Watch the grid</h2>
         <p className="subtitle">
           {instructionStyle ? <span style={instructionStyle}>{encodingInstruction}</span> : encodingInstruction}
         </p>
@@ -314,10 +324,11 @@ export default function GMT22Memory() {
           onDrop={disabled ? () => {} : handlePlace}
           onCellClick={disabled ? () => {} : (cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
+          highlightCell={highlightCell}
         />
       </div>
       <button type="button" onClick={handleSubmit} className="copy-submit" disabled={disabled}>
-        Submit
+        Done
       </button>
     </div>
   );

@@ -17,6 +17,7 @@ export default function GMT22Copy() {
   const targetMap = copyItem ? copyItem.target_map : [];
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
   const [timeLeftSec, setTimeLeftSec] = useState(Math.floor(COPY_TIME_LIMIT_MS / 1000));
+  const [highlightCell, setHighlightCell] = useState<number | null>(null);
   const submittedRef = useRef(false);
   const startTimeRef = useRef<number>(0);
   const responseMapRef = useRef<Record<number, GMT22CellSymbol>>({});
@@ -89,7 +90,13 @@ export default function GMT22Copy() {
 
   function handlePlace(cellIndex: number, symbol: GMT22CellSymbol) {
     setResponseMap((prev) => ({ ...prev, [cellIndex]: symbol }));
+    setHighlightCell(cellIndex);
   }
+  useEffect(() => {
+    if (highlightCell === null) return;
+    const t = setTimeout(() => setHighlightCell(null), 250);
+    return () => clearTimeout(t);
+  }, [highlightCell]);
 
   function handleDrop(cellIndex: number, symbol: GMT22CellSymbol) {
     handlePlace(cellIndex, symbol);
@@ -101,19 +108,19 @@ export default function GMT22Copy() {
 
   return (
     <div className="page copy-page">
-      <h2 className="grid-title">Copy the grid</h2>
+      <h2 className="grid-title">Match this grid</h2>
       <p className="subtitle">
-        Copy the reference grid into the empty grid (8 symbols). You have {timeLeftSec} seconds.
+        Copy the grid into the empty one (8 symbols). You have {timeLeftSec} seconds.
       </p>
       <div className="copy-page-layout">
         <div className="copy-reference">
-          <p className="copy-section-label">Reference (copy this)</p>
+          <p className="copy-section-label">Copy this</p>
           <div className="grid-container copy-grid-wrap">
             <GMT22DisplayGrid gridMap={targetMap} />
           </div>
         </div>
         <div className="copy-response">
-          <p className="copy-section-label">Your copy</p>
+          <p className="copy-section-label">Your grid</p>
           <GMT22ShapePalette
             includePlus={false}
             selectedSymbol={selected}
@@ -126,6 +133,7 @@ export default function GMT22Copy() {
               onDrop={handleDrop}
               onCellClick={(cellIndex: number) => selected !== null && handlePlace(cellIndex, selected)}
               paletteIncludesPlus={false}
+              highlightCell={highlightCell}
             />
           </div>
           <button
@@ -133,7 +141,7 @@ export default function GMT22Copy() {
             onClick={() => submitCopy(responseMap)}
             className="copy-submit"
           >
-            Submit
+            Done
           </button>
         </div>
       </div>

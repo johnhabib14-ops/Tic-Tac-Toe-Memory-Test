@@ -49,6 +49,7 @@ export default function GMT22Practice() {
   const [responseMap, setResponseMap] = useState<Record<number, GMT22CellSymbol>>({});
   const [timeLeftSec, setTimeLeftSec] = useState(0);
   const [selectedSymbol, setSelectedSymbol] = useState<GMT22CellSymbol | null>(null);
+  const [highlightCell, setHighlightCell] = useState<number | null>(null);
   const reconStartRef = useRef(0);
   const responseMapRef = useRef<Record<number, GMT22CellSymbol>>({});
   const recordedForTrialRef = useRef(-1);
@@ -154,7 +155,13 @@ export default function GMT22Practice() {
 
   function handlePlace(cellIndex: number, symbol: GMT22CellSymbol) {
     setResponseMap((prev) => ({ ...prev, [cellIndex]: symbol }));
+    setHighlightCell(cellIndex);
   }
+  useEffect(() => {
+    if (highlightCell === null) return;
+    const t = setTimeout(() => setHighlightCell(null), 250);
+    return () => clearTimeout(t);
+  }, [highlightCell]);
 
   function handleSubmit() {
     if (!currentItem || phase !== 'reconstructing') return;
@@ -194,7 +201,7 @@ export default function GMT22Practice() {
   if (showClarification) {
     return (
       <div className="page">
-        <h1>Practice</h1>
+        <h1 className="game-title">Warm up</h1>
         <p className="subtitle">
           Place the symbols in the exact positions you saw. Use only X and O where you saw them; don&apos;t add extras. Then try again.
         </p>
@@ -208,7 +215,9 @@ export default function GMT22Practice() {
   if (items.length === 0 || !currentItem) {
     return (
       <div className="page">
-        <p>Loading…</p>
+        <div className="loading-dots" aria-label="Loading">
+          <span /><span /><span />
+        </div>
       </div>
     );
   }
@@ -218,7 +227,7 @@ export default function GMT22Practice() {
     const instructionStyle = { color: '#1f77b4' as const, fontWeight: 600 as const };
     return (
       <div className="page">
-        <h2 className="grid-title">Practice — Remember the grid</h2>
+        <h2 className="grid-title">Warm up: watch the grid</h2>
         <p className="subtitle">
           {currentItem.condition === 'ignore_distractor' && (
             <span style={instructionStyle}>Only place X and O. Ignore the +.</span>
@@ -235,7 +244,7 @@ export default function GMT22Practice() {
   const includePlus = paletteIncludesPlus(currentItem.condition);
   return (
     <div className="page">
-      <h2 className="grid-title">Practice — Reconstruct the grid</h2>
+      <h2 className="grid-title">Warm up: place the symbols</h2>
       <p className="subtitle">
         Place the symbols you saw. {timeLeftSec > 5 ? 'You have limited time.' : `Time left: ${timeLeftSec}s`}
       </p>
@@ -256,10 +265,11 @@ export default function GMT22Practice() {
           onDrop={handlePlace}
           onCellClick={(cellIndex: number) => selectedSymbol !== null && handlePlace(cellIndex, selectedSymbol)}
           paletteIncludesPlus={includePlus}
+          highlightCell={highlightCell}
         />
       </div>
       <button type="button" onClick={handleSubmit} className="copy-submit">
-        Submit
+        Done
       </button>
     </div>
   );

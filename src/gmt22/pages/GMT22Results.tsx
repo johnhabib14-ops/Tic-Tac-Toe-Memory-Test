@@ -84,26 +84,31 @@ export default function GMT22Results() {
     handleSubmit();
   }, [participant?.session_id]);
 
+  const warmUpLine = copyResult != null
+    ? `Warm up: ${copyResult.copy_hits}/${COPY_NUM_TARGETS} in ${(copyResult.copy_total_rt_ms / 1000).toFixed(0)}s`
+    : 'Warm up: —';
+
   return (
     <div className="page">
       <div className="results-card">
-        <h1 className="results-title" style={{ whiteSpace: 'nowrap' }}>
-          Thank you for completing GMT 2
-        </h1>
-        <p className="subtitle" style={{ marginTop: '0.25rem', marginBottom: '0.25rem', fontWeight: 600 }}>
-          {overallPct != null ? `Overall: ${overallPct}% accuracy` : 'Overall: —'}
-        </p>
-        <p className="subtitle" style={{ marginTop: 0, marginBottom: '1rem' }}>
-          This task measures visual–spatial memory span under different task demands.
-        </p>
+        <h1 className="results-title">You did it!</h1>
+
+        <div className="results-hero">
+          <span className="results-hero-value" aria-label={`${overallPct ?? '—'}% accuracy`}>
+            {overallPct != null ? `${overallPct}%` : '—'}
+          </span>
+          <span className="results-hero-label">Memory score</span>
+        </div>
+
+        <p className="results-summary-line">{warmUpLine}</p>
 
         {isGMT22BackendConfigured() && (
           <div style={{ marginBottom: '1.5rem' }}>
             {submitError && <p className="form-error">{submitError}</p>}
             {submitted ? (
-              <p>Your responses have been submitted.</p>
+              <p className="results-success">Your results are saved. Nice work!</p>
             ) : submitting ? (
-              <p>Saving your results…</p>
+              <p className="results-saving">Saving your results…</p>
             ) : submitError ? (
               <button
                 type="button"
@@ -116,41 +121,41 @@ export default function GMT22Results() {
           </div>
         )}
 
-        <div className="results-score-block">
-          <h3>Copy</h3>
-          <p>Hits: {copyResult?.copy_hits ?? 0} / {COPY_NUM_TARGETS}</p>
-          <p>Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : '—'} seconds</p>
-        </div>
-
-        <div className="results-score-block">
-          <h3>Memory</h3>
-          {conditionOrder.map((condition, idx) => {
-            const c = summary.by_condition[condition as GMT22Condition];
-            if (!c) return null;
-            return (
-              <div key={condition} className="results-condition-row">
-                <p><strong>Block {idx + 1}</strong></p>
-                <p>Span: {c.span_estimate}</p>
-                <p>Consistency: {c.span_consistency_flag ? 'Stable' : 'Boundary'}</p>
-                <p>Mean Accuracy: {(c.mean_accuracy * 100).toFixed(1)}%</p>
-                <p>Mean RT: {(c.mean_rt_ms / 1000).toFixed(1)}s</p>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="results-score-block">
-          <h3>Costs</h3>
-          <p>Interference Cost: {summary.interference_cost}</p>
-          <p>Binding Cost: {summary.binding_cost}</p>
-          <p>Delay Cost: {summary.delay_cost}</p>
-        </div>
-
-        <div className="results-score-block">
-          <h3>Participant</h3>
-          <p>Participant ID: {participant.participant_id}</p>
-          <p>Condition order: Order {summary.condition_order}</p>
-        </div>
+        <details className="results-details-collapse">
+          <summary>More details</summary>
+          <div className="results-score-block">
+            <h3>Copy</h3>
+            <p>Hits: {copyResult?.copy_hits ?? 0} / {COPY_NUM_TARGETS}</p>
+            <p>Time: {copyResult != null ? (copyResult.copy_total_rt_ms / 1000).toFixed(1) : '—'} seconds</p>
+          </div>
+          <div className="results-score-block">
+            <h3>Memory</h3>
+            {conditionOrder.map((condition, idx) => {
+              const c = summary.by_condition[condition as GMT22Condition];
+              if (!c) return null;
+              return (
+                <div key={condition} className="results-condition-row">
+                  <p><strong>Block {idx + 1}</strong></p>
+                  <p>Span: {c.span_estimate}</p>
+                  <p>Consistency: {c.span_consistency_flag ? 'Stable' : 'Boundary'}</p>
+                  <p>Mean accuracy: {(c.mean_accuracy * 100).toFixed(1)}%</p>
+                  <p>Mean RT: {(c.mean_rt_ms / 1000).toFixed(1)}s</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="results-score-block">
+            <h3>Costs</h3>
+            <p>Interference cost: {summary.interference_cost}</p>
+            <p>Binding cost: {summary.binding_cost}</p>
+            <p>Delay cost: {summary.delay_cost}</p>
+          </div>
+          <div className="results-score-block">
+            <h3>Participant</h3>
+            <p>Participant ID: {participant.participant_id}</p>
+            <p>Condition order: Order {summary.condition_order}</p>
+          </div>
+        </details>
       </div>
     </div>
   );

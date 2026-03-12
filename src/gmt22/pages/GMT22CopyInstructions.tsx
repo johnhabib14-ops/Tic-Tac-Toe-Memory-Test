@@ -5,18 +5,18 @@ export default function GMT22CopyInstructions() {
 
   return (
     <div className="page">
-      <h1>Part 1: Copy task</h1>
+      <h1 className="game-title">Warm up</h1>
       <p className="subtitle">
-        Match the grid shown above in the empty grid below. Use the same positions.
+        Match the grid above in the empty grid below. Same positions.
       </p>
       <p>
-        Pick X or O, click a cell to place it. When it matches, click <strong>Submit</strong>.
+        Pick X or O, click a cell to place it. When it matches, click Done.
       </p>
-      <p style={{ marginTop: '1rem', fontSize: '0.95rem', color: '#555' }}>
+      <p style={{ marginTop: '1rem', fontSize: '0.95rem', color: 'var(--text-muted)' }}>
         You have 30 seconds; if time runs out, your answers are saved.
       </p>
       <button type="button" onClick={() => setPhase('copy')}>
-        Start copy task
+        Start
       </button>
     </div>
   );

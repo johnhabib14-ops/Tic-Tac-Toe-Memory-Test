@@ -107,7 +107,7 @@ export default function GMT22Demographics() {
 
   return (
     <div className="page">
-      <h1>Your information</h1>
+      <h1 className="game-title">Your information</h1>
       <p className="subtitle">
         Please answer a few questions before starting. Your responses are anonymous.
       </p>

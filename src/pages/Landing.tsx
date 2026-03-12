@@ -5,11 +5,11 @@ export default function Landing() {
 
   return (
     <div className="page">
-      <h1>Grid Memory Test (GMT)</h1>
+      <h1 className="game-title">Grid Memory</h1>
       <p className="subtitle">
-        A brief visual memory task. You will see grids quickly and try to remember exact symbol positions.
+        Remember the grid. Place the symbols.
       </p>
-      <button onClick={() => navigate('/gmt2')}>Begin test</button>
+      <button onClick={() => navigate('/gmt2')}>Play</button>
       <button
         type="button"
         className="secondary"

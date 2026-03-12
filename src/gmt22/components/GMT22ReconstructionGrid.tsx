@@ -9,6 +9,8 @@ interface GMT22ReconstructionGridProps {
   onDrop: (cellIndex: number, symbol: GMT22CellSymbol) => void;
   onCellClick: (cellIndex: number) => void;
   paletteIncludesPlus: boolean;
+  /** When set, this cell briefly shows a placement animation. */
+  highlightCell?: number | null;
 }
 
 const GRID_SIZE = 4;
@@ -20,6 +22,7 @@ export default function GMT22ReconstructionGrid({
   onDrop,
   onCellClick,
   paletteIncludesPlus,
+  highlightCell = null,
 }: GMT22ReconstructionGridProps) {
   void _onPlace;
   function handleDragOver(e: React.DragEvent) {
@@ -52,7 +55,7 @@ export default function GMT22ReconstructionGrid({
         return (
           <div
             key={i}
-            className="grid-cell reconstruction"
+            className={`grid-cell reconstruction${highlightCell === i ? ' cell-just-placed' : ''}`}
             onClick={() => onCellClick(i)}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
