@@ -277,8 +277,8 @@ export default function GMT22Memory() {
       cond === 'delay' ? 'Short pause, then place.' :
       'Place the symbols you saw.';
     const instructionStyle =
-      cond === 'ignore_distractor' ? { color: '#1f77b4' as const, fontWeight: 600 as const } :
-      cond === 'remember_distractor' ? { color: '#ff7f0e' as const, fontWeight: 600 as const } :
+      cond === 'ignore_distractor' ? { color: '#737373' as const, fontWeight: 600 as const } :
+      cond === 'remember_distractor' ? { color: '#171717' as const, fontWeight: 600 as const } :
       undefined;
     return (
       <div className="page">

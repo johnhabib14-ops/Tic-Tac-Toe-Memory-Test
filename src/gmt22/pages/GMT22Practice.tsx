@@ -224,7 +224,7 @@ export default function GMT22Practice() {
 
   if (phase === 'encoding') {
     const displayMap = getEncodingDisplayMap(currentItem);
-    const instructionStyle = { color: '#1f77b4' as const, fontWeight: 600 as const };
+    const instructionStyle = { color: '#737373' as const, fontWeight: 600 as const };
     return (
       <div className="page">
         <h2 className="grid-title">Warm up: watch the grid</h2>

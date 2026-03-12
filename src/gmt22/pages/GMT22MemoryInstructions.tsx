@@ -13,8 +13,8 @@ export default function GMT22MemoryInstructions() {
         Some rounds: only place X and O (ignore the +). Other rounds: place X, O, and +.
       </p>
       <ul style={{ textAlign: 'left', maxWidth: '32rem', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
-        <li><strong style={{ color: '#1f77b4' }}>Blue: ignore the +.</strong> Only place X and O.</li>
-        <li><strong style={{ color: '#ff7f0e' }}>Orange: remember the +.</strong> Place X, O, and +.</li>
+        <li><strong style={{ color: '#737373' }}>Gray: ignore the +.</strong> Only place X and O.</li>
+        <li><strong style={{ color: '#171717' }}>Black: remember the +.</strong> Place X, O, and +.</li>
       </ul>
       <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)' }}>
         Sometimes a + appears briefly before you place. That&apos;s normal.
