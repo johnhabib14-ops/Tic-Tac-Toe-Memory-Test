@@ -42,6 +42,7 @@ export default function GMT22Memory() {
   } = useGMT22State();
 
   const [showAttentionCheck, setShowAttentionCheck] = useState(true);
+  const [showConditionWarning, setShowConditionWarning] = useState(false);
   const [conditionIndex, setConditionIndex] = useState(0);
   const [span, setSpan] = useState(2);
   const [trialIndexInSpan, setTrialIndexInSpan] = useState(1 as 1 | 2);
@@ -184,7 +185,11 @@ export default function GMT22Memory() {
           setConditionIndex(nextConditionIndex);
           setSpan(2);
           setTrialIndexInSpan(1);
-          setPhaseLocal('encoding');
+          if (nextConditionIndex >= 1) {
+            setShowConditionWarning(true);
+          } else {
+            setPhaseLocal('encoding');
+          }
         }
       }
       return;
@@ -198,7 +203,11 @@ export default function GMT22Memory() {
     setConditionIndex(nextConditionIndex);
     setSpan(2);
     setTrialIndexInSpan(1);
-    setPhaseLocal('encoding');
+    if (nextConditionIndex >= 1) {
+      setShowConditionWarning(true);
+    } else {
+      setPhaseLocal('encoding');
+    }
   }
 
   function handleAttentionCheckSubmit() {
@@ -264,6 +273,30 @@ export default function GMT22Memory() {
         <div className="loading-dots" aria-label="Loading">
           <span /><span /><span />
         </div>
+      </div>
+    );
+  }
+
+  if (showConditionWarning && condition != null) {
+    const cond = condition;
+    const warningCopy =
+      cond === 'ignore_distractor' ? 'Only place X and O. Ignore the +.' :
+      cond === 'remember_distractor' ? 'Place X, O, and + in the correct spots.' :
+      cond === 'delay' ? 'You will see a short pause before each placement. Then place the symbols you saw.' :
+      'Place the symbols you saw.';
+    const warningStyle =
+      cond === 'ignore_distractor' ? { color: '#1f77b4' as const, fontWeight: 600 as const } :
+      cond === 'remember_distractor' ? { color: '#ff7f0e' as const, fontWeight: 600 as const } :
+      undefined;
+    return (
+      <div className="page">
+        <h2 className="grid-title">Rules are changing</h2>
+        <p className="subtitle">
+          Next block: {warningStyle ? <span style={warningStyle}>{warningCopy}</span> : warningCopy}
+        </p>
+        <button type="button" onClick={() => { setShowConditionWarning(false); setPhaseLocal('encoding'); }}>
+          Next
+        </button>
       </div>
     );
   }
