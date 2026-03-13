@@ -137,7 +137,6 @@ export default function GMT22Results() {
                 <div key={condition} className="results-condition-row">
                   <p><strong>Block {idx + 1}</strong></p>
                   <p>Span: {c.span_estimate}</p>
-                  <p>Consistency: {c.span_consistency_flag ? 'Stable' : 'Boundary'}</p>
                   <p>Mean accuracy: {(c.mean_accuracy * 100).toFixed(1)}%</p>
                   <p>Mean RT: {(c.mean_rt_ms / 1000).toFixed(1)}s</p>
                 </div>
