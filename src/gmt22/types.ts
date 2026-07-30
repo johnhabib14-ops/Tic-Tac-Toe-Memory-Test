@@ -49,6 +49,8 @@ export interface GMT22Participant {
   device_type: GMT22DeviceType;
   session_seed: number;
   condition_order: GMT22ConditionOrder;
+  /** Present when run as part of a sequenced battery session. */
+  battery_id?: string | null;
 }
 
 export interface GMT22CopyResult {
@@ -146,8 +148,15 @@ export function getConditionOrder(order: GMT22ConditionOrder): GMT22Condition[] 
     : ['baseline', 'delay', 'ignore_distractor', 'remember_distractor'];
 }
 
+/** Demo: two conditions only — baseline + ignore distractor. */
+export function getDemoConditionOrder(): GMT22Condition[] {
+  return ['baseline', 'ignore_distractor'];
+}
+
 export const GMT22_SPANS = [2, 3, 4, 5, 6, 7] as const;
 export const GMT22_TRIALS_PER_SPAN = 2;
+export const GMT22_DEMO_MAX_SPAN = 3;
+export const GMT22_DEMO_TRIALS_PER_SPAN = 1;
 
 export const COPY_GRID_SIZE = 4;
 export const COPY_NUM_TARGETS = 8;

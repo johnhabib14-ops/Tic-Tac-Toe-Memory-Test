@@ -12,6 +12,7 @@ import type {
   GMT22MemoryTrialRecord,
   GMT22PracticeTrialRecord,
 } from './types';
+import { resolveDemoFromSearch } from '../lib/demoResolve';
 
 interface GMT22StateValue {
   phase: GMT22Phase;
@@ -31,9 +32,15 @@ interface GMT22StateValue {
   setPracticePassedFirstTry: (v: boolean) => void;
   attentionCheckFailed: boolean;
   setAttentionCheckFailed: (v: boolean) => void;
+  demoMode: boolean;
 }
 
 const GMT22StateContext = createContext<GMT22StateValue | null>(null);
+
+function initialDemoMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  return resolveDemoFromSearch(window.location.search);
+}
 
 export function GMT22StateProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<GMT22Phase>('intro');
@@ -44,6 +51,7 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
   const [practiceFailed, setPracticeFailed] = useState(false);
   const [practicePassedFirstTry, setPracticePassedFirstTry] = useState(false);
   const [attentionCheckFailed, setAttentionCheckFailed] = useState(false);
+  const [demoMode] = useState(initialDemoMode);
 
   const addMemoryTrial = useCallback((t: GMT22MemoryTrialRecord) => {
     setMemoryTrials((prev) => [...prev, t]);
@@ -67,6 +75,7 @@ export function GMT22StateProvider({ children }: { children: ReactNode }) {
     setPracticePassedFirstTry,
     attentionCheckFailed,
     setAttentionCheckFailed,
+    demoMode,
   };
 
   return (

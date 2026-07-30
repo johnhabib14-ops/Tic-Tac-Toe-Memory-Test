@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGMT22State } from '../GMT22State';
 import type { GMT22Participant, GMT22Gender, GMT22DeviceType } from '../types';
+import { getBatteryId } from '../../lib/batterySession';
 
 function generateSessionId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -100,6 +101,7 @@ export default function GMT22Demographics() {
       device_type: deviceType as GMT22DeviceType,
       session_seed: Date.now(),
       condition_order: Math.random() < 0.5 ? 'A' : 'B',
+      battery_id: getBatteryId(),
     };
     setParticipant(p);
     setPhase('practice');

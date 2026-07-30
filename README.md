@@ -1,8 +1,21 @@
-# Grid Memory
+# EF Assessment Battery
 
-A web app that measures visual spatial working memory: participants briefly see grids with X and O (and sometimes distractor shapes), then reconstruct the layout by placing shapes from a palette into the grid. Results can be submitted to a Google Form (one row per participant).
+Experimental executive-function research tasks by Habib Labs LLC: Grid Memory (working memory), Response Inhibition, and Cognitive Flexibility. Not diagnostic or clinically validated.
 
-**Version 1.1.0** — GMT 2 protocol frozen at 1.0.0; 1.1 adds PWA (installable app, icon, “GMT” on home screen).
+**Version 1.1.0** — GMT 2 protocol frozen at 1.0.0; battery hub also includes RIT and CFT.
+
+### Session modes
+
+| Mode | How to start | What runs |
+|------|----------------|-----------|
+| **Full battery** | Hub → Start full battery (`/battery`) | GMT → RIT → CFT in order, full protocols, interstitial handoff. No combined EF score. |
+| **Demo** | Hub → Demo Mode (`/demo`) | Same order with short blocks (`?profile=demo`). |
+| **Solo task** | Hub task cards | One subtest only; clears any active battery session. |
+
+### Base path
+
+- Local and Vercel default: `/` (see `.env.development`).
+- GitHub Pages: build with `VITE_BASE_PATH=/Tic-Tac-Toe-Memory-Test/`.
 
 ## Tech stack
 
@@ -63,6 +76,18 @@ To skip the Google Form and have each participant’s results appended as one ro
 5. Rebuild and run the app. When a participant clicks **Submit results to study**, a new tab will POST the results to the script; the script appends one row to the sheet and shows “Results recorded.”
 
 Column order in the sheet: participantId, name, age, gender, location, timestamp, memoryPoints, highestLevelPassed, overallAccuracyPercent, meanReactionTimeMs, totalIncorrectPlacements, totalWrongShapeUsed, copyScore, copyTimeMs.
+
+## Platform (in progress)
+
+Phase 1 shared spine: Supabase Auth, RBAC, three-schema data separation (`clinical` / `research` / `public` + `platform`), assessment links, and a de-identifying submit pipeline. Mode dashboards (clinician / research / public) come later.
+
+- Architecture: [docs/PLATFORM_ARCHITECTURE.md](./docs/PLATFORM_ARCHITECTURE.md)
+- ADRs: [docs/adr/](./docs/adr/)
+- SQL: run `scripts/platform_schema.sql`, then `clinical_schema.sql`, `research_schema.sql`, `public_schema.sql` in the Supabase SQL Editor (expose those schemas in API settings)
+
+**Client env:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL`  
+**Server env:** `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`  
+BAAs and full HIPAA program requirements are organizational — this codebase is HIPAA-oriented, not a certification claim.
 
 ## Plan
 

@@ -1,0 +1,13 @@
+-- Combined Phase 1 spine schema install.
+-- Run in Supabase SQL Editor (in order), then expose schemas in API settings:
+--   platform, clinical, research, public_data
+--
+-- \i is not available in the SQL Editor — paste each file or run via psql.
+-- Order:
+--   1) scripts/platform_schema.sql
+--   2) scripts/clinical_schema.sql
+--   3) scripts/research_schema.sql
+--   4) scripts/public_schema.sql
+--
+-- Also set Vercel env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+-- Client: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_API_URL

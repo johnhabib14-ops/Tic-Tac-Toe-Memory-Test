@@ -15,7 +15,14 @@ import GMT22DisplayGrid from '../components/GMT22DisplayGrid';
 import GMT22ShapePalette from '../components/GMT22ShapePalette';
 import GMT22ReconstructionGrid from '../components/GMT22ReconstructionGrid';
 import FixationCross from '../../components/FixationCross';
-import { DELAY_FIXATION_MS, getConditionOrder } from '../types';
+import {
+  DELAY_FIXATION_MS,
+  GMT22_DEMO_MAX_SPAN,
+  GMT22_DEMO_TRIALS_PER_SPAN,
+  GMT22_TRIALS_PER_SPAN,
+  getConditionOrder,
+  getDemoConditionOrder,
+} from '../types';
 
 /** Encoding display: ignore_distractor = target + distractor; else target only (remember has Plus in target_map). */
 function getEncodingDisplayMap(item: GMT22ItemBankEntry): GMT22GridMap {
@@ -39,7 +46,11 @@ export default function GMT22Memory() {
     addMemoryTrial,
     setPhase,
     setAttentionCheckFailed,
+    demoMode,
   } = useGMT22State();
+
+  const maxSpan = demoMode ? GMT22_DEMO_MAX_SPAN : 7;
+  const trialsPerSpan = demoMode ? GMT22_DEMO_TRIALS_PER_SPAN : GMT22_TRIALS_PER_SPAN;
 
   const [showAttentionCheck, setShowAttentionCheck] = useState(true);
   const [showConditionWarning, setShowConditionWarning] = useState(false);
@@ -67,7 +78,11 @@ export default function GMT22Memory() {
     if (phase === 'encoding') setGridFrozen(false);
   }, [phase]);
 
-  const conditionOrder = participant ? getConditionOrder(participant.condition_order) : [];
+  const conditionOrder = participant
+    ? demoMode
+      ? getDemoConditionOrder()
+      : getConditionOrder(participant.condition_order)
+    : [];
   const condition = conditionOrder[conditionIndex];
   const currentItem: GMT22ItemBankEntry | null =
     participant && conditionIndex < conditionOrder.length && !showAttentionCheck
@@ -163,8 +178,8 @@ export default function GMT22Memory() {
       setResponseMap({});
     });
 
-    if (trialIndexInSpan === 1) {
-      setTrialIndexInSpan(2);
+    if (trialIndexInSpan < trialsPerSpan) {
+      setTrialIndexInSpan((trialIndexInSpan + 1) as 1 | 2);
       setPhaseLocal('encoding');
       return;
     }
@@ -173,7 +188,7 @@ export default function GMT22Memory() {
     const atLeastOnePassed = conditionTrials.some((t) => t.passed);
 
     if (atLeastOnePassed) {
-      if (span < 7) {
+      if (span < maxSpan) {
         setSpan(span + 1);
         setTrialIndexInSpan(1);
         setPhaseLocal('encoding');

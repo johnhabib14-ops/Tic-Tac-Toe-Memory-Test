@@ -39,7 +39,11 @@ export default function GMT22Practice() {
     practiceTrials,
     setPracticeFailed,
     setPracticePassedFirstTry,
+    demoMode,
   } = useGMT22State();
+
+  const afterPractice = () =>
+    setPhase(demoMode ? 'memory_instructions' : 'copy_instructions');
 
   const [showIntro, setShowIntro] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
@@ -141,7 +145,7 @@ export default function GMT22Practice() {
     const atLeastOnePassed = nextTrials.some((t) => t.passed);
     if (atLeastOnePassed) {
       setPracticePassedFirstTry(retryCount === 0);
-      setPhase('copy_instructions');
+      afterPractice();
       return;
     }
     if (retryCount === 0) {
@@ -150,7 +154,7 @@ export default function GMT22Practice() {
     }
     setPracticePassedFirstTry(false);
     setPracticeFailed(true);
-    setPhase('copy_instructions');
+    afterPractice();
   }
 
   function handlePlace(cellIndex: number, symbol: GMT22CellSymbol) {
